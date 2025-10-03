@@ -14,50 +14,31 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 @Configuration
 public class OAuth2ClientConfig {
 
-    @Bean
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        return new InMemoryClientRegistrationRepository(webClientRegistration());
-    }
 
-    private ClientRegistration webClientRegistration() {
-        return ClientRegistration.withRegistrationId("web-client")
-                .clientId("web-client")
-                .clientSecret("secret")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-                .scope("openid")
-                .authorizationUri("http://localhost:9090/oauth2/authorize")
-                .tokenUri("http://localhost:9090/oauth2/token")
-                .userInfoUri("http://localhost:9090/userinfo")
-                .userNameAttributeName("sub")
-                .clientName("Web Client")
-                .build();
-    }
 
-    @Bean
-    public OAuth2AuthorizedClientService authorizedClientService(
-            ClientRegistrationRepository clientRegistrationRepository) {
-        return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
-    }
-
-    @Bean
-    public OAuth2AuthorizedClientManager authorizedClientManager(
-            ClientRegistrationRepository clientRegistrationRepository,
-            OAuth2AuthorizedClientRepository authorizedClientRepository) {
-
-        OAuth2AuthorizedClientProvider authorizedClientProvider =
-                OAuth2AuthorizedClientProviderBuilder.builder()
-                        .authorizationCode()
-                        .refreshToken()
-                        .build();
-
-        DefaultOAuth2AuthorizedClientManager authorizedClientManager =
-                new DefaultOAuth2AuthorizedClientManager(
-                        clientRegistrationRepository, authorizedClientRepository);
-
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-        return authorizedClientManager;
-    }
+//    @Bean
+//    public OAuth2AuthorizedClientService authorizedClientService(
+//            ClientRegistrationRepository clientRegistrationRepository) {
+//        return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
+//    }
+//
+//    @Bean
+//    public OAuth2AuthorizedClientManager authorizedClientManager(
+//            ClientRegistrationRepository clientRegistrationRepository,
+//            OAuth2AuthorizedClientRepository authorizedClientRepository) {
+//
+//        OAuth2AuthorizedClientProvider authorizedClientProvider =
+//                OAuth2AuthorizedClientProviderBuilder.builder()
+//                        .authorizationCode()
+//                        .refreshToken()
+//                        .build();
+//
+//        DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+//                new DefaultOAuth2AuthorizedClientManager(
+//                        clientRegistrationRepository, authorizedClientRepository);
+//
+//        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+//
+//        return authorizedClientManager;
+//    }
 }
