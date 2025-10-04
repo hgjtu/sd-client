@@ -18,7 +18,7 @@
 <div class="container">
     <h1>Dashboard</h1>
 
-    <div class="user-info" th:if="${name} || ${sub}">
+    <div class="user-info" th:if="${name} or ${sub}">
         <h2>Welcome, <span th:text="${name ?: sub}">User</span>!</h2>
         <p th:if="${email}">Email: <span th:text="${email}"></span></p>
         <p>Subject: <span th:text="${sub}"></span></p>
@@ -26,9 +26,9 @@
 
     <div th:if="${attributes}">
         <h3>User Attributes:</h3>
-        <pre class="attributes" th:text="${#maps.toString(attributes)}">
-                User attributes will be displayed here
-            </pre>
+        <pre class="attributes" th:text="${attributes}">
+        User attributes will be displayed here
+    </pre>
     </div>
 
     <div style="margin-top: 30px;">
