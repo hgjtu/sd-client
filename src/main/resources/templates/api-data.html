@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .data-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .pre-formatted {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 5px 0 0;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .no-data {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Protected API Data</h1>
+
+    <!-- Ошибка -->
+    <div th:if="${error != null and !error.isEmpty()}" class="error">
+        <strong>Error:</strong> <span th:text="${error}"></span>
+    </div>
+
+    <!-- Информация пользователя -->
+    <div th:if="${userInfo != null and !userInfo.isEmpty()}" class="data-section">
+        <h3>User Information</h3>
+        <div class="pre-formatted" th:text="${userInfo}"></div>
+    </div>
+
+    <!-- Данные API -->
+    <div th:if="${apiData != null and !apiData.isEmpty()}" class="data-section">
+        <h3>Protected API Data</h3>
+        <div class="pre-formatted" th:text="${apiData}"></div>
+    </div>
+
+    <!-- Нет данных -->
+    <div th:if="${(error == null or error.isEmpty()) and
+                  (userInfo == null or userInfo.isEmpty()) and
+                  (apiData == null or apiData.isEmpty())}"
+         class="no-data">
+        <p>No data available. Please authenticate first.</p>
+    </div>
+
+    <!-- Кнопки -->
+    <div style="margin-top: 20px;">
+        <a href="/" class="btn btn-secondary">Home</a>
+        <a th:href="@{/api-data}" class="btn">Refresh Data</a>
+    </div>
+</div>
+</body>
+</html>
