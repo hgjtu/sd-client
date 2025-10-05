@@ -1,5 +1,6 @@
 package dev.hgjtu.auth_client;
 
+import dev.hgjtu.auth_client.dto.RegistrationRequest;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,12 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Controller
 public class ClientController {
@@ -93,5 +98,52 @@ public class ClientController {
         }
 
         return "api-data";
+    }
+
+    @GetMapping("/register")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("registrationRequest", new RegistrationRequest());
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String register(@ModelAttribute RegistrationRequest registrationRequest, Model model) {
+        String authUrl = "http://localhost:9090/auth";
+
+        try {
+            if (registrationRequest.getRoles() == null || registrationRequest.getRoles().isEmpty()) {
+                registrationRequest.setRoles(List.of("ROLE_USER"));
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<RegistrationRequest> entity = new HttpEntity<>(registrationRequest, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    authUrl, HttpMethod.POST, entity, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                model.addAttribute("success", "Registration successful! You can now login.");
+                return "login";
+            } else {
+                model.addAttribute("error", "Registration failed: " + response.getBody());
+                return "register";
+            }
+
+        } catch (HttpClientErrorException e) {
+            // Обработка ошибок 4xx
+            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                model.addAttribute("error", "Invalid registration data: " + e.getResponseBodyAsString());
+            } else if (e.getStatusCode() == HttpStatus.CONFLICT) {
+                model.addAttribute("error", "User already exists: " + e.getResponseBodyAsString());
+            } else {
+                model.addAttribute("error", "Registration error: " + e.getResponseBodyAsString());
+            }
+            return "register";
+        } catch (Exception e) {
+            model.addAttribute("error", "Error during registration: " + e.getMessage());
+            return "register";
+        }
     }
 }
