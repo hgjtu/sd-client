@@ -108,7 +108,7 @@ public class ClientController {
 
     @PostMapping("/register")
     public String register(@ModelAttribute RegistrationRequest registrationRequest, Model model) {
-        String authUrl = "http://localhost:9090/auth";
+        String authUrl = "http://localhost:9090/auth/register";
 
         try {
             if (registrationRequest.getRoles() == null || registrationRequest.getRoles().isEmpty()) {
