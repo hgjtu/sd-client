@@ -42,12 +42,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/user").authenticated()
+                        .requestMatchers("/user/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
-                        .defaultSuccessUrl("/user", true)
+                        .defaultSuccessUrl("/user/my-page", true)
                         .failureUrl("/login?error=true")
                         .authorizationEndpoint(authorization -> authorization
                                 .authorizationRequestResolver(pkceResolver(clientRegistrationRepository()))
