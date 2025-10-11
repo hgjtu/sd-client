@@ -1,5 +1,6 @@
 package dev.hgjtu.auth_client.services;
 
+import dev.hgjtu.auth_client.dto.UserResponse;
 import dev.hgjtu.auth_client.models.User;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +17,24 @@ public class UserService {
     @Value("${RESOURCE_SERVER_URL}")
     private String resourceServerUrl;
 
-    public Mono<User> getUserInfo() {
-        return webClient.get()
-                .uri(resourceServerUrl + "/api/user")
-                .retrieve()
-                .bodyToMono(User.class);
-    }
+//    public Mono<User> getUserInfo() {
+//        return webClient.get()
+//                .uri(resourceServerUrl + "/api/user")
+//                .retrieve()
+//                .bodyToMono(User.class);
+//    }
 
-    public Mono<User> getUserInfoById(Long id) {
+    public Mono<UserResponse> getUserInfoById(Long id) {
         return webClient.get()
                 .uri(resourceServerUrl + "/api/user/{id}", id)
                 .retrieve()
-                .bodyToMono(User.class);
+                .bodyToMono(UserResponse.class);
+    }
+
+    public Mono<UserResponse> getUserInfoByUsername(String username) {
+        return webClient.get()
+                .uri(resourceServerUrl + "/api/user/{username}", username)
+                .retrieve()
+                .bodyToMono(UserResponse.class);
     }
 }

@@ -1,15 +1,13 @@
-package dev.hgjtu.auth_client.models;
+package dev.hgjtu.auth_client.dto;
 
-import lombok.*;
+import dev.hgjtu.auth_client.models.Jump;
+import dev.hgjtu.auth_client.models.UserRole;
+import lombok.Getter;
 
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Setter
-@Data
-public class User {
+public class UserResponse {
     private Long id;
     private String username;
     private String email;
