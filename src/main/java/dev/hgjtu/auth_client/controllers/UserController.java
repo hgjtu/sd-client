@@ -38,7 +38,6 @@ public class UserController {
 
     @GetMapping("/profile")
     public Mono<String> userPage(Model model, @AuthenticationPrincipal OAuth2User principal) {
-        if(principal == null) { return Mono.just("error"); }
         return userService.getUserInfoByUsername(principal.getAttribute("sub"))
                 .map(userInfo -> {
                     model.addAttribute("user", userInfo);

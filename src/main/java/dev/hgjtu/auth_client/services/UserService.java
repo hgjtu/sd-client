@@ -14,15 +14,8 @@ import reactor.core.publisher.Mono;
 public class UserService {
     private final WebClient webClient;
 
-    @Value("${RESOURCE_SERVER_URL}")
+    @Value("${USER_RESOURCE_SERVER_URL}")
     private String resourceServerUrl;
-
-//    public Mono<User> getUserInfo() {
-//        return webClient.get()
-//                .uri(resourceServerUrl + "/api/user")
-//                .retrieve()
-//                .bodyToMono(User.class);
-//    }
 
     public Mono<UserResponse> getUserInfoById(Long id) {
         return webClient.get()
