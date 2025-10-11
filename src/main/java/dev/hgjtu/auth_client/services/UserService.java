@@ -26,14 +26,14 @@ public class UserService {
 
     public Mono<UserResponse> getUserInfoById(Long id) {
         return webClient.get()
-                .uri(resourceServerUrl + "/api/user/{id}", id)
+                .uri(resourceServerUrl + "/api/user/id/{id}", id)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }
 
     public Mono<UserResponse> getUserInfoByUsername(String username) {
         return webClient.get()
-                .uri(resourceServerUrl + "/api/user/{username}", username)
+                .uri(resourceServerUrl + "/api/user/username/{username}", username)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }

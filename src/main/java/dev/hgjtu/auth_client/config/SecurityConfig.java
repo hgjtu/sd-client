@@ -47,7 +47,7 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
-                        .defaultSuccessUrl("/user/my-page", true)
+                        .defaultSuccessUrl("/profile", true)
                         .failureUrl("/login?error=true")
                         .authorizationEndpoint(authorization -> authorization
                                 .authorizationRequestResolver(pkceResolver(clientRegistrationRepository()))
