@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${user.username} + ' — Редактирование профиля'">Редактирование профиля</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            background-color: #fff;
+        }
+        .tag {
+            background-color: #0d6efd;
+            color: #fff;
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .tag button {
+            background: none;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .tag-input-container input {
+            border: none;
+            outline: none;
+            flex-grow: 1;
+            min-width: 100px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<!-- Header -->
+<div th:replace="fragments/header :: site-header"></div>
+
+<main class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Редактировать профиль</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/profile/edit}" th:object="${user}" method="post" class="row g-3">
+                <!-- Имя пользователя -->
+                <div class="col-md-6">
+                    <label for="username" class="form-label">Имя пользователя</label>
+                    <input type="text" id="username" th:value="${user.username}" name="username"
+                           class="form-control" readonly>
+                </div>
+
+                <!-- Имя -->
+                <div class="col-md-6">
+                    <label for="firstName" class="form-label">Имя</label>
+                    <input type="text" id="firstName" th:value="${user.firstName}" name="firstName"
+                           class="form-control" placeholder="Введите имя">
+                </div>
+
+                <!-- Фамилия -->
+                <div class="col-md-6">
+                    <label for="lastName" class="form-label">Фамилия</label>
+                    <input type="text" id="lastName" th:value="${user.lastName}" name="lastName"
+                           class="form-control" placeholder="Введите фамилию">
+                </div>
+
+                <!-- Аэродром -->
+                <div class="col-md-6">
+                    <label for="homeDropzone" class="form-label">Базовый аэродром</label>
+                    <input type="text" id="homeDropzone" th:value="${user.homeDropzone}" name="homeDropzone"
+                           class="form-control" placeholder="Введите название аэродрома">
+                </div>
+
+                <!-- Лицензии -->
+                <div class="col-12">
+                    <label class="form-label">Лицензии</label>
+                    <div id="licenseInput" class="tag-input-container">
+                        <!-- существующие лицензии -->
+                        <span class="tag" th:each="license : ${user.licenses}">
+                            <span th:text="${license}"></span>
+                            <button type="button" onclick="removeTag(this)">×</button>
+                        </span>
+                        <input type="text" id="licenseTextInput" placeholder="Введите и нажмите Enter">
+                    </div>
+                    <!-- скрытое поле для отправки -->
+                    <input type="hidden" id="licensesHidden" name="licenses">
+                    <small class="text-muted">Нажмите Enter или запятую, чтобы добавить лицензию.</small>
+                </div>
+
+                <!-- О себе -->
+                <div class="col-12">
+                    <label for="bio" class="form-label">О себе</label>
+                    <textarea id="bio" th:text="${user.bio}" name="bio" class="form-control"
+                              rows="4" placeholder="Расскажите о себе..."></textarea>
+                </div>
+
+                <!-- Кнопки -->
+                <div class="col-12 d-flex justify-content-between mt-3">
+                    <a th:href="@{/profile}" class="btn btn-outline-secondary">Отмена</a>
+                    <button type="submit" class="btn btn-success" onclick="serializeLicenses()">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="fragments/footer :: site-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const input = document.getElementById('licenseTextInput');
+    const container = document.getElementById('licenseInput');
+    const hiddenInput = document.getElementById('licensesHidden');
+
+    function removeTag(btn) {
+        btn.parentElement.remove();
+    }
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            const value = input.value.trim();
+            if (value !== '') {
+                const tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.innerHTML = `<span>${value}</span><button type="button" onclick="removeTag(this)">×</button>`;
+                container.insertBefore(tag, input);
+                input.value = '';
+            }
+        }
+    });
+
+    function serializeLicenses() {
+        const tags = Array.from(container.querySelectorAll('.tag span')).map(el => el.textContent);
+        hiddenInput.value = tags.join(',');
+    }
+</script>
+</body>
+</html>

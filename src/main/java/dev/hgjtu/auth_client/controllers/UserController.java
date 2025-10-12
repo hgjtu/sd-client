@@ -1,19 +1,18 @@
 package dev.hgjtu.auth_client.controllers;
 
+import dev.hgjtu.auth_client.dto.RegistrationRequest;
+import dev.hgjtu.auth_client.dto.UserEditRequest;
 import dev.hgjtu.auth_client.services.UserService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.client.ClientAuthorizationRequiredException;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import reactor.core.publisher.Mono;
 
 @Controller
@@ -49,29 +48,18 @@ public class UserController {
                 });
     }
 
-//    @GetMapping("/user/my-page")
-//    public Mono<String> userPage(Model model,
-//                       @RegisteredOAuth2AuthorizedClient("web-client") OAuth2AuthorizedClient authorizedClient) {
-//        return userService.getUserInfoById()
-//                .map(userInfo -> {
-//                    model.addAttribute("user", userInfo);
-//                    return "user/user-page";
-//                })
-////                .onErrorResume(ClientAuthorizationRequiredException.class, e -> {
-////                    // Перенаправляем на авторизацию
-////                    return Mono.just("redirect:/oauth2/authorization/web-client");
-////                })
-//                .onErrorResume(Exception.class, e -> {
-//                    model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
-//                    return Mono.just("user/user-page");
-//                });
-////        try {
-////            model.addAttribute("userInfo", userService.getUserInfo(authorizedClient));
-////        } catch (Exception e) {
-////            model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
-////        }
-////
-////        return "user/user-page";
-////        return "home";
-//    }
+    @GetMapping("/profile/edit")
+    public Mono<String> showEditUserPage(Model model, @AuthenticationPrincipal OAuth2User principal) {
+        return userService.getUserInfoByUsername(principal.getAttribute("sub"))
+                .map(userInfo -> {
+                    model.addAttribute("user", userInfo);
+                    return "user/user-edit-page";
+                });
+    }
+
+    @PostMapping("/profile/edit")
+    public Mono<String> editUser(@ModelAttribute UserEditRequest userEditRequest) {
+        return userService.editUser(userEditRequest)
+                .then(Mono.just("redirect:/profile"));
+    }
 }
