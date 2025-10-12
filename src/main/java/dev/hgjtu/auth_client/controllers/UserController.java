@@ -52,7 +52,9 @@ public class UserController {
     public Mono<String> showEditUserPage(Model model, @AuthenticationPrincipal OAuth2User principal) {
         return userService.getUserInfoByUsername(principal.getAttribute("sub"))
                 .map(userInfo -> {
-                    model.addAttribute("user", userInfo);
+                    model.addAttribute("userEditRequest", new UserEditRequest(
+                            principal.getAttribute("sub"), userInfo.getFirstName(), userInfo.getLastName(),
+                            userInfo.getHomeDropzone(), userInfo.getLicenses(), userInfo.getBio()));
                     return "user/user-edit-page";
                 });
     }

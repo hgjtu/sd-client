@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${user.username} + ' — Редактирование профиля'">Редактирование профиля</title>
+    <title th:text="${userEditRequest.username} + ' — Редактирование профиля'">Редактирование профиля</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .tag-input-container {
@@ -51,32 +51,32 @@
             <h5 class="mb-0">Редактировать профиль</h5>
         </div>
         <div class="card-body">
-            <form th:action="@{/profile/edit}" th:object="${user}" method="post" class="row g-3">
+            <form th:action="@{/profile/edit}" th:object="${userEditRequest}" method="post" class="row g-3">
                 <!-- Имя пользователя -->
                 <div class="col-md-6">
                     <label for="username" class="form-label">Имя пользователя</label>
-                    <input type="text" id="username" th:value="${user.username}" name="username"
+                    <input type="text" id="username" th:value="${userEditRequest.username}"  name="username"
                            class="form-control" readonly>
                 </div>
 
                 <!-- Имя -->
                 <div class="col-md-6">
                     <label for="firstName" class="form-label">Имя</label>
-                    <input type="text" id="firstName" th:value="${user.firstName}" name="firstName"
+                    <input type="text" id="firstName" th:value="${userEditRequest.firstName}" th:field="*{firstName}"
                            class="form-control" placeholder="Введите имя">
                 </div>
 
                 <!-- Фамилия -->
                 <div class="col-md-6">
                     <label for="lastName" class="form-label">Фамилия</label>
-                    <input type="text" id="lastName" th:value="${user.lastName}" name="lastName"
+                    <input type="text" id="lastName" th:value="${userEditRequest.lastName}" th:field="*{lastName}"
                            class="form-control" placeholder="Введите фамилию">
                 </div>
 
                 <!-- Аэродром -->
                 <div class="col-md-6">
                     <label for="homeDropzone" class="form-label">Базовый аэродром</label>
-                    <input type="text" id="homeDropzone" th:value="${user.homeDropzone}" name="homeDropzone"
+                    <input type="text" id="homeDropzone" th:value="${userEditRequest.homeDropzone}" th:field="*{homeDropzone}"
                            class="form-control" placeholder="Введите название аэродрома">
                 </div>
 
@@ -85,21 +85,21 @@
                     <label class="form-label">Лицензии</label>
                     <div id="licenseInput" class="tag-input-container">
                         <!-- существующие лицензии -->
-                        <span class="tag" th:each="license : ${user.licenses}">
+                        <span class="tag" th:each="license : ${userEditRequest.licenses}">
                             <span th:text="${license}"></span>
                             <button type="button" onclick="removeTag(this)">×</button>
                         </span>
                         <input type="text" id="licenseTextInput" placeholder="Введите и нажмите Enter">
                     </div>
                     <!-- скрытое поле для отправки -->
-                    <input type="hidden" id="licensesHidden" name="licenses">
+                    <input type="hidden" id="licensesHidden" th:field="*{licenses}">
                     <small class="text-muted">Нажмите Enter или запятую, чтобы добавить лицензию.</small>
                 </div>
 
                 <!-- О себе -->
                 <div class="col-12">
                     <label for="bio" class="form-label">О себе</label>
-                    <textarea id="bio" th:text="${user.bio}" name="bio" class="form-control"
+                    <textarea id="bio" th:text="${userEditRequest.bio}" th:field="*{bio}" class="form-control"
                               rows="4" placeholder="Расскажите о себе..."></textarea>
                 </div>
 
