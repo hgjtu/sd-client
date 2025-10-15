@@ -1,5 +1,6 @@
 package dev.hgjtu.auth_client.services;
 
+import dev.hgjtu.auth_client.dto.JumpRequest;
 import dev.hgjtu.auth_client.dto.UserEditRequest;
 import dev.hgjtu.auth_client.dto.UserResponse;
 import dev.hgjtu.auth_client.models.User;
@@ -35,12 +36,20 @@ public class UserService {
 
     public Mono<UserResponse> editUser(UserEditRequest userEditRequest) {
         return webClient.patch()
-                .uri(resourceServerUrl + "/api/user/username/{username}", userEditRequest.getUsername())
+                .uri(resourceServerUrl + "/api/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(userEditRequest)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }
 
+    public Mono<UserResponse> addJump(JumpRequest jumpRequest){
+        return webClient.post()
+                .uri(resourceServerUrl + "/api/user/addJump")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(jumpRequest)
+                .retrieve()
+                .bodyToMono(UserResponse.class);
+    }
 
 }

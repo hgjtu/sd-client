@@ -1,5 +1,6 @@
 package dev.hgjtu.auth_client.controllers;
 
+import dev.hgjtu.auth_client.dto.JumpRequest;
 import dev.hgjtu.auth_client.dto.RegistrationRequest;
 import dev.hgjtu.auth_client.dto.UserEditRequest;
 import dev.hgjtu.auth_client.services.UserService;
@@ -62,6 +63,12 @@ public class UserController {
     @PostMapping("/profile/edit")
     public Mono<String> editUser(@ModelAttribute UserEditRequest userEditRequest) {
         return userService.editUser(userEditRequest)
+                .then(Mono.just("redirect:/profile"));
+    }
+
+    @PostMapping("/logbook/add")
+    public Mono<String> addJump (@ModelAttribute JumpRequest jumpRequest) {
+        return userService.addJump(jumpRequest)
                 .then(Mono.just("redirect:/profile"));
     }
 }

@@ -65,7 +65,7 @@
                 <table class="table table-borderless align-middle">
                     <tbody>
                     <tr>
-                        <th>Лицензия:</th>
+                        <th>Лицензии:</th>
                         <td th:text="${user.licenses ?: '—'}">—</td>
                     </tr>
                     <tr>
@@ -91,7 +91,9 @@
 
             <!-- Кнопки видны только владельцу -->
             <div th:if="${#authentication != null and #authentication.name == user.username}">
-                <a th:href="@{/logbook/add}" class="btn btn-sm btn-primary">Добавить запись</a>
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addJumpModal">
+                    Добавить запись
+                </button>
             </div>
         </div>
 
@@ -127,6 +129,47 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addJumpModal" tabindex="-1" aria-labelledby="addJumpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form th:action="@{/logbook/add}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addJumpModalLabel">Добавить запись в логбук</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Дата</label>
+                            <input type="date" id="date" name="date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Место</label>
+                            <input type="text" id="location" name="location" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Тип прыжка</label>
+                            <input type="text" id="type" name="type" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="altitude" class="form-label">Высота (м)</label>
+                            <input type="number" id="altitude" name="altitude" class="form-control" min="0">
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Заметки</label>
+                            <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </main>
