@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 public class JumpRequest {
-    private String userName;
+    private String username;
     private LocalDate date;
     private String location;
     private String type;

@@ -91,7 +91,7 @@
 
             <!-- Кнопки видны только владельцу -->
             <div th:if="${#authentication != null and #authentication.name == user.username}">
-                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addJumpModal">
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#jumpModal">
                     Добавить запись
                 </button>
             </div>
@@ -123,7 +123,18 @@
                     <td th:text="${jump.notes ?: '—'}">Нет данных</td>
 
                     <td th:if="${#authentication != null and #authentication.name == user.username}">
-                        <a th:href="@{'/logbook/edit/' + ${jump.id}}" class="btn btn-sm btn-outline-secondary">✏️</a>
+                        <a href="#"
+                           class="btn btn-sm btn-outline-secondary"
+                           data-bs-toggle="modal"
+                           data-bs-target="#jumpModal"
+                           th:attr="data-id=${jump.id},
+                                data-date=${jump.date},
+                                data-location=${jump.location},
+                                data-type=${jump.type},
+                                data-altitude=${jump.altitude},
+                                data-notes=${jump.notes}">
+                            ✏️
+                        </a>
                         <a th:href="@{'/logbook/delete/' + ${jump.id}}" class="btn btn-sm btn-outline-danger">🗑️</a>
                     </td>
                 </tr>
@@ -132,16 +143,16 @@
         </div>
     </div>
 
-    <div class="modal fade" id="addJumpModal" tabindex="-1" aria-labelledby="addJumpModalLabel" aria-hidden="true">
+    <div class="modal fade" id="jumpModal" tabindex="-1" aria-labelledby="jumpModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <form th:action="@{/logbook/add}" method="post">
+                <form id="jumpForm" th:action="@{/logbook/add}" method="post">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addJumpModalLabel">Добавить запись в логбук</h5>
+                        <h5 class="modal-title" id="jumpModalLabel">Добавить запись в логбук</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                     </div>
-
                     <div class="modal-body">
+                        <input type="hidden" name="id" id="jumpId">
                         <div class="mb-3">
                             <label for="date" class="form-label">Дата</label>
                             <input type="date" id="date" name="date" class="form-control" required>
@@ -163,10 +174,9 @@
                             <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
                         </div>
                     </div>
-
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <button type="submit" class="btn btn-primary" id="saveButton">Сохранить</button>
                     </div>
                 </form>
             </div>
@@ -178,5 +188,41 @@
 <div th:replace="fragments/footer :: site-footer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const jumpModal = document.getElementById('jumpModal');
+        const form = document.getElementById('jumpForm');
+        const title = document.getElementById('jumpModalLabel');
+        const saveButton = document.getElementById('saveButton');
+
+        jumpModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+
+            // Проверяем, открывается ли окно для редактирования
+            const id = button.getAttribute('data-id');
+
+            if (id) {
+                // Режим редактирования
+                form.action = `/logbook/edit/${id}`;
+                title.textContent = 'Редактировать запись';
+                saveButton.textContent = 'Обновить';
+
+                // Заполняем поля
+                document.getElementById('jumpId').value = id;
+                document.getElementById('date').value = button.getAttribute('data-date');
+                document.getElementById('location').value = button.getAttribute('data-location');
+                document.getElementById('type').value = button.getAttribute('data-type');
+                document.getElementById('altitude').value = button.getAttribute('data-altitude');
+                document.getElementById('notes').value = button.getAttribute('data-notes');
+            } else {
+                // Режим добавления
+                form.action = '/logbook/add';
+                title.textContent = 'Добавить запись в логбук';
+                saveButton.textContent = 'Сохранить';
+                form.reset();
+            }
+        });
+    });
+</script>
 </body>
 </html>

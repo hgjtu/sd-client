@@ -71,4 +71,16 @@ public class UserController {
         return userService.addJump(jumpRequest)
                 .then(Mono.just("redirect:/profile"));
     }
+
+    @PostMapping("/logbook/edit/{id}")
+    public Mono<String> editJump (@PathVariable Long id, @ModelAttribute JumpRequest jumpRequest) {
+        return userService.editJump(id, jumpRequest)
+                .then(Mono.just("redirect:/profile"));
+    }
+
+    @GetMapping("/logbook/delete/{id}")
+    public Mono<String> deleteJump (@PathVariable Long id) {
+        return userService.deleteJump(id)
+                .then(Mono.just("redirect:/profile"));
+    }
 }

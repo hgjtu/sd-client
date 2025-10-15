@@ -45,9 +45,27 @@ public class UserService {
 
     public Mono<UserResponse> addJump(JumpRequest jumpRequest){
         return webClient.post()
-                .uri(resourceServerUrl + "/api/user/addJump")
+                .uri(resourceServerUrl + "/api/logbook/addJump")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(jumpRequest)
+                .retrieve()
+                .bodyToMono(UserResponse.class);
+    }
+
+    public Mono<UserResponse> editJump(Long id, JumpRequest jumpRequest){
+        return webClient.patch()
+                .uri(resourceServerUrl + "/api/logbook/editJump/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(jumpRequest)
+                .retrieve()
+                .bodyToMono(UserResponse.class);
+    }
+
+    public Mono<UserResponse> deleteJump(Long id){
+        return webClient.delete()
+                .uri(resourceServerUrl + "/api/logbook/deleteJump/{id}", id)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(jumpRequest)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }
