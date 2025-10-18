@@ -22,21 +22,21 @@ public class UserService {
 
     public Mono<UserResponse> getUserInfoById(Long id) {
         return webClient.get()
-                .uri(resourceServerUrl + "/api/user/id/{id}", id)
+                .uri(resourceServerUrl + "/api/users/id/{id}", id)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }
 
     public Mono<UserResponse> getUserInfoByUsername(String username) {
         return webClient.get()
-                .uri(resourceServerUrl + "/api/user/username/{username}", username)
+                .uri(resourceServerUrl + "/api/users/username/{username}", username)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }
 
     public Mono<UserResponse> editUser(UserEditRequest userEditRequest) {
         return webClient.patch()
-                .uri(resourceServerUrl + "/api/user")
+                .uri(resourceServerUrl + "/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(userEditRequest)
                 .retrieve()
@@ -64,10 +64,7 @@ public class UserService {
     public Mono<UserResponse> deleteJump(Long id){
         return webClient.delete()
                 .uri(resourceServerUrl + "/api/logbook/deleteJump/{id}", id)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(jumpRequest)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }
-
 }
