@@ -1,8 +1,8 @@
 package dev.hgjtu.auth_client.services;
 
-import dev.hgjtu.auth_client.dto.JumpRequest;
-import dev.hgjtu.auth_client.dto.UserEditRequest;
-import dev.hgjtu.auth_client.dto.UserResponse;
+import dev.hgjtu.auth_client.dto.user.JumpRequest;
+import dev.hgjtu.auth_client.dto.user.UserEditRequest;
+import dev.hgjtu.auth_client.dto.user.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

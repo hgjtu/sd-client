@@ -1,4 +1,4 @@
-package dev.hgjtu.auth_client.dto;
+package dev.hgjtu.auth_client.dto.user;
 
 import dev.hgjtu.auth_client.models.Jump;
 import dev.hgjtu.auth_client.models.UserRole;

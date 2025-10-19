@@ -1,8 +1,7 @@
 package dev.hgjtu.auth_client.controllers;
 
-import dev.hgjtu.auth_client.dto.JumpRequest;
-import dev.hgjtu.auth_client.dto.RegistrationRequest;
-import dev.hgjtu.auth_client.dto.UserEditRequest;
+import dev.hgjtu.auth_client.dto.user.JumpRequest;
+import dev.hgjtu.auth_client.dto.user.UserEditRequest;
 import dev.hgjtu.auth_client.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

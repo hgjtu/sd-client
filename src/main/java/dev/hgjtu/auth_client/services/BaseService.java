@@ -1,6 +1,6 @@
 package dev.hgjtu.auth_client.services;
 
-import dev.hgjtu.auth_client.dto.RegistrationRequest;
+import dev.hgjtu.auth_client.dto.user.RegistrationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

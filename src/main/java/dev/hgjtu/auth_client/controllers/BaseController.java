@@ -1,24 +1,16 @@
 package dev.hgjtu.auth_client.controllers;
 
-import dev.hgjtu.auth_client.dto.RegistrationRequest;
+import dev.hgjtu.auth_client.dto.user.RegistrationRequest;
 import dev.hgjtu.auth_client.services.BaseService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
