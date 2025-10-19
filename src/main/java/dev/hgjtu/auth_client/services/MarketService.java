@@ -39,13 +39,11 @@ public class MarketService {
                 .bodyToMono(CategoryResponse.class);
     }
 
-    public Flux<ItemMinResponse> getItemsByCategory(String category) {
-        Flux<ItemMinResponse> qw = webClient.get()
+    public Flux<ItemMinResponse> getAllItemsByCategory(String category) {
+        return webClient.get()
                 .uri(marketResourceServerUrl + "/api/items/all-by-category/{category}", category)
                 .retrieve()
                 .bodyToFlux(ItemMinResponse.class);
-
-        return qw;
     }
 
 }

@@ -67,7 +67,7 @@
         <div class="col-12 col-md-6 col-lg-4" th:each="item : ${items}">
             <div class="card item-card h-100"
                  th:data-id="${item.id}"
-                 th:onclick="'window.location.href=\'/item/' + ${item.id} + '?mode=' + ${mode} + '\';'">
+                 th:data-mode="${mode}">
                 <img th:src="${item.mainImageUrl}" class="item-img" th:alt="${item.title}">
                 <div class="card-body">
                     <h5 class="card-title mb-1" th:text="${item.title}">Название товара</h5>
@@ -105,6 +105,15 @@
                 const url = new URL(window.location.href);
                 url.searchParams.set('mode', currentMode);
                 window.location.href = url.toString();
+            });
+        });
+
+        // Добавляем кликабельность карточкам товаров
+        document.querySelectorAll('.item-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.dataset.id;
+                const mode = card.dataset.mode;
+                window.location.href = `/item/${id}?mode=${mode}`;
             });
         });
     })();
