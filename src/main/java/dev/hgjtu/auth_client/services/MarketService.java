@@ -63,4 +63,11 @@ public class MarketService {
                 .retrieve()
                 .bodyToMono(ItemResponse.class);
     }
+
+    public Mono<ItemResponse> getItemById(Long id) {
+        return webClient.get()
+                .uri(marketResourceServerUrl + "/api/items/{id}", id)
+                .retrieve()
+                .bodyToMono(ItemResponse.class);
+    }
 }

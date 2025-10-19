@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${item.title}">Товар</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .item-images {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+        }
+        .item-images img {
+            height: 250px;
+            object-fit: cover;
+            border-radius: .5rem;
+            cursor: pointer;
+            transition: transform .15s ease;
+        }
+        .item-images img:hover {
+            transform: scale(1.05);
+        }
+        .comment {
+            border-top: 1px solid #dee2e6;
+            padding: 0.5rem 0;
+        }
+        .comment:first-child {
+            border-top: none;
+        }
+        .comment .username {
+            font-weight: 500;
+        }
+        .back-link {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div th:replace="fragments/header :: site-header"></div>
+
+<div class="container py-4">
+
+    <a href="javascript:history.back()" class="back-link mb-3 d-inline-block">&larr; Назад к списку</a>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <div class="row g-4">
+        <!-- Изображения товара -->
+        <div class="col-12 col-md-6">
+            <div class="item-images mb-3" th:if="${item.imagesUrls}">
+                <img th:each="imgUrl : ${item.imagesUrls}" th:src="${imgUrl}" th:alt="${item.title}">
+            </div>
+        </div>
+
+        <!-- Информация о товаре -->
+        <div class="col-12 col-md-6">
+            <h2 th:text="${item.title}">Название товара</h2>
+            <p class="text-muted mb-1" th:text="'Цена: ' + ${item.price} + ' ₽'">Цена</p>
+            <p class="text-muted mb-1" th:text="'Локация: ' + ${item.location}">Локация</p>
+            <p class="text-muted mb-3" th:text="'Опубликовано: ' + ${item.publicationDate}">Дата публикации</p>
+
+            <h5>Описание:</h5>
+            <p th:text="${item.description}">Описание товара...</p>
+
+            <h5>Продавец:</h5>
+            <p th:text="${item.username}">Имя пользователя</p>
+        </div>
+    </div>
+
+    <!-- Комментарии -->
+    <div class="mt-4">
+        <h5>Комментарии:</h5>
+        <div th:if="${#lists.isEmpty(item.comments)}" class="text-muted py-2">
+            Нет комментариев
+        </div>
+        <div th:each="comment : ${item.comments}" class="comment">
+            <span class="username" th:text="${comment.userId}">Пользователь</span>:
+            <span th:text="${comment.content}">Комментарий</span>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div th:replace="fragments/footer :: site-footer"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

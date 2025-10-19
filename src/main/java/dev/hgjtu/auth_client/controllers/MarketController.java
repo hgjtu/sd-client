@@ -60,13 +60,59 @@ public class MarketController {
     }
 
     @GetMapping("/add-item")
-    public Mono<String> addItem() {
-        return Mono.just("market/add-item");
+    public Mono<String> addItem(Model model) {
+        return marketService.getAllCategories()
+                .collectList()
+                .map(categories -> {
+                    model.addAttribute("categories", categories);
+                    return "market/add-item";
+                })
+                .onErrorResume(Exception.class, e -> {
+                    model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
+                    return Mono.just("market/add-item");
+                });
     }
 
     @PostMapping("/add-item")
     public Mono<String> addItem (@ModelAttribute ItemRequest itemRequest) {
+        itemRequest.setType("buy");
         return marketService.addItem(itemRequest)
                 .then(Mono.just("redirect:/market"));
+    }
+
+    @GetMapping("/add-request")
+    public Mono<String> addRequest(Model model) {
+        return marketService.getAllCategories()
+                .collectList()
+                .map(categories -> {
+                    model.addAttribute("categories", categories);
+                    return "market/add-request";
+                })
+                .onErrorResume(Exception.class, e -> {
+                    model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
+                    return Mono.just("market/add-request");
+                });
+    }
+
+    @PostMapping("/add-request")
+    public Mono<String> addRequest (@ModelAttribute ItemRequest itemRequest) {
+        itemRequest.setType("sell");
+        itemRequest.setPrice(0);
+        return marketService.addItem(itemRequest)
+                .then(Mono.just("redirect:/market"));
+    }
+
+    @GetMapping("/item/{id}")
+    public Mono<String> getItemById(Model model,
+                                    @PathVariable Long id) {
+        return marketService.getItemById(id)
+                .map(item -> {
+                    model.addAttribute("item", item);
+                    return "market/item";
+                })
+                .onErrorResume(Exception.class, e -> {
+                    model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
+                    return Mono.just("market/item");
+                });
     }
 }

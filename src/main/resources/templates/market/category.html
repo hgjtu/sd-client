@@ -57,6 +57,11 @@
                        th:checked="${mode == 'sell'}">
                 <label class="btn btn-outline-danger mode-pill" for="mode-sell" data-mode="sell">Продать</label>
             </div>
+
+            <div class="ms-3 d-flex gap-2">
+                <a href="/market/add-item" class="btn btn-success btn-sm">➕ Добавить товар</a>
+                <a href="/market/add-request" class="btn btn-warning btn-sm">📝 Создать заявку</a>
+            </div>
         </div>
     </div>
 
@@ -112,8 +117,7 @@
         document.querySelectorAll('.item-card').forEach(card => {
             card.addEventListener('click', () => {
                 const id = card.dataset.id;
-                const mode = card.dataset.mode;
-                window.location.href = `/item/${id}?mode=${mode}`;
+                window.location.href = `/market/item/${id}`;
             });
         });
     })();

@@ -12,6 +12,7 @@ import java.util.List;
 public class ItemResponse {
     private String title;
     private String description;
+    private String username;
     private List<String> imagesUrls;
     private Integer price;
     private String location;
