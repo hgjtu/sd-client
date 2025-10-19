@@ -8,7 +8,6 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@Data
 public class User {
     private Long id;
     private String username;
