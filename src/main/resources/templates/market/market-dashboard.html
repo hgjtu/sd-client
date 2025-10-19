@@ -57,95 +57,21 @@
         </div>
     </div>
 
+    <!-- Сообщение об ошибке -->
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
     <!-- Сетка категорий -->
     <div class="row g-4">
-        <!-- Пример карточки -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card category-card h-100" data-slug="altimeters">
-                <img src="/images/altimeters.jpg" class="category-img" alt="Высотомеры">
+        <!-- Динамическое заполнение -->
+        <div class="col-12 col-md-6 col-lg-4" th:each="category : ${categories}">
+            <div class="card category-card h-100"
+                 th:attr="data-slug=${category.name}">
+                <img th:src="@{/images/{name}.jpg(name=${category.name})}"
+                     class="category-img"
+                     th:alt="${category.nameRu}">
                 <div class="card-body">
-                    <h5 class="card-title mb-1">Высотомеры</h5>
-                    <p class="card-text text-muted small mb-0">Приборы, AAD, электронные высотомеры</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card category-card h-100" data-slug="helmets">
-                <img src="/images/helmets.jpg" class="category-img" alt="Шлемы">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Шлемы</h5>
-                    <p class="card-text text-muted small mb-0">Защита головы и камеры</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card category-card h-100" data-slug="rental">
-                <img src="/images/rental.jpg" class="category-img" alt="Аренда">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Аренда</h5>
-                    <p class="card-text text-muted small mb-0">Краткосрочная аренда снаряжения</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card category-card h-100" data-slug="containers">
-                <img src="/images/containers.jpg" class="category-img" alt="Ранцы">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Ранцы</h5>
-                    <p class="card-text text-muted small mb-0">Контейнеры и ранцы для парашютов</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card category-card h-100" data-slug="main-canopies">
-                <img src="/images/main_canopies.jpg" class="category-img" alt="Основные купола">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Основные купола</h5>
-                    <p class="card-text text-muted small mb-0">Главные купола разных размеров</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card category-card h-100" data-slug="reserve-canopies">
-                <img src="/images/reserve_canopies.jpg" class="category-img" alt="Запасные купола">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Запасные купола</h5>
-                    <p class="card-text text-muted small mb-0">Резервные купола и аксессуары</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card category-card h-100" data-slug="complete-systems">
-                <img src="/images/complete_systems.jpg" class="category-img" alt="Системы в сборе">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Системы в сборе</h5>
-                    <p class="card-text text-muted small mb-0">Полные комплекты для прыжков</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card category-card h-100" data-slug="instruments">
-                <img src="/images/instruments.jpg" class="category-img" alt="Приборы">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Приборы</h5>
-                    <p class="card-text text-muted small mb-0">Часы, логгеры и электронные устройства</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card category-card h-100" data-slug="other">
-                <img src="/images/other.jpg" class="category-img" alt="Прочее">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Прочее</h5>
-                    <p class="card-text text-muted small mb-0">Аксессуары и дополнительное снаряжение</p>
+                    <h5 class="card-title mb-1" th:text="${category.nameRu}">Название категории</h5>
+                    <p class="card-text text-muted small mb-0" th:text="${category.shortDescription}">Краткое описание</p>
                 </div>
             </div>
         </div>
@@ -171,11 +97,12 @@
             });
         });
 
-        document.querySelectorAll('.category-card').forEach(card => {
-            card.addEventListener('click', () => {
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('.category-card');
+            if (card) {
                 const slug = card.dataset.slug;
                 window.location.href = '/market/category/' + encodeURIComponent(slug) + '?mode=' + encodeURIComponent(currentMode);
-            });
+            }
         });
     })();
 </script>

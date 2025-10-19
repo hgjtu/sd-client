@@ -8,7 +8,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
-@Data
 public class Jump {
     private Long id;
     private Long userId;
