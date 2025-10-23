@@ -10,6 +10,8 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class ItemResponse {
+    private Long id;
+    private Integer categoryId;
     private String title;
     private String description;
     private String username;
@@ -17,5 +19,6 @@ public class ItemResponse {
     private Integer price;
     private String location;
     private LocalDate publicationDate;
+    private String type;
     private List<Comment> comments;
 }

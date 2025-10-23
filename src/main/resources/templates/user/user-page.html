@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security" lang="ru">
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,6 +24,7 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsMenuButton">
                 <li>
+                    <a class="dropdown-item" th:href="@{/profile/edit}">
                     <a class="dropdown-item" th:href="@{/profile/edit}">
                         ✏️ Редактировать профиль
                     </a>
