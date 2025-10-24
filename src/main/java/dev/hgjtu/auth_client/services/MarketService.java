@@ -20,13 +20,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MarketService {
     private final WebClient webClient;
+    private final WebClient serverWebClient;
 
 
     @Value("${MARKET_RESOURCE_SERVER_URL}")
     private String marketResourceServerUrl;
 
     public Flux<CategoryResponse> getAllCategories() {
-        return webClient.get()
+        return serverWebClient.get()
                 .uri(marketResourceServerUrl + "/api/categories")
                 .retrieve()
                 .bodyToFlux(CategoryResponse.class);
