@@ -22,13 +22,14 @@ public class MarketService {
     private final WebClient webClient;
     private final WebClient serverWebClient;
 
-
-    @Value("${MARKET_RESOURCE_SERVER_URL}")
-    private String marketResourceServerUrl;
+    @Value("${GATEWAY_SERVICE_URL}")
+    private String gatewayServiceURL;
+    @Value("${MARKET_RESOURCE_PREFIX}")
+    private String marketResourcePrefix;
 
     public Flux<CategoryResponse> getAllCategories() {
         return serverWebClient.get()
-                .uri(marketResourceServerUrl + "/api/categories")
+                .uri(gatewayServiceURL + marketResourcePrefix + "/categories")
                 .retrieve()
                 .bodyToFlux(CategoryResponse.class);
     }
@@ -42,14 +43,14 @@ public class MarketService {
 
     public Mono<CategoryResponse> getCategoryByName(String name) {
         return webClient.get()
-                .uri(marketResourceServerUrl + "/api/categories/{name}", name)
+                .uri(gatewayServiceURL + marketResourcePrefix + "/categories/{name}", name)
                 .retrieve()
                 .bodyToMono(CategoryResponse.class);
     }
 
     public Mono<String> getCategoryNameById(Integer id) {
         return webClient.get()
-                .uri(marketResourceServerUrl + "/api/categories-name/{id}", id)
+                .uri(gatewayServiceURL + marketResourcePrefix + "/categories-name/{id}", id)
                 .retrieve()
                 .bodyToMono(String.class);
     }
@@ -59,14 +60,14 @@ public class MarketService {
         params.put("category", category);
         params.put("mode", mode);
         return webClient.get()
-                .uri(marketResourceServerUrl + "/api/items/all-by-category/{category}/{mode}", params)
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/all-by-category/{category}/{mode}", params)
                 .retrieve()
                 .bodyToFlux(ItemMinResponse.class);
     }
 
     public Mono<ItemResponse> addItem(ItemRequest itemRequest) {
         return webClient.post()
-                .uri(marketResourceServerUrl + "/api/items/add")
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(itemRequest)
                 .retrieve()
@@ -75,7 +76,7 @@ public class MarketService {
 
     public Mono<ItemResponse> editItem(Long id, ItemRequest itemRequest) {
         return webClient.patch()
-                .uri(marketResourceServerUrl + "/api/items/edit/{id}", id)
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/edit/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(itemRequest)
                 .retrieve()
@@ -84,14 +85,14 @@ public class MarketService {
 
     public Mono<String> deleteItem(Long id){
         return webClient.delete()
-                .uri(marketResourceServerUrl + "/api/items/delete/{id}", id)
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/delete/{id}", id)
                 .retrieve()
                 .bodyToMono(String.class);
     }
 
     public Mono<ItemResponse> getItemById(Long id) {
         return webClient.get()
-                .uri(marketResourceServerUrl + "/api/items/{id}", id)
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/{id}", id)
                 .retrieve()
                 .bodyToMono(ItemResponse.class);
     }
@@ -101,7 +102,7 @@ public class MarketService {
         params.put("username", username);
         params.put("mode", mode);
         return webClient.get()
-                .uri(marketResourceServerUrl + "/api/items/all-by-username/{username}/{mode}", params)
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/all-by-username/{username}/{mode}", params)
                 .retrieve()
                 .bodyToFlux(ItemMinResponse.class);
     }

@@ -15,26 +15,28 @@ import reactor.core.publisher.Mono;
 public class UserService {
     private final WebClient webClient;
 
-    @Value("${USER_RESOURCE_SERVER_URL}")
-    private String resourceServerUrl;
+    @Value("${GATEWAY_SERVICE_URL}")
+    private String gatewayServiceURL;
+    @Value("${USER_RESOURCE_PREFIX}")
+    private String userResourcePrefix;
 
     public Mono<UserResponse> getUserInfoById(Long id) {
         return webClient.get()
-                .uri(resourceServerUrl + "/api/users/id/{id}", id)
+                .uri(gatewayServiceURL + userResourcePrefix + "/users/id/{id}", id)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }
 
     public Mono<UserResponse> getUserInfoByUsername(String username) {
         return webClient.get()
-                .uri(resourceServerUrl + "/api/users/username/{username}", username)
+                .uri(gatewayServiceURL + userResourcePrefix + "/users/username/{username}", username)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }
 
     public Mono<UserResponse> editUser(UserEditRequest userEditRequest) {
         return webClient.patch()
-                .uri(resourceServerUrl + "/api/users")
+                .uri(gatewayServiceURL + userResourcePrefix + "/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(userEditRequest)
                 .retrieve()
@@ -43,7 +45,7 @@ public class UserService {
 
     public Mono<UserResponse> addJump(JumpRequest jumpRequest){
         return webClient.post()
-                .uri(resourceServerUrl + "/api/logbook/addJump")
+                .uri(gatewayServiceURL + userResourcePrefix + "/logbook/addJump")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(jumpRequest)
                 .retrieve()
@@ -52,7 +54,7 @@ public class UserService {
 
     public Mono<UserResponse> editJump(Long id, JumpRequest jumpRequest){
         return webClient.patch()
-                .uri(resourceServerUrl + "/api/logbook/editJump/{id}", id)
+                .uri(gatewayServiceURL + userResourcePrefix + "/logbook/editJump/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(jumpRequest)
                 .retrieve()
@@ -61,7 +63,7 @@ public class UserService {
 
     public Mono<UserResponse> deleteJump(Long id){
         return webClient.delete()
-                .uri(resourceServerUrl + "/api/logbook/deleteJump/{id}", id)
+                .uri(gatewayServiceURL + userResourcePrefix + "/logbook/deleteJump/{id}", id)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
     }

@@ -16,8 +16,10 @@ public class BaseService {
     @Value("${AUTH_SERVER_URL}")
     private String authServerUrl;
 
-    @Value("${USER_RESOURCE_SERVER_URL}")
-    private String resourceServerUrl;
+    @Value("${GATEWAY_SERVICE_URL}")
+    private String gatewayServiceURL;
+    @Value("${USER_RESOURCE_PREFIX}")
+    private String userResourcePrefix;
 
     public Mono<Void> registerUser(RegistrationRequest registerRequest) {
         return serverWebClient.post()
@@ -27,7 +29,7 @@ public class BaseService {
                 .retrieve()
                 .bodyToMono(Void.class)
                 .then(serverWebClient.post()
-                        .uri(resourceServerUrl + "/api/auth/register")
+                        .uri(gatewayServiceURL + userResourcePrefix + "/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(registerRequest)
                         .retrieve()
