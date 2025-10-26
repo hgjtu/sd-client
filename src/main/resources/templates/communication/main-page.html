@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SkyFriends — клуб парашютистов</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg:#f5f8fb;
+            --card:#fff;
+            --accent:#1fb6ff;
+            --accent-2:#ff9f43;
+            --muted:#6b7280;
+            --radius:14px;
+            --shadow:0 6px 18px rgba(22,28,37,0.08);
+        }
+
+        * {box-sizing:border-box;}
+        body {
+            margin:0;
+            font-family:'Inter',system-ui,sans-serif;
+            background:linear-gradient(180deg,#eaf6ff 0%,#f5f8fb 60%);
+            color:#111827;
+            padding:24px;
+        }
+
+        /* layout */
+        .container {
+            max-width:1300px;
+            margin:0 auto;
+            display:grid;
+            grid-template-columns:280px 1fr 300px;
+            gap:22px;
+        }
+
+        /* LEFT: mini profile + news */
+        .left {
+            position:sticky;
+            top:24px;
+            align-self:start;
+            display:flex;
+            flex-direction:column;
+            gap:18px;
+        }
+
+        .profile {
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            padding:18px;
+            text-align:center;
+        }
+        .profile .avatar {
+            width:80px;height:80px;margin:0 auto 10px;
+            border-radius:50%;
+            background:linear-gradient(135deg,var(--accent),#4fd1c5);
+            display:flex;align-items:center;justify-content:center;
+            color:#fff;font-weight:700;font-size:24px;
+        }
+        .profile h4 {margin:0;}
+        .profile p {color:var(--muted);font-size:13px;margin:4px 0 0;}
+
+        .news-block {
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            padding:16px;
+        }
+        .news-block h5 {margin:0 0 8px 0;}
+        .announce {
+            padding:8px 0;
+            border-bottom:1px solid #f1f5f9;
+        }
+        .announce:last-child {border:0;}
+        .announce strong {display:block;color:#0f172a;font-size:14px;}
+        .announce p {margin:2px 0 0;font-size:13px;color:var(--muted);}
+
+        /* CENTER: main feed */
+        .center {
+            display:flex;
+            flex-direction:column;
+            gap:18px;
+        }
+
+        /* category tabs */
+        .tabs {
+            display:flex;
+            gap:10px;
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            padding:8px;
+            justify-content:space-around;
+            font-weight:600;
+        }
+        .tab {
+            flex:1;
+            text-align:center;
+            padding:10px 0;
+            border-radius:10px;
+            cursor:pointer;
+            color:var(--muted);
+            transition:all .2s;
+        }
+        .tab.active {
+            background:var(--accent);
+            color:white;
+            box-shadow:0 4px 10px rgba(31,182,255,0.2);
+        }
+
+        /* posts */
+        .post {
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            padding:16px;
+            display:flex;
+            gap:12px;
+        }
+        .post .avatar-small {
+            width:56px;height:56px;border-radius:50%;
+            background:linear-gradient(135deg,#ff7ab6,#7c3aed);
+            color:white;font-weight:700;
+            display:flex;align-items:center;justify-content:center;
+            flex-shrink:0;
+        }
+        .post .body {flex:1;}
+        .post .head {display:flex;justify-content:space-between;align-items:center;}
+        .post .head h4 {margin:0;font-size:15px;}
+        .post .head p {margin:0;font-size:13px;color:var(--muted);}
+        .post .content {margin-top:8px;font-size:15px;line-height:1.45;}
+        .tags {margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;}
+        .tag {font-size:13px;background:#eef2ff;padding:6px 10px;border-radius:999px;color:#3730a3;}
+
+        /* reactions + comments */
+        .interactions {
+            margin-top:12px;
+            border-top:1px solid #f1f5f9;
+            padding-top:10px;
+        }
+        .reactions {
+            display:flex;gap:8px;flex-wrap:wrap;
+        }
+        .reaction {
+            background:#f8fafc;
+            border:1px solid #e5e7eb;
+            border-radius:20px;
+            padding:6px 12px;
+            font-size:14px;
+            display:flex;
+            align-items:center;
+            gap:6px;
+            cursor:pointer;
+            transition:.2s;
+        }
+        .reaction:hover {
+            background:#e0f2fe;
+            border-color:#bae6fd;
+        }
+        .comments {
+            margin-top:10px;
+            background:#f9fafb;
+            border-radius:10px;
+            padding:10px;
+        }
+        .comment {
+            border-bottom:1px solid #e5e7eb;
+            padding:6px 0;
+        }
+        .comment:last-child {border:0;}
+        .comment strong {font-size:14px;}
+        .comment p {margin:2px 0 0;font-size:13px;color:#374151;}
+        .add-comment {
+            display:flex;
+            gap:8px;
+            margin-top:8px;
+        }
+        .add-comment input {
+            flex:1;
+            border:1px solid #d1d5db;
+            border-radius:8px;
+            padding:8px 10px;
+        }
+        .add-comment button {
+            background:var(--accent);
+            border:0;
+            color:white;
+            padding:8px 14px;
+            border-radius:8px;
+            cursor:pointer;
+        }
+
+        /* RIGHT: subcategories */
+        .right {
+            position:sticky;
+            top:24px;
+            align-self:start;
+        }
+        .right .category {
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            padding:14px;
+        }
+        .right h5 {margin:0 0 8px 0;}
+        .subcat {
+            padding:8px 10px;
+            border-radius:8px;
+            cursor:pointer;
+            color:#0f172a;
+            margin-bottom:4px;
+            transition:.2s;
+        }
+        .subcat:hover {
+            background:#e0f2fe;
+        }
+        .subcat.active {
+            background:var(--accent);
+            color:white;
+        }
+
+        /* responsive */
+        @media (max-width:1000px){
+            .container{grid-template-columns:1fr;gap:16px;}
+            .right{order:3;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- LEFT -->
+    <aside class="left">
+        <div class="profile">
+            <div class="avatar">SF</div>
+            <h4>SkyFriends</h4>
+            <p>Мой профиль клуба</p>
+        </div>
+
+        <div class="news-block">
+            <h5>Важное</h5>
+            <div class="announce">
+                <strong>Открытие сезона!</strong>
+                <p>2 ноября — старт прыжков 2025 на ДЗ «Юг»</p>
+            </div>
+            <div class="announce">
+                <strong>Обновление правил безопасности</strong>
+                <p>Просьба ознакомиться перед первым прыжком</p>
+            </div>
+            <div class="announce">
+                <strong>Скидки на обучение AFF</strong>
+                <p>До 30 ноября 15% при онлайн-записи</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CENTER -->
+    <main class="center">
+        <!-- TABS -->
+        <div class="tabs">
+            <div class="tab active">Новости</div>
+            <div class="tab">Вопросы</div>
+            <div class="tab">Ивенты</div>
+            <div class="tab">Поиск команды</div>
+            <div class="tab">Обучение</div>
+        </div>
+
+        <!-- Example post -->
+        <div class="post">
+            <div class="avatar-small">KV</div>
+            <div class="body">
+                <div class="head">
+                    <div>
+                        <h4>Кирилл В.</h4>
+                        <p>Инструктор · ДЗ «Восток»</p>
+                    </div>
+                    <span style="font-size:13px;color:var(--muted)">1 час назад</span>
+                </div>
+                <div class="content">
+                    Первая тренировка сезона прошла отлично! Купол открылся мягко, новые ученики справились на отлично.
+                    Следующий сбор планируем на следующие выходные.
+                </div>
+                <div class="tags"><span class="tag">#сезон2025</span><span class="tag">#отчёт</span></div>
+
+                <div class="interactions">
+                    <div class="reactions">
+                        <div class="reaction">👍 Нравится</div>
+                        <div class="reaction">🔥 Вдохновляет</div>
+                        <div class="reaction">💬 Комментировать</div>
+                        <div class="reaction">📎 Поделиться</div>
+                    </div>
+
+                    <div class="comments">
+                        <div class="comment">
+                            <strong>Елена:</strong>
+                            <p>Отличные новости! Уже жду следующей тренировки 🚀</p>
+                        </div>
+                        <div class="comment">
+                            <strong>Михаил:</strong>
+                            <p>Как записаться на выезд?</p>
+                        </div>
+                        <div class="add-comment">
+                            <input placeholder="Напишите комментарий..." />
+                            <button>Отправить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- RIGHT -->
+    <aside class="right">
+        <div class="category">
+            <h5>Подтемы раздела «Новости»</h5>
+            <div class="subcat active">Объявления клуба</div>
+            <div class="subcat">Отчёты о прыжках</div>
+            <div class="subcat">Обновления снаряжения</div>
+            <div class="subcat">Фото и видео</div>
+            <div class="subcat">Пресса и статьи</div>
+        </div>
+    </aside>
+</div>
+
+</body>
+</html>
