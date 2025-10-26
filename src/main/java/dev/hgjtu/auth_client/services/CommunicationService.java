@@ -1,9 +1,6 @@
 package dev.hgjtu.auth_client.services;
 
-import dev.hgjtu.auth_client.dto.communication.CategoryResponse;
-import dev.hgjtu.auth_client.dto.communication.PostRequest;
-import dev.hgjtu.auth_client.dto.communication.PostResponse;
-import dev.hgjtu.auth_client.dto.communication.SectionResponse;
+import dev.hgjtu.auth_client.dto.communication.*;
 import dev.hgjtu.auth_client.dto.market.ItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +15,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+
 public class CommunicationService {
     private final WebClient webClient;
 
@@ -38,6 +36,13 @@ public class CommunicationService {
                 .uri(gatewayServiceURL + communicationResourcePrefix + "/sections/{id}/category", sectionId)
                 .retrieve()
                 .bodyToFlux(CategoryResponse.class);
+    }
+
+    public Flux<SmileyReactionResponse> getAllSmileyReactions(){
+        return webClient.get()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/smiley-reactions")
+                .retrieve()
+                .bodyToFlux(SmileyReactionResponse.class);
     }
 
     public Flux<PostResponse> getPostsBySectionIdAndCategoryId(Short sectionId, Short categoryId) {

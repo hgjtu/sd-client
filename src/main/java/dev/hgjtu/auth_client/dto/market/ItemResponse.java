@@ -1,6 +1,6 @@
 package dev.hgjtu.auth_client.dto.market;
 
-import dev.hgjtu.auth_client.models.Comment;
+import dev.hgjtu.auth_client.models.ItemComment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,5 +20,5 @@ public class ItemResponse {
     private String location;
     private LocalDate publicationDate;
     private String type;
-    private List<Comment> comments;
+    private List<ItemComment> comments;
 }

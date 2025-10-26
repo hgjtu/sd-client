@@ -1,5 +1,7 @@
 package dev.hgjtu.auth_client.dto.communication;
 
+import dev.hgjtu.auth_client.models.PostComment;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -13,4 +15,5 @@ public class PostResponse {
     private List<String> mediaUrls;
     private LocalDateTime publicationDateTime;
     private Map<Short, Integer> smileyReactions;
+    private List<PostComment> comments;
 }

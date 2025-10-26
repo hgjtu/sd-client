@@ -3,9 +3,8 @@ package dev.hgjtu.auth_client.dto.communication;
 import lombok.Getter;
 
 @Getter
-public class CategoryResponse {
+public class SmileyReactionResponse {
     private Short id;
-    private Short sectionId;
     private String name;
-    private String nameRu;
+    private String symbol;
 }

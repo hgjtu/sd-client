@@ -231,59 +231,73 @@
 </head>
 <body>
 
+<!-- Подключаем header -->
+<div th:replace="fragments/header :: site-header"></div>
+
 <div class="container">
+
     <!-- LEFT -->
     <aside class="left">
         <div class="profile">
-            <div class="avatar">SF</div>
-            <h4>SkyFriends</h4>
-            <p>Мой профиль клуба</p>
+            <!-- Аватар: инициалы, если нет фото -->
+            <div class="avatar"
+                 th:text="${#strings.isEmpty(user.photoUrl) ? ${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)} : ''}">
+            </div>
+            <!-- Если фото есть -->
+            <img th:if="${user.photoUrl}" th:src="${user.photoUrl}" class="avatar-img" alt="Avatar" />
+
+            <h4 th:text="${user.firstName + ' ' + user.lastName}">Имя Фамилия</h4>
+            <p th:text="${user.username}">Мой профиль клуба</p>
         </div>
 
         <div class="news-block">
             <h5>Важное</h5>
-            <div class="announce">
-                <strong>Открытие сезона!</strong>
-                <p>2 ноября — старт прыжков 2025 на ДЗ «Юг»</p>
-            </div>
-            <div class="announce">
-                <strong>Обновление правил безопасности</strong>
-                <p>Просьба ознакомиться перед первым прыжком</p>
-            </div>
-            <div class="announce">
-                <strong>Скидки на обучение AFF</strong>
-                <p>До 30 ноября 15% при онлайн-записи</p>
+            <div class="announce" th:each="section : ${sections}">
+                <strong th:text="${section.nameRu}">Название раздела</strong>
+                <p th:text="'ID: ' + ${section.id}"></p>
             </div>
         </div>
     </aside>
 
     <!-- CENTER -->
     <main class="center">
-        <!-- TABS -->
+
+        <!-- TABS: выводим названия разделов -->
         <div class="tabs">
-            <div class="tab active">Новости</div>
-            <div class="tab">Вопросы</div>
-            <div class="tab">Ивенты</div>
-            <div class="tab">Поиск команды</div>
-            <div class="tab">Обучение</div>
+            <div class="tab"
+                 th:each="section : ${sections}"
+                 th:text="${section.nameRu}"
+                 th:classappend="${section.id == ${param.sectionId}} ? ' active' : ''">
+            </div>
         </div>
 
-        <!-- Example post -->
-        <div class="post">
-            <div class="avatar-small">KV</div>
+        <!-- ПОСТЫ -->
+        <div th:each="post : ${posts}" class="post">
+            <div class="avatar-small" th:text="${post.userId}">ID</div>
+
             <div class="body">
                 <div class="head">
                     <div>
-                        <h4>Кирилл В.</h4>
-                        <p>Инструктор · ДЗ «Восток»</p>
+                        <h4 th:text="${user.firstName + ' ' + user.lastName}">Имя</h4>
+                        <p th:text="${user.bio}">Описание</p>
                     </div>
-                    <span style="font-size:13px;color:var(--muted)">1 час назад</span>
+                    <span style="font-size:13px;color:var(--muted)"
+                          th:text="${#temporals.format(post.publicationDateTime, 'dd MMM yyyy HH:mm')}">
+                        1 час назад
+                    </span>
                 </div>
-                <div class="content">
-                    Первая тренировка сезона прошла отлично! Купол открылся мягко, новые ученики справились на отлично.
-                    Следующий сбор планируем на следующие выходные.
+
+                <div class="content" th:text="${post.content}">
+                    Текст поста
                 </div>
-                <div class="tags"><span class="tag">#сезон2025</span><span class="tag">#отчёт</span></div>
+
+                <div class="tags">
+                    <span class="tag"
+                          th:each="entry : ${post.smileyReactions}"
+                          th:text="'😀 ' + ${entry.key} + ': ' + ${entry.value}">
+                        #тег
+                    </span>
+                </div>
 
                 <div class="interactions">
                     <div class="reactions">
@@ -294,14 +308,6 @@
                     </div>
 
                     <div class="comments">
-                        <div class="comment">
-                            <strong>Елена:</strong>
-                            <p>Отличные новости! Уже жду следующей тренировки 🚀</p>
-                        </div>
-                        <div class="comment">
-                            <strong>Михаил:</strong>
-                            <p>Как записаться на выезд?</p>
-                        </div>
                         <div class="add-comment">
                             <input placeholder="Напишите комментарий..." />
                             <button>Отправить</button>
@@ -315,15 +321,22 @@
     <!-- RIGHT -->
     <aside class="right">
         <div class="category">
-            <h5>Подтемы раздела «Новости»</h5>
-            <div class="subcat active">Объявления клуба</div>
-            <div class="subcat">Отчёты о прыжках</div>
-            <div class="subcat">Обновления снаряжения</div>
-            <div class="subcat">Фото и видео</div>
-            <div class="subcat">Пресса и статьи</div>
+            <h5 th:text="'Подтемы раздела: ' + ${#lists.isEmpty(categories) ? '—' : categories[0].nameRu}">
+                Подтемы раздела
+            </h5>
+            <div class="subcat"
+                 th:each="cat : ${categories}"
+                 th:text="${cat.nameRu}"
+                 th:classappend="${cat.id == ${param.categoryId}} ? ' active' : ''">
+                Категория
+            </div>
         </div>
     </aside>
 </div>
+
+
+<!-- Подключаем footer -->
+<div th:replace="fragments/footer :: site-footer"></div>
 
 </body>
 </html>

@@ -3,7 +3,7 @@ package dev.hgjtu.auth_client.models;
 import lombok.Getter;
 
 @Getter
-public class Comment {
+public class ItemComment {
     private Long id;
     private Long itemId;
     private Long userId;
