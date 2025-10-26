@@ -1,4 +1,4 @@
-package dev.hgjtu.auth_client.dto;
+package dev.hgjtu.auth_client.dto.market;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

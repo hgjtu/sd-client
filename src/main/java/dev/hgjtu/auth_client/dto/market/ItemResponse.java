@@ -1,5 +1,6 @@
-package dev.hgjtu.auth_client.dto;
+package dev.hgjtu.auth_client.dto.market;
 
+import dev.hgjtu.auth_client.models.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,20 +9,16 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class ItemRequest {
-    private String title;
+public class ItemResponse {
+    private Long id;
     private Integer categoryId;
+    private String title;
     private String description;
+    private String username;
     private List<String> imagesUrls;
     private Integer price;
     private String location;
+    private LocalDate publicationDate;
     private String type;
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
+    private List<Comment> comments;
 }

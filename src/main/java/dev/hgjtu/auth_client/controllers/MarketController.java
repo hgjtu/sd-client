@@ -1,10 +1,9 @@
 package dev.hgjtu.auth_client.controllers;
 
-import dev.hgjtu.auth_client.dto.CategoryResponse;
-import dev.hgjtu.auth_client.dto.ItemMinResponse;
-import dev.hgjtu.auth_client.dto.ItemRequest;
-import dev.hgjtu.auth_client.dto.ItemResponse;
-import dev.hgjtu.auth_client.dto.user.JumpRequest;
+import dev.hgjtu.auth_client.dto.market.CategoryResponse;
+import dev.hgjtu.auth_client.dto.market.ItemMinResponse;
+import dev.hgjtu.auth_client.dto.market.ItemRequest;
+import dev.hgjtu.auth_client.dto.market.ItemResponse;
 import dev.hgjtu.auth_client.services.MarketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,7 +11,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;

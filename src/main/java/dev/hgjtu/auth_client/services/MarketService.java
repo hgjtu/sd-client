@@ -1,10 +1,9 @@
 package dev.hgjtu.auth_client.services;
 
-import dev.hgjtu.auth_client.dto.CategoryResponse;
-import dev.hgjtu.auth_client.dto.ItemMinResponse;
-import dev.hgjtu.auth_client.dto.ItemRequest;
-import dev.hgjtu.auth_client.dto.ItemResponse;
-import dev.hgjtu.auth_client.dto.user.UserResponse;
+import dev.hgjtu.auth_client.dto.market.CategoryResponse;
+import dev.hgjtu.auth_client.dto.market.ItemMinResponse;
+import dev.hgjtu.auth_client.dto.market.ItemRequest;
+import dev.hgjtu.auth_client.dto.market.ItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
