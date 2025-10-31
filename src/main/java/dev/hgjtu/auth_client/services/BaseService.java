@@ -16,7 +16,7 @@ public class BaseService {
     @Value("${AUTH_SERVER_URL}")
     private String authServerUrl;
 
-    @Value("${GATEWAY_SERVICE_URL}")
+    @Value("${USER_RESOURCE_SERVER_URL}")
     private String gatewayServiceURL;
     @Value("${USER_RESOURCE_PREFIX}")
     private String userResourcePrefix;

@@ -31,7 +31,7 @@ public class UserController {
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
-                    return Mono.just("user/user-page");
+                    return Mono.just("error");
                 });
     }
 
@@ -44,7 +44,7 @@ public class UserController {
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
-                    return Mono.just("user/user-page");
+                    return Mono.just("error");
                 });
     }
 

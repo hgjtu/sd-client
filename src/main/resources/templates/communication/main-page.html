@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>SkyFriends — клуб парашютистов</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -239,41 +239,43 @@
     <!-- LEFT -->
     <aside class="left">
         <div class="profile">
-            <!-- Аватар: инициалы, если нет фото -->
-            <div class="avatar"
-                 th:text="${#strings.isEmpty(user.photoUrl) ? ${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)} : ''}">
+            <!-- Фото или инициалы -->
+            <div th:if="${user.photoUrl}" class="avatar">
+                <img th:src="${user.photoUrl}" alt="Avatar" />
             </div>
-            <!-- Если фото есть -->
-            <img th:if="${user.photoUrl}" th:src="${user.photoUrl}" class="avatar-img" alt="Avatar" />
+            <div th:if="${user.photoUrl == null}" class="avatar"
+                 th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}">
+                SF
+            </div>
 
-            <h4 th:text="${user.firstName + ' ' + user.lastName}">Имя Фамилия</h4>
+            <h4 th:text="${user.firstName + ' ' + user.lastName}">SkyFriends</h4>
             <p th:text="${user.username}">Мой профиль клуба</p>
         </div>
 
         <div class="news-block">
-            <h5>Важное</h5>
+            <h5>Разделы</h5>
             <div class="announce" th:each="section : ${sections}">
-                <strong th:text="${section.nameRu}">Название раздела</strong>
+                <strong th:text="${section.nameRu}">Название</strong>
                 <p th:text="'ID: ' + ${section.id}"></p>
             </div>
         </div>
     </aside>
 
+
     <!-- CENTER -->
     <main class="center">
-
-        <!-- TABS: выводим названия разделов -->
+        <!-- Вкладки (разделы) -->
         <div class="tabs">
             <div class="tab"
                  th:each="section : ${sections}"
                  th:text="${section.nameRu}"
-                 th:classappend="${section.id == ${param.sectionId}} ? ' active' : ''">
+                 th:classappend="${section.id == param.sectionId} ? ' active' : ''">
             </div>
         </div>
 
-        <!-- ПОСТЫ -->
+        <!-- Посты -->
         <div th:each="post : ${posts}" class="post">
-            <div class="avatar-small" th:text="${post.userId}">ID</div>
+            <div class="avatar-small" th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}">KV</div>
 
             <div class="body">
                 <div class="head">
@@ -287,53 +289,65 @@
                     </span>
                 </div>
 
+                <!-- Контент поста -->
                 <div class="content" th:text="${post.content}">
                     Текст поста
                 </div>
 
-                <div class="tags">
-                    <span class="tag"
-                          th:each="entry : ${post.smileyReactions}"
-                          th:text="'😀 ' + ${entry.key} + ': ' + ${entry.value}">
-                        #тег
+                <!-- Медиа -->
+                <div class="media" th:if="${post.mediaUrls != null}">
+                    <img th:each="url : ${post.mediaUrls}" th:src="${url}" alt="media" style="max-width:100%;border-radius:6px;margin-top:5px;"/>
+                </div>
+
+                <!-- Реакции -->
+                <div class="reactions" style="margin-top:10px;">
+                    <span class="reaction"
+                          th:each="reaction : ${smileyReactions}"
+                          th:text="${reaction.symbol + ' ' + (post.smileyReactions[reaction.id] != null ? post.smileyReactions[reaction.id] : 0)}"
+                          style="margin-right:10px;cursor:pointer;">
                     </span>
                 </div>
 
-                <div class="interactions">
-                    <div class="reactions">
-                        <div class="reaction">👍 Нравится</div>
-                        <div class="reaction">🔥 Вдохновляет</div>
-                        <div class="reaction">💬 Комментировать</div>
-                        <div class="reaction">📎 Поделиться</div>
+                <!-- Комментарии -->
+                <div class="comments" style="margin-top:15px;">
+                    <div class="comment"
+                         th:each="comment : ${post.comments}">
+                        <strong th:text="'Пользователь #' + ${comment.userId} + ':'">Елена:</strong>
+                        <p th:text="${comment.content}">Комментарий</p>
+                        <span style="font-size:12px;color:gray"
+                              th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">
+                            1ч назад
+                        </span>
+                        <span style="font-size:12px;margin-left:10px;color:gray"
+                              th:text="'❤️ ' + ${comment.likes}">
+                            0
+                        </span>
                     </div>
 
-                    <div class="comments">
-                        <div class="add-comment">
-                            <input placeholder="Напишите комментарий..." />
-                            <button>Отправить</button>
-                        </div>
+                    <div class="add-comment">
+                        <input placeholder="Напишите комментарий..." />
+                        <button>Отправить</button>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
+
     <!-- RIGHT -->
     <aside class="right">
         <div class="category">
-            <h5 th:text="'Подтемы раздела: ' + ${#lists.isEmpty(categories) ? '—' : categories[0].nameRu}">
-                Подтемы раздела
-            </h5>
+            <h5>Подтемы раздела</h5>
             <div class="subcat"
                  th:each="cat : ${categories}"
                  th:text="${cat.nameRu}"
-                 th:classappend="${cat.id == ${param.categoryId}} ? ' active' : ''">
+                 th:classappend="${cat.id == param.categoryId} ? ' active' : ''">
                 Категория
             </div>
         </div>
     </aside>
-</div>
 
+</div>
 
 <!-- Подключаем footer -->
 <div th:replace="fragments/footer :: site-footer"></div>

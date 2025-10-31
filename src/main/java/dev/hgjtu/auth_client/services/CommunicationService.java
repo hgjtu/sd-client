@@ -19,7 +19,7 @@ import java.util.Map;
 public class CommunicationService {
     private final WebClient webClient;
 
-    @Value("${GATEWAY_SERVICE_URL}")
+    @Value("${COMMUNICATION_RESOURCE_SERVER_URL}")
     private String gatewayServiceURL;
     @Value("${COMMUNICATION_RESOURCE_PREFIX}")
     private String communicationResourcePrefix;

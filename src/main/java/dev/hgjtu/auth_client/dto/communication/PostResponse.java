@@ -16,4 +16,40 @@ public class PostResponse {
     private LocalDateTime publicationDateTime;
     private Map<Short, Integer> smileyReactions;
     private List<PostComment> comments;
+
+    public Long getId() {
+        return id;
+    }
+
+    public Short getSectionId() {
+        return sectionId;
+    }
+
+    public Short getCategoryId() {
+        return categoryId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public List<String> getMediaUrls() {
+        return mediaUrls;
+    }
+
+    public LocalDateTime getPublicationDateTime() {
+        return publicationDateTime;
+    }
+
+    public Map<Short, Integer> getSmileyReactions() {
+        return smileyReactions;
+    }
+
+    public List<PostComment> getComments() {
+        return comments;
+    }
 }

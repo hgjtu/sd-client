@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 public class UserService {
     private final WebClient webClient;
 
-    @Value("${GATEWAY_SERVICE_URL}")
+    @Value("${USER_RESOURCE_SERVER_URL}")
     private String gatewayServiceURL;
     @Value("${USER_RESOURCE_PREFIX}")
     private String userResourcePrefix;
@@ -28,7 +28,7 @@ public class UserService {
     }
 
     public Mono<UserResponse> getUserInfoByUsername(String username) {
-        return webClient.get()
+        return  webClient.get()
                 .uri(gatewayServiceURL + userResourcePrefix + "/users/username/{username}", username)
                 .retrieve()
                 .bodyToMono(UserResponse.class);

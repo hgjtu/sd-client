@@ -26,8 +26,8 @@ public class CommunicationController {
     private final UserService userService;
     private final CommunicationService communicationService;
 
-    @GetMapping("/")
-    public Mono<String> home(Model model,
+    @GetMapping
+    public Mono<String> communicationHome(Model model,
                        @RequestParam(defaultValue = "1") Short sectionId,
                        @RequestParam(defaultValue = "1") Short categoryId,
                        @AuthenticationPrincipal OAuth2User principal) {
@@ -48,9 +48,8 @@ public class CommunicationController {
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
-                    return Mono.just("market/item");
+                    return Mono.just("error");
                 });
-
     }
 
 }
