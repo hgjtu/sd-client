@@ -31,6 +31,13 @@ public class CommunicationService {
                 .bodyToFlux(SectionResponse.class);
     }
 
+    public Flux<CategoryResponse> getAllCategories() {
+        return webClient.get()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/categories")
+                .retrieve()
+                .bodyToFlux(CategoryResponse.class);
+    }
+
     public Flux<CategoryResponse> getCategoriesBySectionId(Short sectionId) {
         return webClient.get()
                 .uri(gatewayServiceURL + communicationResourcePrefix + "/sections/{id}/category", sectionId)

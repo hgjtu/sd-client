@@ -11,6 +11,7 @@ public class PostResponse {
     private Short sectionId;
     private Short categoryId;
     private Long userId;
+    private String authorUsername;
     private String content;
     private List<String> mediaUrls;
     private LocalDateTime publicationDateTime;
@@ -51,5 +52,9 @@ public class PostResponse {
 
     public List<PostComment> getComments() {
         return comments;
+    }
+
+    public String getAuthorUsername() {
+        return authorUsername;
     }
 }

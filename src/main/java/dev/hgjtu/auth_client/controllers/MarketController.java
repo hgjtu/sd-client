@@ -161,12 +161,9 @@ public class MarketController {
 
         return Mono.zip(categoriesMono, itemMono)
                 .map(tuple -> {
-                    List<CategoryResponse> categories = tuple.getT1();
-                    ItemResponse item = tuple.getT2();
-
-                    model.addAttribute("categories", categories);
-                    model.addAttribute("item", item);
-                    model.addAttribute("actionUrl", "/market/item/edit/" + item.getId());
+                    model.addAttribute("categories", tuple.getT1());
+                    model.addAttribute("item", tuple.getT2());
+                    model.addAttribute("actionUrl", "/market/item/edit/" + id);
                     return "market/add-item";
                 })
                 .onErrorResume(Exception.class, e -> {

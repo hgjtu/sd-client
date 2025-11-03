@@ -269,19 +269,19 @@
             <div class="tab"
                  th:each="section : ${sections}"
                  th:text="${section.nameRu}"
+                 th:attr="data-section-id=${section.id}"
                  th:classappend="${section.id == param.sectionId} ? ' active' : ''">
             </div>
         </div>
 
         <!-- Посты -->
         <div th:each="post : ${posts}" class="post">
-            <div class="avatar-small" th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}">KV</div>
+            <div class="avatar-small" th:text="${post.authorUsername.substring(0,1)}">H</div>
 
             <div class="body">
                 <div class="head">
                     <div>
-                        <h4 th:text="${user.firstName + ' ' + user.lastName}">Имя</h4>
-                        <p th:text="${user.bio}">Описание</p>
+                        <h4 th:text="${post.authorUsername}">Никнейм</h4>
                     </div>
                     <span style="font-size:13px;color:var(--muted)"
                           th:text="${#temporals.format(post.publicationDateTime, 'dd MMM yyyy HH:mm')}">
@@ -303,7 +303,7 @@
                 <div class="reactions" style="margin-top:10px;">
                     <span class="reaction"
                           th:each="reaction : ${smileyReactions}"
-                          th:text="${reaction.symbol + ' ' + (post.smileyReactions[reaction.id] != null ? post.smileyReactions[reaction.id] : 0)}"
+                          th:utext="|${reaction.symbol} ${post.smileyReactions[reaction.id] != null ? post.smileyReactions[reaction.id] : 0}|"
                           style="margin-right:10px;cursor:pointer;">
                     </span>
                 </div>
@@ -341,6 +341,7 @@
             <div class="subcat"
                  th:each="cat : ${categories}"
                  th:text="${cat.nameRu}"
+                 th:attr="data-category-id=${cat.id}"
                  th:classappend="${cat.id == param.categoryId} ? ' active' : ''">
                 Категория
             </div>
@@ -351,6 +352,31 @@
 
 <!-- Подключаем footer -->
 <div th:replace="fragments/footer :: site-footer"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tabs = document.querySelectorAll(".tab");
+        const subcats = document.querySelectorAll(".subcat");
+
+        // При клике на раздел
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                const sectionId = tab.getAttribute("data-section-id");
+                window.location.href = `/communication?sectionId=${sectionId}&categoryId=1`;
+            });
+        });
+
+        // При клике на категорию
+        subcats.forEach(cat => {
+            cat.addEventListener("click", () => {
+                const sectionTab = document.querySelector(".tab.active");
+                const sectionId = sectionTab ? sectionTab.getAttribute("data-section-id") : 1;
+                const categoryId = cat.getAttribute("data-category-id");
+                window.location.href = `/communication?sectionId=${sectionId}&categoryId=${categoryId}`;
+            });
+        });
+    });
+</script>
 
 </body>
 </html>
