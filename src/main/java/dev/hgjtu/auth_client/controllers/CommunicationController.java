@@ -28,21 +28,23 @@ public class CommunicationController {
     @GetMapping
     public Mono<String> communicationHome(Model model,
                        @RequestParam(defaultValue = "1") Short sectionId,
-                       @RequestParam(defaultValue = "1") Short categoryId,
+                       @RequestParam(required = false) Short categoryId,
                        @AuthenticationPrincipal OAuth2User principal) {
         Mono<UserResponse> userMono = userService.getUserInfoByUsername(principal.getAttribute("sub"));
         Mono<List<SectionResponse>> sectionsMono = communicationService.getAllSections().collectList();
         Mono<List<CategoryResponse>> categoriesMono = communicationService.getCategoriesBySectionId(sectionId).collectList();
         Mono<List<SmileyReactionResponse>> smileyReactionsMono = communicationService.getAllSmileyReactions().collectList();
         Mono<List<PostResponse>> postsMono = communicationService.getPostsBySectionIdAndCategoryId(sectionId, categoryId).collectList();
+        Mono<List<PostResponse>> myPostsMono = communicationService.getPostsByUser().collectList();
 
-        return Mono.zip(userMono, sectionsMono, categoriesMono, smileyReactionsMono, postsMono)
+        return Mono.zip(userMono, sectionsMono, categoriesMono, smileyReactionsMono, postsMono, myPostsMono)
                 .map(tuple -> {
                     model.addAttribute("user", tuple.getT1());
                     model.addAttribute("sections", tuple.getT2());
                     model.addAttribute("categories", tuple.getT3());
                     model.addAttribute("smileyReactions", tuple.getT4());
                     model.addAttribute("posts", tuple.getT5());
+                    model.addAttribute("myPosts", tuple.getT6());
                     return "communication/main-page";
                 })
                 .onErrorResume(Exception.class, e -> {
@@ -50,6 +52,20 @@ public class CommunicationController {
                     return Mono.just("error");
                 });
     }
+
+    @GetMapping("/post/{id}")
+    public Mono<String> communicationHome(Model model, @PathVariable Long id) {
+        return communicationService.getPostById(id)
+                .map(post -> {
+                    model.addAttribute("post", post);
+                    return "communication/post-page";
+                })
+                .onErrorResume(Exception.class, e -> {
+                    model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
+                    return Mono.just("error");
+                });
+    }
+
 
     @GetMapping("/post/create")
     public Mono<String> createPost (Model model) {

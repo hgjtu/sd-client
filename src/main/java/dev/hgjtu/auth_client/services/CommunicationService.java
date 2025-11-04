@@ -56,8 +56,19 @@ public class CommunicationService {
         Map<String, Short> params = new HashMap<>();
         params.put("sectionId", sectionId);
         params.put("categoryId", categoryId);
-        return webClient.get()
+        if(categoryId != null) return webClient.get()
                 .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/section/{sectionId}/category/{categoryId}", params)
+                .retrieve()
+                .bodyToFlux(PostResponse.class);
+        else return webClient.get()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/section/{sectionId}", sectionId)
+                .retrieve()
+                .bodyToFlux(PostResponse.class);
+    }
+
+    public Flux<PostResponse> getPostsByUser(){
+        return webClient.get()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/user")
                 .retrieve()
                 .bodyToFlux(PostResponse.class);
     }
