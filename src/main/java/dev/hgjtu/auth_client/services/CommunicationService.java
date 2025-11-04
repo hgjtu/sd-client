@@ -93,4 +93,15 @@ public class CommunicationService {
                 .retrieve()
                 .bodyToMono(String.class);
     }
+
+    public Mono<Void> addReaction(Long postId, Short reactionId) {
+        Map<String, Long> params = new HashMap<>();
+        params.put("postId", postId);
+        params.put("reactionId", Long.valueOf(reactionId));
+        return webClient.get()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/{postId}/add-reaction/{reactionId}", params)
+                .retrieve()
+                .bodyToMono(Void.class);
+    }
+
 }

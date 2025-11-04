@@ -8,6 +8,9 @@
 </head>
 <body class="bg-light">
 
+<!-- Подключаем header -->
+<div th:replace="fragments/header :: site-header"></div>
+
 <div class="container mt-5">
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
@@ -33,13 +36,15 @@
                     <label for="category" class="form-label">Категория</label>
                     <select id="category" name="categoryId" class="form-select" required>
                         <option value="">-- Выберите категорию --</option>
-                        <th:block th:each="entry : ${categories}">
-                            <optgroup th:label="'Секция #' + ${entry.key}"
-                                      th:attr="data-section-id=${entry.key}">
-                                <option th:each="cat : ${entry.value}"
-                                        th:value="${cat.id}"
-                                        th:text="${cat.nameRu != null ? cat.nameRu : cat.name}"
-                                        th:selected="${post != null} ? ${cat.id} == ${post.categoryId} : false">
+                        <!-- Категории группируются по секциям для фильтрации -->
+                        <th:block th:each="section : ${sections}">
+                            <optgroup th:label="${section.nameRu != null ? section.nameRu : section.name}"
+                                      th:attr="data-section-id=${section.id}">
+                                <option th:each="category : ${categories}"
+                                        th:if="${category.sectionId == section.id}"
+                                        th:value="${category.id}"
+                                        th:text="${category.nameRu != null ? category.nameRu : category.name}"
+                                        th:selected="${post != null} ? ${category.id} == ${post.categoryId} : false">
                                 </option>
                             </optgroup>
                         </th:block>
@@ -78,41 +83,71 @@
     <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
 </div>
 
+<!-- Подключаем footer -->
+<div th:replace="fragments/footer :: site-footer"></div>
+
 <script>
-    // === Фильтрация категорий по секции ===
     document.addEventListener("DOMContentLoaded", () => {
         const sectionSelect = document.getElementById("section");
         const categorySelect = document.getElementById("category");
 
+        // === Фильтрация категорий по секции ===
         function filterCategories() {
             const selectedSection = sectionSelect.value;
+
+            // Скрываем все optgroup
             categorySelect.querySelectorAll("optgroup").forEach(group => {
-                group.style.display = group.getAttribute("data-section-id") === selectedSection ? "" : "none";
+                group.style.display = "none";
             });
+
+            // Показываем только optgroup выбранной секции
+            if (selectedSection) {
+                const targetGroup = categorySelect.querySelector(`optgroup[data-section-id="${selectedSection}"]`);
+                if (targetGroup) {
+                    targetGroup.style.display = "";
+                }
+            }
+
+            // Сбрасываем выбор категории при смене секции
+            if (!categorySelect.querySelector('option:checked') ||
+                categorySelect.querySelector('option:checked').value === "") {
+                categorySelect.value = "";
+            }
         }
 
         sectionSelect.addEventListener("change", filterCategories);
-        filterCategories();
+
+        // Инициализируем фильтрацию при загрузке
+        if (sectionSelect.value) {
+            filterCategories();
+        } else {
+            // Если секция не выбрана, скрываем все категории
+            categorySelect.querySelectorAll("optgroup").forEach(group => {
+                group.style.display = "none";
+            });
+        }
 
         // === Добавление/удаление полей для медиа URL ===
         const addMediaBtn = document.getElementById("addMediaUrl");
         const mediaContainer = document.getElementById("mediaUrlsContainer");
 
-        addMediaBtn.addEventListener("click", () => {
-            const div = document.createElement("div");
-            div.classList.add("input-group", "mb-2");
-            div.innerHTML = `
-                <input type="url" name="mediaUrls" class="form-control" placeholder="Введите URL картинки/видео">
-                <button type="button" class="btn btn-outline-danger remove-media">✕</button>
-            `;
-            mediaContainer.appendChild(div);
-        });
+        if (addMediaBtn && mediaContainer) {
+            addMediaBtn.addEventListener("click", () => {
+                const div = document.createElement("div");
+                div.classList.add("input-group", "mb-2");
+                div.innerHTML = `
+                    <input type="url" name="mediaUrls" class="form-control" placeholder="Введите URL картинки/видео">
+                    <button type="button" class="btn btn-outline-danger remove-media">✕</button>
+                `;
+                mediaContainer.appendChild(div);
+            });
 
-        mediaContainer.addEventListener("click", (e) => {
-            if (e.target.classList.contains("remove-media")) {
-                e.target.closest(".input-group").remove();
-            }
-        });
+            mediaContainer.addEventListener("click", (e) => {
+                if (e.target.classList.contains("remove-media")) {
+                    e.target.closest(".input-group").remove();
+                }
+            });
+        }
     });
 </script>
 

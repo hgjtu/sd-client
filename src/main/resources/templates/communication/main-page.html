@@ -106,9 +106,10 @@
             transition:all .2s;
         }
         .tab.active {
-            background:var(--accent);
-            color:white;
-            box-shadow:0 4px 10px rgba(31,182,255,0.2);
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 10px rgba(31,182,255,0.2);
+            transform: translateY(-2px);
         }
 
         /* posts */
@@ -214,13 +215,19 @@
             margin-bottom:4px;
             transition:.2s;
         }
-        .subcat:hover {
-            background:#e0f2fe;
-        }
         .subcat.active {
-            background:var(--accent);
-            color:white;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(31,182,255,0.25);
         }
+        .subcat:hover {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+
+        .actions { margin-bottom: 8px; }
 
         /* responsive */
         @media (max-width:1000px){
@@ -259,6 +266,13 @@
                 <p th:text="'ID: ' + ${section.id}"></p>
             </div>
         </div>
+
+        <!-- Кнопки действий -->
+        <div class="actions d-flex justify-content-end gap-2">
+            <button id="create-post-btn" class="btn btn-primary">Создать пост</button>
+            <button id="my-posts-btn" class="btn btn-outline-primary">Мои посты</button>
+        </div>
+
     </aside>
 
 
@@ -300,10 +314,12 @@
                 </div>
 
                 <!-- Реакции -->
-                <div class="reactions" style="margin-top:10px;">
+                <div class="reactions" style="margin-top:10px;"
+                     th:attr="data-post-id=${post.id}">
                     <span class="reaction"
                           th:each="reaction : ${smileyReactions}"
                           th:utext="|${reaction.symbol} ${post.smileyReactions[reaction.id] != null ? post.smileyReactions[reaction.id] : 0}|"
+                          th:attr="data-reaction-id=${reaction.id}"
                           style="margin-right:10px;cursor:pointer;">
                     </span>
                 </div>
@@ -358,24 +374,82 @@
         const tabs = document.querySelectorAll(".tab");
         const subcats = document.querySelectorAll(".subcat");
 
-        // При клике на раздел
+        // Получаем текущие параметры из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentSectionId = urlParams.get("sectionId");
+        const currentCategoryId = urlParams.get("categoryId");
+
+        // --- Если sectionId не задан, используем 1 по умолчанию ---
+        if (!currentSectionId) {
+            currentSectionId = "1";
+        }
+
+
+        // ===== Подсветка активной вкладки (раздела) =====
         tabs.forEach(tab => {
+            const sectionId = tab.getAttribute("data-section-id");
+            if (sectionId === currentSectionId) {
+                tab.classList.add("active");
+            } else {
+                tab.classList.remove("active");
+            }
+
+            // При клике на вкладку (меняем раздел, сбрасываем категорию)
             tab.addEventListener("click", () => {
-                const sectionId = tab.getAttribute("data-section-id");
-                window.location.href = `/communication?sectionId=${sectionId}&categoryId=1`;
+                const newSectionId = tab.getAttribute("data-section-id");
+                window.location.href = `/communication?sectionId=${newSectionId}`;
             });
         });
 
-        // При клике на категорию
+        // ===== Подсветка активной категории =====
         subcats.forEach(cat => {
+            const categoryId = cat.getAttribute("data-category-id");
+            if (categoryId === currentCategoryId) {
+                cat.classList.add("active");
+            } else {
+                cat.classList.remove("active");
+            }
+
+            // При клике на категорию (сохраняем текущую секцию)
             cat.addEventListener("click", () => {
-                const sectionTab = document.querySelector(".tab.active");
-                const sectionId = sectionTab ? sectionTab.getAttribute("data-section-id") : 1;
-                const categoryId = cat.getAttribute("data-category-id");
-                window.location.href = `/communication?sectionId=${sectionId}&categoryId=${categoryId}`;
+                const activeTab = document.querySelector(".tab.active");
+                const sectionId = activeTab ? activeTab.getAttribute("data-section-id") : currentSectionId;
+                const newCategoryId = cat.getAttribute("data-category-id");
+                window.location.href = `/communication?sectionId=${sectionId}&categoryId=${newCategoryId}`;
             });
         });
     });
+
+    // --- Создать пост и Мои посты ---
+    document.getElementById("create-post-btn").addEventListener("click", () => {
+        window.location.href = "/communication/post/create";
+    });
+
+    document.getElementById("my-posts-btn").addEventListener("click", () => {
+        window.location.href = "/communication/posts/my";
+    });
+
+    // --- Обработка реакций ---
+    const reactionButtons = document.querySelectorAll(".reaction");
+    reactionButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const reactionId = btn.getAttribute("data-reaction-id");
+            const postContainer = btn.closest(".reactions");
+            const postId = postContainer.getAttribute("data-post-id");
+
+            fetch(`/post/${postId}/add-reaction/${reactionId}`)
+                .then(res => {
+                    if (res.ok) {
+                        // Можно обновить число реакций без перезагрузки
+                        location.reload();
+                    } else {
+                        console.error("Ошибка при отправке реакции");
+                    }
+                })
+                .catch(err => console.error(err));
+        });
+    });
+
 </script>
 
 </body>

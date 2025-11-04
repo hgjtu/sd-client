@@ -60,7 +60,7 @@ public class CommunicationController {
                 .map(tuple -> {
                     model.addAttribute("sections", tuple.getT1());
                     model.addAttribute("categories", tuple.getT2());
-                    model.addAttribute("actionUrl", "/post/create");
+                    model.addAttribute("actionUrl", "/communication/post/create");
 
                     return "communication/create-post";
                 })
@@ -109,5 +109,10 @@ public class CommunicationController {
     public Mono<String> deleteItemById (@PathVariable Long id) {
         return communicationService.deletePost(id)
                 .then(Mono.just("redirect:/communication"));
+    }
+
+    @GetMapping("/post/{postId}/add-reaction/{reactionId}")
+    public Mono<Void> deleteItemById (@PathVariable Long postId, @PathVariable Short reactionId) {
+        return communicationService.addReaction(postId, reactionId);
     }
 }
