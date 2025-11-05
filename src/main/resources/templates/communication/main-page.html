@@ -161,6 +161,11 @@
             background:#e0f2fe;
             border-color:#bae6fd;
         }
+        .reaction.reacted {
+            font-weight: bold;
+            color: #ff4500; /* яркий цвет для активной реакции */
+            text-shadow: 0 0 3px #ff4500;
+        }
         .comments {
             margin-top:10px;
             background:#f9fafb;
@@ -333,15 +338,16 @@
                 </div>
 
                 <!-- Реакции -->
-                <div class="reactions" style="margin-top:10px;"
-                     th:attr="data-post-id=${post.id}">
+                <div class="reactions" style="margin-top:10px;" th:attr="data-post-id=${post.id}">
                     <span class="reaction"
-                          th:each="reaction : ${smileyReactions}"
-                          th:utext="|${reaction.symbol} ${post.smileyReactions[reaction.id] != null ? post.smileyReactions[reaction.id] : 0}|"
-                          th:attr="data-reaction-id=${reaction.id}"
+                          th:each="entry : ${post.smileyReactions.entrySet()}"
+                          th:utext="${entry.key == 'hearts' ? '❤️ ' : (entry.key == 'likes' ? '👍 ' : entry.key)} + ${entry.value}"
+                          th:attr="data-reaction-id=${entry.key}"
+                          th:classappend="${post.isReacted == entry.key} ? ' reacted' : ''"
                           style="margin-right:10px;cursor:pointer;">
                     </span>
                 </div>
+
 
                 <!-- Комментарии -->
                 <div class="comments" style="margin-top:15px;">
@@ -403,15 +409,10 @@
             currentSectionId = "1";
         }
 
-
         // ===== Подсветка активной вкладки (раздела) =====
         tabs.forEach(tab => {
             const sectionId = tab.getAttribute("data-section-id");
-            if (sectionId === currentSectionId) {
-                tab.classList.add("active");
-            } else {
-                tab.classList.remove("active");
-            }
+            tab.classList.toggle("active", sectionId === currentSectionId);
 
             // При клике на вкладку (меняем раздел, сбрасываем категорию)
             tab.addEventListener("click", () => {
@@ -423,11 +424,7 @@
         // ===== Подсветка активной категории =====
         subcats.forEach(cat => {
             const categoryId = cat.getAttribute("data-category-id");
-            if (categoryId === currentCategoryId) {
-                cat.classList.add("active");
-            } else {
-                cat.classList.remove("active");
-            }
+            cat.classList.toggle("active", categoryId === currentCategoryId);
 
             // При клике на категорию (сохраняем текущую секцию)
             cat.addEventListener("click", () => {
@@ -437,39 +434,60 @@
                 window.location.href = `/communication?sectionId=${sectionId}&categoryId=${newCategoryId}`;
             });
         });
-    });
 
-    // --- Создать пост и Мои посты ---
-    document.getElementById("create-post-btn").addEventListener("click", () => {
-        window.location.href = "/communication/post/create";
-    });
+        // --- Создать пост и Мои посты ---
+        document.getElementById("create-post-btn").addEventListener("click", () => {
+            window.location.href = "/communication/post/create";
+        });
 
-    document.getElementById("my-posts-btn").addEventListener("click", () => {
-        window.location.href = "/communication/posts/my";
-    });
+        // ===== Реакции на посты =====
+        document.querySelectorAll('.reactions').forEach(reactionsDiv => {
+            const postId = reactionsDiv.dataset.postId;
 
-    // --- Обработка реакций ---
-    const reactionButtons = document.querySelectorAll(".reaction");
-    reactionButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-            const reactionId = btn.getAttribute("data-reaction-id");
-            const postContainer = btn.closest(".reactions");
-            const postId = postContainer.getAttribute("data-post-id");
+            reactionsDiv.querySelectorAll('.reaction').forEach(reactionSpan => {
+                reactionSpan.addEventListener('click', () => {
+                    const reactionType = reactionSpan.dataset.reactionId;
 
-            fetch(`/post/${postId}/add-reaction/${reactionId}`)
-                .then(res => {
-                    if (res.ok) {
-                        // Можно обновить число реакций без перезагрузки
-                        location.reload();
-                    } else {
-                        console.error("Ошибка при отправке реакции");
-                    }
-                })
-                .catch(err => console.error(err));
+                    fetch(`/communication/post/${postId}/add-reaction/${reactionType}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+
+                            // Найдем текущую выделенную реакцию
+                            const currentReacted = reactionsDiv.querySelector('.reaction.reacted');
+
+                            // Если есть выделенная реакция и это не та, на которую кликнули
+                            if (currentReacted && currentReacted !== reactionSpan) {
+                                let partsOld = currentReacted.innerText.trim().split(' ');
+                                let countOld = parseInt(partsOld[1] || 0, 10);
+                                countOld = Math.max(countOld - 1, 0);
+                                currentReacted.innerText = `${partsOld[0]} ${countOld}`;
+                                currentReacted.classList.remove('reacted');
+                            }
+
+                            // Работа с текущей реакцией
+                            const currentText = reactionSpan.innerText.trim();
+                            const parts = currentText.split(' ');
+                            let count = parseInt(parts[1] || 0, 10);
+                            const alreadyReacted = reactionSpan.classList.contains('reacted');
+
+                            if (!alreadyReacted) {
+                                count += 1;
+                                reactionSpan.classList.add('reacted');
+                            } else {
+                                count = Math.max(count - 1, 0);
+                                reactionSpan.classList.remove('reacted');
+                            }
+
+                            const emoji = parts[0];
+                            reactionSpan.innerText = `${emoji} ${count}`;
+                        })
+                        .catch(error => console.error('Error adding reaction:', error));
+                });
+            });
         });
     });
-
 </script>
+
 
 </body>
 </html>

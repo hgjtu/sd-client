@@ -184,6 +184,17 @@
             color:#0369a1;
         }
 
+        .reactions .reaction:hover {
+            background:#e0f2fe;
+            border-color:#bae6fd;
+        }
+
+        .reactions .reaction.reacted {
+            font-weight: bold;
+            color: #ff4500; /* яркий цвет для активной реакции */
+            text-shadow: 0 0 3px #ff4500;
+        }
+
 
         @media(max-width:768px){
             .post {
@@ -239,6 +250,25 @@
                 <img th:each="url : ${post.mediaUrls}" th:src="${url}" alt="media"/>
             </div>
 
+            <div class="reactions" style="margin-top:10px;" th:attr="data-post-id=${post.id}">
+                <span class="reaction"
+                      th:each="entry : ${post.smileyReactions.entrySet()}"
+                      th:utext="${entry.key == 'hearts' ? '❤️ ' : (entry.key == 'likes' ? '👍 ' : entry.key)} + ${entry.value}"
+                      th:attr="data-reaction-id=${entry.key}"
+                      th:classappend="${post.isReacted == entry.key} ? ' reacted' : ''"
+                      style="margin-right:10px;cursor:pointer;
+                             background:#f8fafc;
+                             border:1px solid #e5e7eb;
+                             border-radius:20px;
+                             padding:6px 12px;
+                             font-size:14px;
+                             display:inline-flex;
+                             align-items:center;
+                             gap:6px;
+                             transition:.2s;">
+                </span>
+            </div>
+
             <!-- Комментарии -->
             <div class="comments">
                 <h4>Комментарии</h4>
@@ -265,6 +295,56 @@
 
 <!-- общий footer -->
 <div th:replace="fragments/footer :: site-footer"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // ===== Реакции на посты =====
+        document.querySelectorAll('.reactions').forEach(reactionsDiv => {
+            const postId = reactionsDiv.dataset.postId;
+
+            reactionsDiv.querySelectorAll('.reaction').forEach(reactionSpan => {
+                reactionSpan.addEventListener('click', () => {
+                    const reactionType = reactionSpan.dataset.reactionId;
+
+                    fetch(`/communication/post/${postId}/add-reaction/${reactionType}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+
+                            // Найдем текущую выделенную реакцию
+                            const currentReacted = reactionsDiv.querySelector('.reaction.reacted');
+
+                            // Если есть выделенная реакция и это не та, на которую кликнули
+                            if (currentReacted && currentReacted !== reactionSpan) {
+                                let partsOld = currentReacted.innerText.trim().split(' ');
+                                let countOld = parseInt(partsOld[1] || 0, 10);
+                                countOld = Math.max(countOld - 1, 0);
+                                currentReacted.innerText = `${partsOld[0]} ${countOld}`;
+                                currentReacted.classList.remove('reacted');
+                            }
+
+                            // Работа с текущей реакцией
+                            const currentText = reactionSpan.innerText.trim();
+                            const parts = currentText.split(' ');
+                            let count = parseInt(parts[1] || 0, 10);
+                            const alreadyReacted = reactionSpan.classList.contains('reacted');
+
+                            if (!alreadyReacted) {
+                                count += 1;
+                                reactionSpan.classList.add('reacted');
+                            } else {
+                                count = Math.max(count - 1, 0);
+                                reactionSpan.classList.remove('reacted');
+                            }
+
+                            const emoji = parts[0];
+                            reactionSpan.innerText = `${emoji} ${count}`;
+                        })
+                        .catch(error => console.error('Error adding reaction:', error));
+                });
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

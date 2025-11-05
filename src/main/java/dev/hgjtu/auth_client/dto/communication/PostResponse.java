@@ -15,8 +15,9 @@ public class PostResponse {
     private String content;
     private List<String> mediaUrls;
     private LocalDateTime publicationDateTime;
-    private Map<Short, Integer> smileyReactions;
+    private Map<String, Integer> smileyReactions;
     private List<PostComment> comments;
+    private String isReacted;
 
     public Long getId() {
         return id;
@@ -46,7 +47,7 @@ public class PostResponse {
         return publicationDateTime;
     }
 
-    public Map<Short, Integer> getSmileyReactions() {
+    public Map<String, Integer> getSmileyReactions() {
         return smileyReactions;
     }
 
@@ -56,5 +57,9 @@ public class PostResponse {
 
     public String getAuthorUsername() {
         return authorUsername;
+    }
+
+    public String getIsReacted() {
+        return isReacted;
     }
 }

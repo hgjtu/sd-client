@@ -45,12 +45,12 @@ public class CommunicationService {
                 .bodyToFlux(CategoryResponse.class);
     }
 
-    public Flux<SmileyReactionResponse> getAllSmileyReactions(){
-        return webClient.get()
-                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/smiley-reactions")
-                .retrieve()
-                .bodyToFlux(SmileyReactionResponse.class);
-    }
+//    public Flux<SmileyReactionResponse> getAllSmileyReactions(){
+//        return webClient.get()
+//                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/smiley-reactions")
+//                .retrieve()
+//                .bodyToFlux(SmileyReactionResponse.class);
+//    }
 
     public Flux<PostResponse> getPostsBySectionIdAndCategoryId(Short sectionId, Short categoryId) {
         Map<String, Short> params = new HashMap<>();
@@ -105,12 +105,12 @@ public class CommunicationService {
                 .bodyToMono(String.class);
     }
 
-    public Mono<Void> addReaction(Long postId, Short reactionId) {
-        Map<String, Long> params = new HashMap<>();
+    public Mono<Void> addReaction(Long postId, String reactionType) {
+        Map<String, Object> params = new HashMap<>();
         params.put("postId", postId);
-        params.put("reactionId", Long.valueOf(reactionId));
+        params.put("reactionType", reactionType);
         return webClient.get()
-                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/{postId}/add-reaction/{reactionId}", params)
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/{postId}/add-reaction/{reactionType}", params)
                 .retrieve()
                 .bodyToMono(Void.class);
     }

@@ -33,18 +33,17 @@ public class CommunicationController {
         Mono<UserResponse> userMono = userService.getUserInfoByUsername(principal.getAttribute("sub"));
         Mono<List<SectionResponse>> sectionsMono = communicationService.getAllSections().collectList();
         Mono<List<CategoryResponse>> categoriesMono = communicationService.getCategoriesBySectionId(sectionId).collectList();
-        Mono<List<SmileyReactionResponse>> smileyReactionsMono = communicationService.getAllSmileyReactions().collectList();
+//        Mono<List<SmileyReactionResponse>> smileyReactionsMono = communicationService.getAllSmileyReactions().collectList();
         Mono<List<PostResponse>> postsMono = communicationService.getPostsBySectionIdAndCategoryId(sectionId, categoryId).collectList();
         Mono<List<PostResponse>> myPostsMono = communicationService.getPostsByUser().collectList();
 
-        return Mono.zip(userMono, sectionsMono, categoriesMono, smileyReactionsMono, postsMono, myPostsMono)
+        return Mono.zip(userMono, sectionsMono, categoriesMono, postsMono, myPostsMono)
                 .map(tuple -> {
                     model.addAttribute("user", tuple.getT1());
                     model.addAttribute("sections", tuple.getT2());
                     model.addAttribute("categories", tuple.getT3());
-                    model.addAttribute("smileyReactions", tuple.getT4());
-                    model.addAttribute("posts", tuple.getT5());
-                    model.addAttribute("myPosts", tuple.getT6());
+                    model.addAttribute("posts", tuple.getT4());
+                    model.addAttribute("myPosts", tuple.getT5());
                     return "communication/main-page";
                 })
                 .onErrorResume(Exception.class, e -> {
@@ -127,8 +126,10 @@ public class CommunicationController {
                 .then(Mono.just("redirect:/communication"));
     }
 
-    @GetMapping("/post/{postId}/add-reaction/{reactionId}")
-    public Mono<Void> deleteItemById (@PathVariable Long postId, @PathVariable Short reactionId) {
-        return communicationService.addReaction(postId, reactionId);
+    @GetMapping("/post/{postId}/add-reaction/{reactionType}")
+    @ResponseBody
+    public Mono<Void> deleteItemById (@PathVariable Long postId, @PathVariable String reactionType) {
+        return communicationService.addReaction(postId, reactionType)
+                .then(Mono.empty());
     }
 }
