@@ -231,6 +231,33 @@
             color: #0369a1;
         }
 
+        .comment-actions {
+            margin-top: 6px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-actions button {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .comment-actions button:hover {
+            color: var(--accent-2);
+        }
+        .comment-actions .delete-comment-btn {
+            color: #ef4444;
+        }
+        .comment-actions .delete-comment-btn:hover {
+            color: #dc2626;
+        }
+
+
 
         .actions { margin-bottom: 8px; }
 
@@ -352,7 +379,8 @@
                 <!-- Комментарии -->
                 <div class="comments" style="margin-top:15px;">
                     <div class="comment"
-                         th:each="comment : ${post.comments}">
+                         th:each="comment : ${post.comments}"
+                         th:attr="data-comment-id=${comment.id}">
                         <strong th:text="'Пользователь #' + ${comment.userId} + ':'">Елена:</strong>
                         <p th:text="${comment.content}">Комментарий</p>
                         <span style="font-size:12px;color:gray"
@@ -363,7 +391,15 @@
                               th:text="'❤️ ' + ${comment.likes}">
                             0
                         </span>
+
+                        <!-- Кнопки управления только для своих комментариев -->
+                        <div class="comment-actions"
+                             th:if="${comment.userId == user.id}">
+                            <button class="edit-comment-btn">Редактировать</button>
+                            <button class="delete-comment-btn">Удалить</button>
+                        </div>
                     </div>
+
 
                     <div class="add-comment">
                         <input placeholder="Напишите комментарий..." />

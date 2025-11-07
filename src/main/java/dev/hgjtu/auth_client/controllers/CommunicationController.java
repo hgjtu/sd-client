@@ -3,6 +3,7 @@ package dev.hgjtu.auth_client.controllers;
 import dev.hgjtu.auth_client.dto.communication.*;
 import dev.hgjtu.auth_client.dto.market.ItemRequest;
 import dev.hgjtu.auth_client.dto.user.UserResponse;
+import dev.hgjtu.auth_client.models.PostComment;
 import dev.hgjtu.auth_client.services.CommunicationService;
 import dev.hgjtu.auth_client.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -130,6 +131,28 @@ public class CommunicationController {
     @ResponseBody
     public Mono<Void> deleteItemById (@PathVariable Long postId, @PathVariable String reactionType) {
         return communicationService.addReaction(postId, reactionType)
+                .then(Mono.empty());
+    }
+
+    @PostMapping("/post/comment/add")
+    @ResponseBody
+    public Mono<Void> deleteItemById (@RequestBody CommentRequest commentRequest) {
+        return communicationService.addComment(commentRequest)
+                .then(Mono.empty());
+    }
+
+    @PostMapping("/post/comment/edit/{id}")
+    @ResponseBody
+    public Mono<Void> editCommentById (@PathVariable Long id,
+                                      @RequestBody  CommentRequest commentRequest) {
+        return communicationService.editComment(id, commentRequest)
+                .then(Mono.empty());
+    }
+
+    @PostMapping("/post/comment/delete/{id}")
+    @ResponseBody
+    public Mono<Void> deleteCommentById (@PathVariable Long id) {
+        return communicationService.deleteComment(id)
                 .then(Mono.empty());
     }
 }

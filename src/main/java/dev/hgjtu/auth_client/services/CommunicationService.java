@@ -2,6 +2,7 @@ package dev.hgjtu.auth_client.services;
 
 import dev.hgjtu.auth_client.dto.communication.*;
 import dev.hgjtu.auth_client.dto.market.ItemResponse;
+import dev.hgjtu.auth_client.models.PostComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -115,4 +116,28 @@ public class CommunicationService {
                 .bodyToMono(Void.class);
     }
 
+    public Mono<PostComment> addComment(CommentRequest commentRequest) {
+        return webClient.post()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/add-comment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(commentRequest)
+                .retrieve()
+                .bodyToMono(PostComment.class);
+    }
+
+    public Mono<PostResponse> editComment(Long commentId, CommentRequest commentRequest) {
+        return webClient.patch()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/edit-comment/{commentId}", commentId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(commentRequest)
+                .retrieve()
+                .bodyToMono(PostResponse.class);
+    }
+
+    public Mono<String> deleteComment(Long commentId) {
+        return webClient.delete()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/delete-comment/{commentId}", commentId)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
 }
