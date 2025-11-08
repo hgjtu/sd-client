@@ -54,10 +54,13 @@ public class CommunicationController {
     }
 
     @GetMapping("/post/{id}")
-    public Mono<String> communicationHome(Model model, @PathVariable Long id) {
-        return communicationService.getPostById(id)
-                .map(post -> {
-                    model.addAttribute("post", post);
+    public Mono<String> postPage(Model model, @PathVariable Long id, @AuthenticationPrincipal OAuth2User principal) {
+        Mono<UserResponse> userMono = userService.getUserInfoByUsername(principal.getAttribute("sub"));
+        Mono<PostResponse> postMono = communicationService.getPostById(id);
+        return Mono.zip(userMono, postMono)
+                .map(tuple -> {
+                    model.addAttribute("user", tuple.getT1());
+                    model.addAttribute("post", tuple.getT2());
                     return "communication/post-page";
                 })
                 .onErrorResume(Exception.class, e -> {

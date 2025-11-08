@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>SkyFriends — клуб парашютистов</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -166,6 +168,7 @@
             color: #ff4500; /* яркий цвет для активной реакции */
             text-shadow: 0 0 3px #ff4500;
         }
+
         .comments {
             margin-top:10px;
             background:#f9fafb;
@@ -257,6 +260,141 @@
             color: #dc2626;
         }
 
+        /* === Комментарии и ответы === */
+        .comments {
+            margin-top: 15px;
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .comment-thread {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 0;
+        }
+
+        .comment-thread:last-child {
+            border-bottom: none;
+        }
+
+        .comment-main {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .comment-content {
+            margin: 0;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .comment-meta {
+            font-size: 12px;
+            color: #6b7280;
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .comment-actions button {
+            background: none;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--accent);
+            transition: color 0.2s;
+            padding: 0;
+        }
+
+        .comment-actions button:hover {
+            color: var(--accent-2);
+        }
+
+        .comment-actions .delete-comment-btn {
+            color: #ef4444;
+        }
+        .comment-actions .delete-comment-btn:hover {
+            color: #dc2626;
+        }
+
+        .replies {
+            margin-left: 20px;
+            border-left: 2px solid #e5e7eb;
+            padding-left: 10px;
+        }
+
+        .reply {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 6px;
+            margin-top: 6px;
+        }
+
+        .add-reply {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .add-reply input,
+        .add-comment input {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .add-reply button,
+        .add-comment button {
+            background: var(--accent);
+            border: 0;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* === Комментарии (дерево) === */
+        .comments { margin-top: 15px; background: #f9fafb; border-radius: 10px; padding: 12px; }
+        .comments-rendered { display: flex; flex-direction: column; gap: 8px; }
+
+        .comment-node {
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+            border: 1px solid #eef2f5;
+        }
+
+        .comment-header { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+        .comment-author { font-weight:600; font-size:14px; color:#0f172a; }
+        .comment-content { margin:6px 0 8px; font-size:14px; color:#374151; white-space:pre-wrap; }
+        .comment-meta { font-size:12px; color:#6b7280; display:flex; gap:10px; align-items:center; }
+
+        .comment-actions { margin-top:8px; display:flex; gap:8px; }
+        .comment-actions button {
+            background:none;border:0;color:var(--accent);cursor:pointer;padding:0;font-size:13px;
+        }
+        .comment-actions button:hover { color:var(--accent-2); }
+        .comment-actions .delete-comment-btn { color:#ef4444; }
+        .comment-actions .delete-comment-btn:hover { color:#dc2626; }
+
+        /* Вложенные ответы */
+        .comment-children { margin-left: 18px; margin-top:8px; display:flex; flex-direction:column; gap:8px; }
+        /* Форма для быстрого ответа */
+        .inline-reply { display:flex; gap:8px; margin-top:8px; }
+        .inline-reply input { flex:1; border:1px solid #d1d5db; border-radius:8px; padding:8px 10px; }
+        .inline-reply button { background:var(--accent); border:0; color:white; padding:8px 12px; border-radius:8px; cursor:pointer; }
+
+        /* Поле редактирования комментария (инлайн) */
+        .edit-input { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #d1d5db; }
+        .save-edit-btn { background:var(--accent); color:#fff; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; margin-left:8px; }
 
 
         .actions { margin-bottom: 8px; }
@@ -377,35 +515,35 @@
 
 
                 <!-- Комментарии -->
-                <div class="comments" style="margin-top:15px;">
-                    <div class="comment"
-                         th:each="comment : ${post.comments}"
-                         th:attr="data-comment-id=${comment.id}">
-                        <strong th:text="'Пользователь #' + ${comment.userId} + ':'">Елена:</strong>
-                        <p th:text="${comment.content}">Комментарий</p>
-                        <span style="font-size:12px;color:gray"
-                              th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}">
-                            1ч назад
-                        </span>
-                        <span style="font-size:12px;margin-left:10px;color:gray"
-                              th:text="'❤️ ' + ${comment.likes}">
-                            0
-                        </span>
+                <div class="comments"
+                     th:attr="data-post-id=${post.id}, data-current-user-id=${user.id}">
 
-                        <!-- Кнопки управления только для своих комментариев -->
-                        <div class="comment-actions"
-                             th:if="${comment.userId == user.id}">
-                            <button class="edit-comment-btn">Редактировать</button>
-                            <button class="delete-comment-btn">Удалить</button>
+                    <!-- Скрытые элементы — плоский список комментариев, которые прочитает JS -->
+                    <div class="raw-comments" style="display:none;">
+                        <div class="raw-comment"
+                             th:each="c : ${post.comments}"
+                             th:attr="
+                                data-id=${c.id},
+                                data-post-id=${c.postId},
+                                data-user-id=${c.userId},
+                                data-reply-id=${c.replyCommentId},
+                                data-content=${c.content},
+                                data-likes=${c.likes},
+                                data-created=${#temporals.format(c.createdAt, 'dd.MM.yyyy HH:mm')}
+                                ">
                         </div>
                     </div>
 
+                    <!-- Контейнер, куда JS отрисует уже иерархические комментарии -->
+                    <div class="comments-rendered"></div>
 
+                    <!-- Форма добавления нового (верхнего) комментария -->
                     <div class="add-comment">
-                        <input placeholder="Напишите комментарий..." />
-                        <button>Отправить</button>
+                        <input type="text" placeholder="Напишите комментарий..." />
+                        <button class="send-comment-btn">Отправить</button>
                     </div>
                 </div>
+
             </div>
         </div>
     </main>
@@ -431,6 +569,9 @@
 <div th:replace="fragments/footer :: site-footer"></div>
 
 <script>
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
     document.addEventListener("DOMContentLoaded", () => {
         const tabs = document.querySelectorAll(".tab");
         const subcats = document.querySelectorAll(".subcat");
@@ -521,6 +662,223 @@
                 });
             });
         });
+
+        // ======== Комментарии: собрать дерево из плоского списка и подключить CRUD ========
+        (function(){
+            // Вспомог: создать DOM-узел комментария
+            function createCommentNode(data, currentUserId) {
+                const node = document.createElement('div');
+                node.className = 'comment-node';
+                node.dataset.commentId = data.id;
+
+                node.innerHTML = `
+            <div class="comment-header">
+                <div>
+                    <div class="comment-author">Пользователь #${data.userId}</div>
+                    <div class="comment-meta">${data.created} · <span class="likes">❤️ ${data.likes}</span></div>
+                </div>
+                <div></div>
+            </div>
+            <div class="comment-content" data-content>${escapeHtml(data.content)}</div>
+            <div class="comment-actions"></div>
+            <div class="comment-children"></div>
+        `;
+
+                const actions = node.querySelector('.comment-actions');
+
+                // Reply button
+                const replyBtn = document.createElement('button');
+                replyBtn.className = 'reply-btn';
+                replyBtn.textContent = 'Ответить';
+                actions.appendChild(replyBtn);
+
+                // Edit & Delete only if owner
+                if (String(currentUserId) === String(data.userId)) {
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'edit-comment-btn';
+                    editBtn.textContent = 'Редактировать';
+                    actions.appendChild(editBtn);
+
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'delete-comment-btn';
+                    delBtn.textContent = 'Удалить';
+                    delBtn.style.marginLeft = '6px';
+                    actions.appendChild(delBtn);
+                }
+
+                return node;
+            }
+
+            // безопасное экранирование для вывода в текстовую ноду
+            function escapeHtml(unsafe) {
+                if (unsafe == null) return '';
+                return String(unsafe)
+                    .replaceAll('&', '&amp;')
+                    .replaceAll('<', '&lt;')
+                    .replaceAll('>', '&gt;')
+                    .replaceAll('"', '&quot;')
+                    .replaceAll("'", '&#039;');
+            }
+
+            // Для каждого .comments на странице
+            document.querySelectorAll('.comments').forEach(block => {
+                const postId = block.dataset.postId;
+                const currentUserId = block.dataset.currentUserId;
+                const raw = Array.from(block.querySelectorAll('.raw-comment')).map(rc => ({
+                    id: rc.dataset.id,
+                    postId: rc.dataset.postId,
+                    userId: rc.dataset.userId,
+                    replyId: rc.dataset.replyId === 'null' || rc.dataset.replyId === '' ? null : rc.dataset.replyId,
+                    content: rc.dataset.content,
+                    likes: rc.dataset.likes || 0,
+                    created: rc.dataset.created
+                }));
+
+                const renderedContainer = block.querySelector('.comments-rendered');
+
+                // Построить карту id -> nodeData
+                const map = {};
+                raw.forEach(r => { map[r.id] = Object.assign({}, r, { children: [] }); });
+
+                // Собрать дерево
+                const roots = [];
+                raw.forEach(r => {
+                    const node = map[r.id];
+                    if (r.replyId && map[r.replyId]) {
+                        map[r.replyId].children.push(node);
+                    } else {
+                        roots.push(node);
+                    }
+                });
+
+                // Рекурсивно отрисовать
+                function renderNodes(nodes, parentEl) {
+                    nodes.forEach(n => {
+                        const commentEl = createCommentNode(n, currentUserId);
+                        parentEl.appendChild(commentEl);
+
+                        // обработчики кнопок (reply, edit, delete)
+                        const replyBtn = commentEl.querySelector('.reply-btn');
+                        replyBtn.addEventListener('click', () => {
+                            // не дублируем форму
+                            if (commentEl.querySelector('.inline-reply')) return;
+
+                            const form = document.createElement('div');
+                            form.className = 'inline-reply';
+                            form.innerHTML = `<input type="text" placeholder="Ответить..." /><button>Отправить</button>`;
+                            commentEl.appendChild(form);
+
+                            const input = form.querySelector('input');
+                            const send = form.querySelector('button');
+
+                            send.addEventListener('click', async () => {
+                                const content = input.value.trim();
+                                if (!content) return;
+
+                                const body = { postId: Number(postId), replyCommentId: Number(n.id), content };
+                                try {
+                                    const resp = await fetch('/communication/post/comment/add', {
+                                        method: 'POST',
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            [csrfHeader]: csrfToken
+                                        },
+                                        body: JSON.stringify(body)
+                                    });
+                                    if (!resp.ok) throw new Error('Ошибка добавления ответа');
+                                    window.location.reload();
+                                } catch (err) { console.error(err); }
+                            });
+                        });
+
+                        const editBtn = commentEl.querySelector('.edit-comment-btn');
+                        if (editBtn) {
+                            editBtn.addEventListener('click', () => {
+                                const contentEl = commentEl.querySelector('[data-content]');
+                                const old = contentEl.textContent;
+                                const input = document.createElement('input');
+                                input.className = 'edit-input';
+                                input.value = old;
+                                contentEl.replaceWith(input);
+
+                                // добавить кнопки сохранить/отменить
+                                const save = document.createElement('button');
+                                save.className = 'save-edit-btn';
+                                save.textContent = 'Сохранить';
+                                const actions = commentEl.querySelector('.comment-actions');
+                                actions.appendChild(save);
+
+                                save.addEventListener('click', async () => {
+                                    const newText = input.value.trim();
+                                    if (!newText) return;
+                                    const body = { postId: Number(postId), replyCommentId: null, content: newText };
+                                    try {
+                                        const resp = await fetch(`/communication/post/comment/edit/${n.id}`, {
+                                            method: 'POST',
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                                [csrfHeader]: csrfToken
+                                            },
+                                            body: JSON.stringify(body)
+                                        });
+                                        if (!resp.ok) throw new Error('Ошибка редактирования');
+                                        window.location.reload();
+                                    } catch (err) { console.error(err); }
+                                });
+                            });
+                        }
+
+                        const delBtn = commentEl.querySelector('.delete-comment-btn');
+                        if (delBtn) {
+                            delBtn.addEventListener('click', async () => {
+                                if (!confirm('Удалить комментарий?')) return;
+                                try {
+                                    const resp = await fetch(`/communication/post/comment/delete/${n.id}`, {
+                                        method: 'POST',
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            [csrfHeader]: csrfToken
+                                        }, });
+                                    if (!resp.ok) throw new Error('Ошибка удаления');
+                                    window.location.reload();
+                                } catch (err) { console.error(err); }
+                            });
+                        }
+
+                        // рендер дочерних
+                        if (n.children && n.children.length) {
+                            const childrenContainer = commentEl.querySelector('.comment-children');
+                            renderNodes(n.children, childrenContainer);
+                        }
+                    });
+                }
+
+                // Запуск отрисовки
+                renderNodes(roots, renderedContainer);
+
+                // --- хендлер добавления нового корневого комментария ---
+                const addInput = block.querySelector('.add-comment input');
+                const addBtn = block.querySelector('.add-comment .send-comment-btn');
+                addBtn.addEventListener('click', async () => {
+                    const content = addInput.value.trim();
+                    if (!content) return;
+                    const body = { postId: Number(postId), replyCommentId: null, content };
+                    try {
+                        const resp = await fetch('/communication/post/comment/add', {
+                            method: 'POST',
+                            headers: {
+                                "Content-Type": "application/json",
+                                [csrfHeader]: csrfToken
+                            },
+                            body: JSON.stringify(body)
+                        });
+                        if (!resp.ok) throw new Error('Ошибка добавления комментария');
+                        window.location.reload();
+                    } catch (err) { console.error(err); }
+                });
+            });
+        })();
+
     });
 </script>
 
