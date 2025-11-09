@@ -21,7 +21,7 @@ public class MarketService {
     private final WebClient webClient;
     private final WebClient serverWebClient;
 
-    @Value("${MARKET_RESOURCE_SERVER_URL}")
+    @Value("${GATEWAY_SERVICE_URL}")
     private String gatewayServiceURL;
     @Value("${MARKET_RESOURCE_PREFIX}")
     private String marketResourcePrefix;
