@@ -28,10 +28,11 @@ public class UserService {
     }
 
     public Mono<UserResponse> getUserInfoByUsername(String username) {
-        return webClient.get()
+        Mono<UserResponse> qw =  webClient.get()
                 .uri(gatewayServiceURL + userResourcePrefix + "/users/username/{username}", username)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
+        return qw;
     }
 
     public Mono<UserResponse> editUser(UserEditRequest userEditRequest) {
