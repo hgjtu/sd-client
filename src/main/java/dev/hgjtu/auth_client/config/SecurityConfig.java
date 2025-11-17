@@ -82,11 +82,11 @@ public class SecurityConfig {
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                 .scope("read", "openid", "profile")
-                .userInfoUri("http://localhost:9090/userinfo")
+                .userInfoUri("http://auth-server:9090/userinfo")
                 .userNameAttributeName("sub")
                 .authorizationUri("http://localhost:9090/oauth2/authorize")
-                .tokenUri("http://localhost:9090/oauth2/token")
-                .jwkSetUri("http://localhost:9090/oauth2/jwks")
+                .tokenUri("http://auth-server:9090/oauth2/token")
+                .jwkSetUri("http://auth-server:9090/oauth2/jwks")
                 .clientName("Web Client")
                 .build();
     }
