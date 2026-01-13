@@ -84,7 +84,7 @@ public class SecurityConfig {
                 .scope("read", "openid", "profile")
                 .userInfoUri("http://auth-server:9090/userinfo")
                 .userNameAttributeName("sub")
-                .authorizationUri("http://localhost:9090/oauth2/authorize")
+                .authorizationUri("http://localhost:9090/oauth2/authorize") // 194.87.94.103
                 .tokenUri("http://auth-server:9090/oauth2/token")
                 .jwkSetUri("http://auth-server:9090/oauth2/jwks")
                 .clientName("Web Client")

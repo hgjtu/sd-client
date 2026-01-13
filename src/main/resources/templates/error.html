@@ -56,6 +56,10 @@
     <p class="text-muted mt-4" th:if="${status}">
         Код ошибки: <span th:text="${status}"></span>
     </p>
+
+    <p class="text-muted mt-4" th:if="${error}">
+        Текст ошибки: <span th:text="${error}"></span>
+    </p>
 </main>
 
 <!-- Подключаем footer -->
