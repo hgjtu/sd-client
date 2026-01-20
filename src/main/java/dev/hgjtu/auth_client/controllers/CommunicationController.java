@@ -1,9 +1,7 @@
 package dev.hgjtu.auth_client.controllers;
 
 import dev.hgjtu.auth_client.dto.communication.*;
-import dev.hgjtu.auth_client.dto.market.ItemRequest;
 import dev.hgjtu.auth_client.dto.user.UserResponse;
-import dev.hgjtu.auth_client.models.PostComment;
 import dev.hgjtu.auth_client.services.CommunicationService;
 import dev.hgjtu.auth_client.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor

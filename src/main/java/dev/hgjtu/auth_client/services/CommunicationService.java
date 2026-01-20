@@ -1,7 +1,6 @@
 package dev.hgjtu.auth_client.services;
 
 import dev.hgjtu.auth_client.dto.communication.*;
-import dev.hgjtu.auth_client.dto.market.ItemResponse;
 import dev.hgjtu.auth_client.models.PostComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +15,6 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-
 public class CommunicationService {
     private final WebClient webClient;
 
