@@ -1,19 +1,11 @@
 package dev.hgjtu.auth_client.controllers;
 
-import dev.hgjtu.auth_client.dto.communication.CommentRequest;
-import dev.hgjtu.auth_client.dto.communication.PostResponse;
-import dev.hgjtu.auth_client.dto.communication.SectionResponse;
+
 import dev.hgjtu.auth_client.dto.jump_group.GroupRequest;
 import dev.hgjtu.auth_client.dto.jump_group.GroupResponse;
 import dev.hgjtu.auth_client.dto.jump_group.TrainingLevelResponse;
-import dev.hgjtu.auth_client.dto.market.CategoryResponse;
-import dev.hgjtu.auth_client.dto.market.ItemRequest;
-import dev.hgjtu.auth_client.dto.market.ItemResponse;
-import dev.hgjtu.auth_client.dto.user.UserResponse;
 import dev.hgjtu.auth_client.services.JumpGroupService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +13,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Controller
 @RequiredArgsConstructor
@@ -75,7 +66,7 @@ public class JumpGroupController {
                 .map(levels -> {
                     model.addAttribute("levels", levels);
                     model.addAttribute("actionUrl", "/jump-group/create-group");
-                    return "market/add-item";
+                    return "groups/edit-group";
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
@@ -103,7 +94,7 @@ public class JumpGroupController {
                     model.addAttribute("trainingLevels", trainingLevels);
                     model.addAttribute("group", group);
                     model.addAttribute("actionUrl", "/jump-group/edit/" + group.getId());
-                    return "market/add-request";
+                    return "groups/edit-group";
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
