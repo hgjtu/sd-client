@@ -135,7 +135,7 @@ public class CommunicationController {
 
     @PostMapping("/post/comment/add")
     @ResponseBody
-    public Mono<Void> deleteItemById (@RequestBody CommentRequest commentRequest) {
+    public Mono<Void> addCommentToPost (@RequestBody CommentRequest commentRequest) {
         return communicationService.addComment(commentRequest)
                 .then(Mono.empty());
     }

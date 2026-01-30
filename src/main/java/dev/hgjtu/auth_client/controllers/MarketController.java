@@ -215,4 +215,6 @@ public class MarketController {
         return marketService.deleteItem(id)
                 .then(Mono.just("redirect:/market"));
     }
+
+    // TODO нет комментариев
 }
