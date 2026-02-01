@@ -1,266 +1,762 @@
-<!DOCTYPE html>
-<html lang="ru">
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkyJump — Группа FS Formation</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <title th:text="${group.groupName + ' — SkyFriends'}">SkyFriends — группа</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --blue: #1e88e5;
-            --dark-blue: #0d47a1;
-            --light-bg: #f5f7fa;
-            --card-bg: #ffffff;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --radius: 12px;
-            --transition: 0.3s ease;
+            --bg:#f5f8fb;
+            --card:#fff;
+            --accent:#1fb6ff;
+            --accent-2:#ff9f43;
+            --muted:#6b7280;
+            --radius:14px;
+            --shadow:0 6px 18px rgba(22,28,37,0.08);
         }
-
-        * { box-sizing: border-box; }
 
         body {
-            font-family: "Inter", "Segoe UI", sans-serif;
-            margin: 0;
-            background: var(--light-bg);
-            color: #333;
+            margin:0;
+            font-family:'Inter',system-ui,sans-serif;
+            background:linear-gradient(180deg,#eaf6ff 0%,#f5f8fb 60%);
+            color:#111827;
+            padding:24px;
         }
 
-        header {
-            background: var(--blue);
+        .post-page {
+            max-width:850px;
+            margin:0 auto;
+        }
+
+        .post {
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            padding:24px;
+            display:flex;
+            gap:18px;
+        }
+
+        .avatar-large {
+            width:70px;
+            height:70px;
+            border-radius:50%;
+            background:linear-gradient(135deg,#1fb6ff,#4fd1c5);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:700;
+            color:white;
+            font-size:28px;
+            flex-shrink:0;
+        }
+
+        .body {flex:1;}
+
+        .head {
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            flex-wrap:wrap;
+        }
+
+        .head-left {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            flex-wrap:wrap;
+        }
+
+        .head h3 {
+            margin:0;
+            font-size:18px;
+        }
+
+        .head p {
+            margin:0;
+            color:var(--accent);
+            font-size:14px;
+        }
+
+        .head span {
+            font-size:13px;
+            color:var(--muted);
+        }
+
+        .post-actions {
+            margin-top:8px;
+        }
+
+        .btn-edit {
+            color:var(--accent);
+            font-size:14px;
+            text-decoration:none;
+            margin-right:12px;
+        }
+        .btn-delete {
+            color:#e11d48;
+            background:none;
+            border:none;
+            cursor:pointer;
+            font-size:14px;
+        }
+
+        .content {
+            margin-top:14px;
+            font-size:16px;
+            line-height:1.6;
+            color:#1e293b;
+        }
+
+        .media {
+            margin-top:14px;
+        }
+
+        .media img {
+            max-width:100%;
+            border-radius:10px;
+            box-shadow:0 3px 12px rgba(0,0,0,0.08);
+            margin-top:8px;
+        }
+
+        .comments {
+            margin-top:24px;
+            background:#f9fafb;
+            border-radius:10px;
+            padding:14px 16px;
+        }
+
+        .comments h4 {
+            margin-bottom:12px;
+            font-size:17px;
+            color:#0f172a;
+        }
+
+        .comment {
+            border-bottom:1px solid #e5e7eb;
+            padding:8px 0;
+        }
+        .comment:last-child {border:0;}
+        .comment strong {font-size:14px;color:#111827;}
+        .comment p {margin:4px 0;font-size:14px;color:#374151;}
+        .comment div {font-size:12px;color:var(--muted);}
+
+        .add-comment {
+            display:flex;
+            gap:8px;
+            margin-top:10px;
+        }
+
+        .add-comment input {
+            flex:1;
+            border:1px solid #d1d5db;
+            border-radius:8px;
+            padding:8px 10px;
+        }
+
+        .add-comment button {
+            background:var(--accent);
+            border:0;
+            color:white;
+            padding:8px 16px;
+            border-radius:8px;
+            cursor:pointer;
+            transition:.2s;
+        }
+        .add-comment button:hover {background:#0ea5e9;}
+
+        .btn-back {
+            display:inline-block;
+            background:var(--card);
+            color:var(--accent);
+            padding:8px 14px;
+            border-radius:8px;
+            box-shadow:var(--shadow);
+            font-weight:500;
+            text-decoration:none;
+            transition:.2s;
+        }
+        .btn-back:hover {
+            background:#e0f2fe;
+            color:#0369a1;
+        }
+
+        .reactions .reaction:hover {
+            background:#e0f2fe;
+            border-color:#bae6fd;
+        }
+
+        .reactions .reaction.reacted {
+            font-weight: bold;
+            color: #ff4500; /* яркий цвет для активной реакции */
+            text-shadow: 0 0 3px #ff4500;
+        }
+
+        .comments {
+            margin-top:10px;
+            background:#f9fafb;
+            border-radius:10px;
+            padding:10px;
+        }
+        .comment {
+            border-bottom:1px solid #e5e7eb;
+            padding:6px 0;
+        }
+        .comment:last-child {border:0;}
+        .comment strong {font-size:14px;}
+        .comment p {margin:2px 0 0;font-size:13px;color:#374151;}
+        .add-comment {
+            display:flex;
+            gap:8px;
+            margin-top:8px;
+        }
+        .add-comment input {
+            flex:1;
+            border:1px solid #d1d5db;
+            border-radius:8px;
+            padding:8px 10px;
+        }
+        .add-comment button {
+            background:var(--accent);
+            border:0;
+            color:white;
+            padding:8px 14px;
+            border-radius:8px;
+            cursor:pointer;
+        }
+
+        /* RIGHT: subcategories */
+        .right {
+            position:sticky;
+            top:24px;
+            align-self:start;
+        }
+        .right .category {
+            background:var(--card);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+            padding:14px;
+        }
+        .right h5 {margin:0 0 8px 0;}
+        .subcat {
+            padding:8px 10px;
+            border-radius:8px;
+            cursor:pointer;
+            color:#0f172a;
+            margin-bottom:4px;
+            transition:.2s;
+        }
+        .subcat.active {
+            background: var(--accent);
             color: white;
-            padding: 1rem 2rem;
-            text-align: center;
-            box-shadow: var(--shadow);
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-        }
-
-        main {
-            max-width: 900px;
-            margin: 2rem auto;
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 2rem;
-        }
-
-        .group-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .group-header h2 {
-            margin: 0;
-            color: var(--blue);
-        }
-
-        .apply-btn {
-            background: var(--blue);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
             font-weight: 600;
-            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(31,182,255,0.25);
+        }
+        .subcat:hover {
+            background: #e0f2fe;
+            color: #0369a1;
         }
 
-        .apply-btn:hover {
-            background: var(--dark-blue);
-        }
-
-        .group-info {
-            margin-top: 1rem;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .group-type {
-            display: inline-block;
-            background: var(--blue);
-            color: white;
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-
-        .group-description {
-            margin-top: 1.5rem;
-            font-size: 1.05rem;
-            color: #444;
-            font-style: italic;
-        }
-
-        .members {
-            margin-top: 2rem;
-        }
-
-        .members h3 {
-            margin-bottom: 0.5rem;
-            color: var(--blue);
-        }
-
-        .member-list {
+        .comment-actions {
+            margin-top: 6px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
+            gap: 10px;
         }
 
-        .member {
-            background: #e9f2fd;
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            font-weight: 500;
-            color: #333;
+        .comment-actions button {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s;
         }
 
-        /* Чат/вопросы */
-        .chat-section {
-            margin-top: 2rem;
+        .comment-actions button:hover {
+            color: var(--accent-2);
+        }
+        .comment-actions .delete-comment-btn {
+            color: #ef4444;
+        }
+        .comment-actions .delete-comment-btn:hover {
+            color: #dc2626;
         }
 
-        .chat-section h3 {
-            color: var(--blue);
-            margin-bottom: 1rem;
-        }
-
-        .messages {
-            background: #f0f4fa;
+        /* === Комментарии и ответы === */
+        .comments {
+            margin-top: 15px;
+            background: #f9fafb;
             border-radius: 10px;
-            padding: 1rem;
-            height: 250px;
-            overflow-y: auto;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            padding: 12px;
         }
 
-        .message {
-            margin-bottom: 0.8rem;
+        .comment-thread {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 8px 0;
         }
 
-        .message strong {
-            color: var(--blue);
+        .comment-thread:last-child {
+            border-bottom: none;
         }
 
-        .chat-form {
+        .comment-main {
             display: flex;
-            gap: 0.6rem;
-            margin-top: 1rem;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .chat-form input {
-            flex: 1;
-            padding: 0.8rem;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+        .comment-content {
+            margin: 0;
+            font-size: 14px;
+            color: #374151;
         }
 
-        .chat-form button {
-            background: var(--blue);
-            color: white;
+        .comment-meta {
+            font-size: 12px;
+            color: #6b7280;
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .comment-actions button {
+            background: none;
             border: none;
-            padding: 0.8rem 1.2rem;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--accent);
+            transition: color 0.2s;
+            padding: 0;
+        }
+
+        .comment-actions button:hover {
+            color: var(--accent-2);
+        }
+
+        .comment-actions .delete-comment-btn {
+            color: #ef4444;
+        }
+        .comment-actions .delete-comment-btn:hover {
+            color: #dc2626;
+        }
+
+        .replies {
+            margin-left: 20px;
+            border-left: 2px solid #e5e7eb;
+            padding-left: 10px;
+        }
+
+        .reply {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 6px;
+            margin-top: 6px;
+        }
+
+        .add-reply {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .add-reply input,
+        .add-comment input {
+            flex: 1;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .add-reply button,
+        .add-comment button {
+            background: var(--accent);
+            border: 0;
+            color: white;
+            padding: 8px 14px;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
         }
 
-        .chat-form button:hover {
-            background: var(--dark-blue);
+        /* === Комментарии (дерево) === */
+        .comments { margin-top: 15px; background: #f9fafb; border-radius: 10px; padding: 12px; }
+        .comments-rendered { display: flex; flex-direction: column; gap: 8px; }
+
+        .comment-node {
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+            border: 1px solid #eef2f5;
         }
 
-        footer {
-            text-align: center;
-            margin: 2rem 0;
-            color: #777;
-            font-size: 0.9rem;
-        }
+        .comment-header { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+        .comment-author { font-weight:600; font-size:14px; color:#0f172a; }
+        .comment-content { margin:6px 0 8px; font-size:14px; color:#374151; white-space:pre-wrap; }
+        .comment-meta { font-size:12px; color:#6b7280; display:flex; gap:10px; align-items:center; }
 
-        @media (max-width: 600px) {
-            .group-header {
-                flex-direction: column;
-                align-items: flex-start;
+        .comment-actions { margin-top:8px; display:flex; gap:8px; }
+        .comment-actions button {
+            background:none;border:0;color:var(--accent);cursor:pointer;padding:0;font-size:13px;
+        }
+        .comment-actions button:hover { color:var(--accent-2); }
+        .comment-actions .delete-comment-btn { color:#ef4444; }
+        .comment-actions .delete-comment-btn:hover { color:#dc2626; }
+
+        /* Вложенные ответы */
+        .comment-children { margin-left: 18px; margin-top:8px; display:flex; flex-direction:column; gap:8px; }
+        /* Форма для быстрого ответа */
+        .inline-reply { display:flex; gap:8px; margin-top:8px; }
+        .inline-reply input { flex:1; border:1px solid #d1d5db; border-radius:8px; padding:8px 10px; }
+        .inline-reply button { background:var(--accent); border:0; color:white; padding:8px 12px; border-radius:8px; cursor:pointer; }
+
+        /* Поле редактирования комментария (инлайн) */
+        .edit-input { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #d1d5db; }
+        .save-edit-btn { background:var(--accent); color:#fff; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; margin-left:8px; }
+
+
+        @media(max-width:768px){
+            .post {
+                flex-direction:column;
+                padding:18px;
             }
-            .apply-btn {
-                width: 100%;
+            .avatar-large {
+                width:60px;height:60px;font-size:24px;
             }
         }
     </style>
 </head>
+
 <body>
 
-<header>
-    <h1>SkyJump — Группа</h1>
-</header>
+<!-- header -->
+<div th:replace="fragments/header :: site-header"></div>
 
-<main>
-    <div class="group-header">
-        <h2>FS Formation — Дропзона «Аэроград»</h2>
-        <button class="apply-btn" id="applyBtn">Подать заявку</button>
+<div class="post-page mt-4">
+
+    <div class="mb-3">
+        <a href="javascript:history.back()" class="btn-back">
+            ← Назад
+        </a>
     </div>
 
-    <div class="group-info">
-        <span class="group-type">Тип: Командный прыжок</span>
-        <p><strong>Дата:</strong> 22.12.2025</p>
-        <p><strong>Время:</strong> 11:00</p>
-        <p><strong>Уровень подготовки:</strong> Средний</p>
-        <p><strong>Организатор:</strong> Алексей К.</p>
-        <p class="group-description">Тренировочный прыжок в формации FS (4-way). Цель — отработка стабильных перестроений в команде. Ищем ещё двух участников!</p>
-    </div>
+    <div class="post">
 
-    <div class="members">
-        <h3>Участники группы:</h3>
-        <div class="member-list">
-            <div class="member">Алексей К. (Организатор)</div>
-            <div class="member">Ирина М.</div>
-            <div class="member">Сергей П.</div>
+        <!-- Аватар группы -->
+        <div class="avatar-large"
+             th:text="${group.groupName.substring(0,1)}">G</div>
+
+        <div class="body">
+
+            <!-- HEAD -->
+            <div class="head">
+                <div class="head-left">
+                    <h3 th:text="${group.groupName}">Название группы</h3>
+                    <p th:if="${group.isParticipant == true}">Вы участник</p>
+                </div>
+
+                <span th:text="${#temporals.format(group.jumpDateTime,'dd MMM yyyy HH:mm')}">
+                    01 янв 2026 12:00
+                </span>
+            </div>
+
+            <!-- META -->
+            <div class="content">
+                <p>
+                    📍 <strong th:text="${group.jumpPlace}">Место</strong><br>
+                    👤 Организатор:
+                    <strong th:text="${group.organizerUsername}">user</strong><br>
+                    🎯 Уровень подготовки:
+                    <strong th:text="${group.trainingLevel}"></strong><br>
+                    👥 Участников:
+                    <strong th:text="${#lists.size(group.participants)}"></strong>
+                    /
+                    <strong th:text="${group.maxParticipants}"></strong>
+                </p>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="content" th:text="${group.description}">
+                Описание группы
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="post-actions">
+
+                <!-- Вступить -->
+                <form th:if="${group.isParticipant != true}"
+                      th:action="@{'/jump-group/' + ${group.id} + '/join'}"
+                      method="post"
+                      style="display:inline;">
+                    <button class="btn btn-primary">
+                        ➕ Вступить ВООБЩЕ НЕТ ТАКОГО ФУНКЦИОНАЛА АХХАХАХАХ
+                    </button>
+                </form>
+
+                <!-- Выйти -->
+                <form th:if="${group.isParticipant == true}"
+                      th:action="@{'/jump-group/' + ${group.id} + '/leave'}"
+                      method="post"
+                      style="display:inline;">
+                    <button class="btn btn-outline-danger">
+                        🚪 Выйти
+                    </button>
+                </form>
+
+                <!-- Кнопки -->
+<!--                <div class="post-actions" th:if="${#authentication != null and #authentication.name == group.organizerId}">-->
+                <div th:if="${#authentication != null}">
+                    <a th:href="@{'/jump-group/edit/' + ${group.id}}" class="btn-edit">✏️ Редактировать</a>
+                    <form th:action="@{'/jump-group/delete/' + ${group.id}}" method="post" style="display:inline;">
+                        <button type="submit" class="btn-delete">🗑️ Удалить</button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- ================= COMMENTS ================= -->
+            <div class="comments"
+                 th:attr="data-group-id=${group.id}, data-current-user-id=${user.id}">
+
+                <h4>Комментарии</h4>
+
+                <!-- Плоский список (для JS) -->
+                <div class="raw-comments" style="display:none;">
+                    <div class="raw-comment"
+                         th:each="c : ${group.comments}"
+                         th:attr="
+                            data-id=${c.id},
+                            data-user-id=${c.userId},
+                            data-reply-id=${c.replyCommentId},
+                            data-content=${c.content},
+                            data-likes=${c.likes},
+                            data-created=${#temporals.format(c.createdAt,'dd.MM.yyyy HH:mm')}
+                         ">
+                    </div>
+                </div>
+
+                <!-- JS-рендер -->
+                <div class="comments-rendered"></div>
+
+                <!-- Добавить комментарий -->
+                <div class="add-comment">
+                    <input type="text" placeholder="Напишите комментарий..." />
+                    <button class="send-comment-btn">Отправить</button>
+                </div>
+            </div>
+
         </div>
     </div>
+</div>
 
-    <div class="chat-section">
-        <h3>Задать вопрос участникам</h3>
-        <div class="messages" id="messages">
-            <div class="message"><strong>Ирина:</strong> Привет! Какая будет высота выхода?</div>
-            <div class="message"><strong>Алексей (Орг):</strong> Планируем 4000 м, стандартно. Если погода позволит.</div>
-        </div>
+<!-- footer -->
+<div th:replace="fragments/footer :: site-footer"></div>
 
-        <form class="chat-form" id="chatForm">
-            <input type="text" id="chatInput" placeholder="Написать сообщение..." required />
-            <button type="submit">Отправить</button>
-        </form>
-    </div>
-</main>
-
-<footer>
-    <p>© 2025 SkyJump Community</p>
-</footer>
-
+<!-- ================= JS ================= -->
 <script>
-    // кнопка "Подать заявку"
-    document.getElementById('applyBtn').addEventListener('click', () => {
-        alert('Ваша заявка на участие отправлена организатору!');
-    });
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
 
-    // простой чат (локальный пример)
-    const chatForm = document.getElementById('chatForm');
-    const chatInput = document.getElementById('chatInput');
-    const messages = document.getElementById('messages');
+    document.addEventListener("DOMContentLoaded", () => {
 
-    chatForm.addEventListener('submit', e => {
-        e.preventDefault();
-        const text = chatInput.value.trim();
-        if (!text) return;
-        const msg = document.createElement('div');
-        msg.className = 'message';
-        msg.innerHTML = `<strong>Вы:</strong> ${text}`;
-        messages.appendChild(msg);
-        chatInput.value = '';
-        messages.scrollTop = messages.scrollHeight;
+        // === КОММЕНТАРИИ ДЛЯ ГРУПП (аналог постов) ===
+        document.querySelectorAll('.comments').forEach(block => {
+
+            const groupId = block.dataset.groupId;
+            const currentUserId = block.dataset.currentUserId;
+
+            const raw = Array.from(block.querySelectorAll('.raw-comment')).map(rc => ({
+                id: rc.dataset.id,
+                userId: rc.dataset.userId,
+                replyId: rc.dataset.replyId === 'null' || rc.dataset.replyId === '' ? null : rc.dataset.replyId,
+                content: rc.dataset.content,
+                likes: rc.dataset.likes || 0,
+                created: rc.dataset.created
+            }));
+
+            const rendered = block.querySelector('.comments-rendered');
+
+            const map = {};
+            raw.forEach(r => map[r.id] = {...r, children: []});
+
+            const roots = [];
+            raw.forEach(r => {
+                if (r.replyId && map[r.replyId]) {
+                    map[r.replyId].children.push(map[r.id]);
+                } else {
+                    roots.push(map[r.id]);
+                }
+            });
+
+            function escapeHtml(s) {
+                return String(s)
+                    .replaceAll('&','&amp;')
+                    .replaceAll('<','&lt;')
+                    .replaceAll('>','&gt;');
+            }
+
+            function render(nodes, parent) {
+                nodes.forEach(n => {
+                    const el = document.createElement('div');
+                    el.className = 'comment-node';
+                    el.dataset.commentId = n.id;
+
+                    el.innerHTML = `
+            <div class="comment-header">
+                <div>
+                    <div class="comment-author">Пользователь #${n.userId}</div>
+                    <div class="comment-meta">${n.created}</div>
+                </div>
+            </div>
+            <div class="comment-content" data-content>${escapeHtml(n.content)}</div>
+            <div class="comment-actions"></div>
+            <div class="comment-children"></div>
+        `;
+
+                    const actions = el.querySelector('.comment-actions');
+
+                    /* ===== Ответить ===== */
+                    const replyBtn = document.createElement('button');
+                    replyBtn.textContent = 'Ответить';
+                    actions.appendChild(replyBtn);
+
+                    replyBtn.onclick = () => {
+                        if (el.querySelector('.inline-reply')) return;
+
+                        const form = document.createElement('div');
+                        form.className = 'inline-reply';
+                        form.innerHTML = `<input type="text"><button>Отправить</button>`;
+                        el.appendChild(form);
+
+                        form.querySelector('button').onclick = async () => {
+                            const text = form.querySelector('input').value.trim();
+                            if (!text) return;
+
+                            await fetch('/jump-group/comment/add', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    [csrfHeader]: csrfToken
+                                },
+                                body: JSON.stringify({
+                                    groupId: Number(groupId),
+                                    replyCommentId: Number(n.id),
+                                    content: text
+                                })
+                            });
+
+                            location.reload();
+                        };
+                    };
+
+                    /* ===== Редактировать / Удалить (только автор) ===== */
+                    if (String(currentUserId) === String(n.userId)) {
+
+                        // Редактировать
+                        const editBtn = document.createElement('button');
+                        editBtn.textContent = 'Редактировать';
+                        actions.appendChild(editBtn);
+
+                        editBtn.onclick = () => {
+                            const contentEl = el.querySelector('[data-content]');
+                            const oldText = contentEl.textContent;
+
+                            const input = document.createElement('input');
+                            input.className = 'edit-input';
+                            input.value = oldText;
+
+                            contentEl.replaceWith(input);
+
+                            const saveBtn = document.createElement('button');
+                            saveBtn.className = 'save-edit-btn';
+                            saveBtn.textContent = 'Сохранить';
+                            actions.appendChild(saveBtn);
+
+                            saveBtn.onclick = async () => {
+                                const newText = input.value.trim();
+                                if (!newText) return;
+
+                                await fetch(`/jump-group/comment/edit/${n.id}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        [csrfHeader]: csrfToken
+                                    },
+                                    body: JSON.stringify({
+                                        groupId: Number(groupId),
+                                        content: newText
+                                    })
+                                });
+
+                                location.reload();
+                            };
+                        };
+
+                        // Удалить
+                        const delBtn = document.createElement('button');
+                        delBtn.textContent = 'Удалить';
+                        delBtn.className = 'delete-comment-btn';
+                        actions.appendChild(delBtn);
+
+                        delBtn.onclick = async () => {
+                            if (!confirm('Удалить комментарий?')) return;
+
+                            await fetch(`/jump-group/comment/delete/${n.id}`, {
+                                method: 'POST',
+                                headers: {
+                                    [csrfHeader]: csrfToken
+                                }
+                            });
+
+                            location.reload();
+                        };
+                    }
+
+                    parent.appendChild(el);
+
+                    if (n.children.length) {
+                        render(n.children, el.querySelector('.comment-children'));
+                    }
+                });
+            }
+
+
+            render(roots, rendered);
+
+            // добавить корневой комментарий
+            block.querySelector('.send-comment-btn').onclick = async () => {
+                const input = block.querySelector('.add-comment input');
+                const text = input.value.trim();
+                if (!text) return;
+
+                await fetch('/jump-group/comment/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify({
+                        groupId: Number(groupId),
+                        replyCommentId: null,
+                        content: text
+                    })
+                });
+
+                location.reload();
+            };
+        });
     });
 </script>
 

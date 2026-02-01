@@ -1,11 +1,17 @@
 package dev.hgjtu.auth_client.controllers;
 
 
+import dev.hgjtu.auth_client.dto.PageResponse;
+import dev.hgjtu.auth_client.dto.communication.PostResponse;
 import dev.hgjtu.auth_client.dto.jump_group.GroupRequest;
 import dev.hgjtu.auth_client.dto.jump_group.GroupResponse;
 import dev.hgjtu.auth_client.dto.jump_group.TrainingLevelResponse;
+import dev.hgjtu.auth_client.dto.user.UserResponse;
 import dev.hgjtu.auth_client.services.JumpGroupService;
+import dev.hgjtu.auth_client.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/jump-group")
 public class JumpGroupController {
+    private final UserService userService;
     private final JumpGroupService jumpGroupService;
 
     @GetMapping
@@ -32,12 +39,15 @@ public class JumpGroupController {
                                       @RequestParam(required = false, defaultValue = "false") Boolean isParticipant,
                                       Model model) {
 
-        return jumpGroupService.getGroupsByParams(
-                        page, size, sort, direction, places, trainingLevel,
-                        jumpDateTimeStart, jumpDateTimeEnd, isParticipant
-                )
-                .map(groupsPage -> {
-                    model.addAttribute("groupsPage", groupsPage);
+        Mono<List<TrainingLevelResponse>> trainingLevels = jumpGroupService.getTrainingLevels().collectList();
+        Mono<PageResponse<GroupResponse>> groupsPage = jumpGroupService.getGroupsByParams(
+                page, size, sort, direction, places, trainingLevel,
+                jumpDateTimeStart, jumpDateTimeEnd, isParticipant
+        );
+        return Mono.zip(trainingLevels, groupsPage)
+                .map(tuple -> {
+                    model.addAttribute("trainingLevels", tuple.getT1());
+                    model.addAttribute("groupsPage", tuple.getT2());
                     return "groups/find-group";
                 })
                 .onErrorResume(Exception.class, e -> {
@@ -46,11 +56,14 @@ public class JumpGroupController {
                 });
     }
 
-    @GetMapping("/group/{id}")
-    public Mono<String> groupPage(Model model, @PathVariable Integer id) {
-        return jumpGroupService.getGroupById(id)
-                .map(group -> {
-                    model.addAttribute("group", group);
+    @GetMapping("/{id}")
+    public Mono<String> groupPage(Model model, @PathVariable Integer id, @AuthenticationPrincipal OAuth2User principal) {
+        Mono<UserResponse> userMono = userService.getUserInfoByUsername(principal.getAttribute("sub"));
+        Mono<GroupResponse> groupMono = jumpGroupService.getGroupById(id);
+        return Mono.zip(userMono, groupMono)
+                .map(tuple -> {
+                    model.addAttribute("user", tuple.getT1());
+                    model.addAttribute("group", tuple.getT2());
                     return "groups/group-page";
                 })
                 .onErrorResume(Exception.class, e -> {
@@ -64,9 +77,9 @@ public class JumpGroupController {
         return jumpGroupService.getTrainingLevels()
                 .collectList()
                 .map(levels -> {
-                    model.addAttribute("levels", levels);
+                    model.addAttribute("trainingLevels", levels);
                     model.addAttribute("actionUrl", "/jump-group/create-group");
-                    return "groups/edit-group";
+                    return "groups/create-group";
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
@@ -94,7 +107,7 @@ public class JumpGroupController {
                     model.addAttribute("trainingLevels", trainingLevels);
                     model.addAttribute("group", group);
                     model.addAttribute("actionUrl", "/jump-group/edit/" + group.getId());
-                    return "groups/edit-group";
+                    return "groups/create-group";
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
@@ -106,23 +119,23 @@ public class JumpGroupController {
     public Mono<String> editGroupById (@PathVariable Integer id,
                                       @ModelAttribute GroupRequest groupRequest) {
         return jumpGroupService.editGroup(id, groupRequest)
-                .then(Mono.just("redirect:/jump-group/group/{id}"));
+                .then(Mono.just("redirect:/jump-group/{id}"));
     }
 
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public Mono<String> deleteItemById (@PathVariable Integer id) {
         return jumpGroupService.deleteGroup(id)
                 .then(Mono.just("redirect:/jump-group"));
     }
 
-    @PostMapping("/group/comment/add")
+    @PostMapping("/comment/add")
     @ResponseBody
     public Mono<Void> addCommentToGroup (@RequestBody dev.hgjtu.auth_client.dto.jump_group.CommentRequest commentRequest) {
         return jumpGroupService.addComment(commentRequest)
                 .then(Mono.empty());
     }
 
-    @PostMapping("/post/comment/edit/{id}")
+    @PostMapping("/comment/edit/{id}")
     @ResponseBody
     public Mono<Void> editCommentById (@PathVariable Long id,
                                        @RequestBody  dev.hgjtu.auth_client.dto.jump_group.CommentRequest commentRequest) {
@@ -130,7 +143,7 @@ public class JumpGroupController {
                 .then(Mono.empty());
     }
 
-    @PostMapping("/post/comment/delete/{id}")
+    @PostMapping("/comment/delete/{id}")
     @ResponseBody
     public Mono<Void> deleteCommentById (@PathVariable Long id) {
         return jumpGroupService.deleteComment(id)

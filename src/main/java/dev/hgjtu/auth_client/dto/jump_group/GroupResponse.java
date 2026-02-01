@@ -82,7 +82,7 @@ public class GroupResponse {
         return comments;
     }
 
-    public Boolean getParticipant() {
+    public Boolean getIsParticipant() {
         return isParticipant;
     }
 }

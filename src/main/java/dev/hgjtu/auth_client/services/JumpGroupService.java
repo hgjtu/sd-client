@@ -1,18 +1,14 @@
 package dev.hgjtu.auth_client.services;
 
-import dev.hgjtu.auth_client.dto.communication.CommentRequest;
-import dev.hgjtu.auth_client.dto.communication.PostRequest;
-import dev.hgjtu.auth_client.dto.communication.PostResponse;
+import dev.hgjtu.auth_client.dto.PageResponse;
 import dev.hgjtu.auth_client.dto.jump_group.GroupRequest;
 import dev.hgjtu.auth_client.dto.jump_group.GroupResponse;
 import dev.hgjtu.auth_client.dto.jump_group.TrainingLevelResponse;
-import dev.hgjtu.auth_client.dto.market.ItemRequest;
-import dev.hgjtu.auth_client.dto.market.ItemResponse;
-import dev.hgjtu.auth_client.models.PostComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,12 +24,12 @@ import java.util.List;
 public class JumpGroupService {
     private final WebClient webClient;
 
-    @Value("${GATEWAY_SERVICE_URL}")
+    @Value("${GROUP_RESOURCE_SERVER_URL}")// GATEWAY_SERVICE_URL
     private String gatewayServiceURL;
     @Value("${JUMP_GROUP_RESOURCE_PREFIX}")
     private String jumpGroupResourcePrefix;
 
-    public Mono<Page<GroupResponse>> getGroupsByParams(Integer page,
+    public Mono<PageResponse<GroupResponse>> getGroupsByParams(Integer page,
                                                        Integer size,
                                                        String sort,
                                                        String direction,
@@ -80,14 +76,16 @@ public class JumpGroupService {
         return webClient.get()
                 .uri(uriBuilder.build().toUri())
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Page<GroupResponse>>() {});
+                .bodyToMono(new ParameterizedTypeReference<PageResponse<GroupResponse>>() {});
     }
 
     public Mono<GroupResponse> getGroupById(Integer id) {
-        return webClient.get()
+        Mono<GroupResponse> qw =  webClient.get()
                 .uri(gatewayServiceURL + jumpGroupResourcePrefix + "/groups/{id}", id)
                 .retrieve()
                 .bodyToMono(GroupResponse.class);
+
+        return qw;
     }
 
     public Flux<TrainingLevelResponse> getTrainingLevels() {

@@ -1,341 +1,278 @@
-<!DOCTYPE html>
-<html lang="ru">
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkyJump — Поиск команды для прыжков</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+    <title>SkyFriends — группы прыжков</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --blue: #1e88e5;
-            --dark-blue: #0d47a1;
-            --light-bg: #f5f7fa;
-            --card-bg: #ffffff;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --radius: 12px;
-            --transition: 0.3s ease;
+            --bg:#f5f8fb;
+            --card:#fff;
+            --accent:#1fb6ff;
+            --accent-2:#ff9f43;
+            --muted:#6b7280;
+            --radius:14px;
+            --shadow:0 6px 18px rgba(22,28,37,0.08);
         }
-
-        * { box-sizing: border-box; }
 
         body {
-            font-family: "Inter", "Segoe UI", sans-serif;
-            margin: 0;
-            background: var(--light-bg);
-            color: #333;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(180deg,#eaf6ff 0%,#f5f8fb 60%);
+            padding: 24px;
+            color: #111827;
         }
 
-        header {
-            background: var(--blue);
-            color: white;
-            padding: 1rem 2rem;
-            text-align: center;
-            box-shadow: var(--shadow);
+        .container {
+            max-width: 1300px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 22px;
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            letter-spacing: 0.5px;
-        }
-
-        main {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 1rem;
-        }
-
-        .search-box {
-            background: var(--card-bg);
+        /* LEFT FILTERS */
+        .filters {
+            position: sticky;
+            top: 24px;
+            background: var(--card);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 18px;
         }
 
-        .search-box form {
+        .filters h5 {
+            margin-bottom: 14px;
+        }
+
+        .filters label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        /* GROUP CARD */
+        .group-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 10px;
         }
 
-        .search-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+        .group-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .search-box select, .search-box input {
-            padding: 0.8rem;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-            width: 100%;
+        .group-title {
+            font-size: 18px;
+            font-weight: 700;
         }
 
-        /* поле тегов */
-        .tag-input {
+        .badge-level {
+            background: #eef2ff;
+            color: #3730a3;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .group-meta {
+            font-size: 14px;
+            color: var(--muted);
             display: flex;
             flex-wrap: wrap;
-            gap: 0.4rem;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 0.5rem;
-            cursor: text;
-            min-height: 48px;
+            gap: 14px;
         }
 
-        .tag-input input {
-            border: none;
-            outline: none;
-            flex: 1;
-            padding: 0.4rem;
-            font-size: 1rem;
-            min-width: 100px;
-        }
-
-        .tag {
-            background: var(--blue);
-            color: white;
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-size: 0.9rem;
-        }
-
-        .tag span {
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .search-box button {
-            background: var(--blue);
-            color: white;
-            border: none;
-            padding: 0.9rem;
-            border-radius: 8px;
-            cursor: pointer;
+        .participants {
             font-weight: 600;
-            transition: var(--transition);
-            width: 200px;
-            align-self: end;
         }
 
-        .search-box button:hover {
-            background: var(--dark-blue);
-        }
-
-        .groups {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .group-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 1.5rem;
-            transition: transform 0.2s ease;
-        }
-
-        .group-card:hover {
-            transform: scale(1.01);
-        }
-
-        .group-card h3 {
-            margin: 0;
-            color: var(--blue);
-            font-size: 1.3rem;
-        }
-
-        .group-type {
-            display: inline-block;
-            background: var(--blue);
-            color: white;
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            margin-top: 0.3rem;
-        }
-
-        .datetime-inline {
-            font-weight: 500;
-            color: #444;
-            margin-top: 0.6rem;
-        }
-
-        .group-description {
-            margin-top: 0.8rem;
-            font-style: italic;
-            color: #444;
-        }
-
-        .details-btn {
-            background: var(--blue);
-            color: white;
-            border: none;
-            padding: 0.7rem 1.2rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            cursor: pointer;
+        .joined {
+            color: #16a34a;
             font-weight: 600;
-            transition: var(--transition);
         }
 
-        .details-btn:hover {
-            background: var(--dark-blue);
+        /* PAGINATION */
+        .pagination {
+            margin-top: 20px;
+            justify-content: center;
         }
 
-        .create-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--blue);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 2rem;
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .create-btn:hover {
-            background: var(--dark-blue);
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 600px) {
-            header h1 { font-size: 1.4rem; }
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<header>
-    <h1>SkyJump — Поиск команды для прыжков</h1>
-</header>
+<div th:replace="fragments/header :: site-header"></div>
 
-<main>
-    <section class="search-box">
-        <form id="search-form">
-            <div class="search-row">
-                <div>
-                    <label><strong>Дропзоны и города:</strong></label>
-                    <div class="tag-input" id="dropzone-input">
-                        <input type="text" placeholder="Введите и нажмите Enter" />
-                    </div>
-                </div>
+<div class="container">
 
-                <div>
-                    <label><strong>Тип прыжка:</strong></label>
-                    <select>
-                        <option value="">Любой</option>
-                        <option>FS Formation</option>
-                        <option>Wingsuit</option>
-                        <option>Freefly</option>
-                    </select>
-                </div>
+    <!-- LEFT: FILTERS -->
+    <aside class="filters">
+        <h5>Поиск групп ОН НЕ РАБОТАЕТ</h5>
 
-                <div>
-                    <label><strong>Уровень подготовки:</strong></label>
-                    <select>
-                        <option value="">Любой</option>
-                        <option>Новичок</option>
-                        <option>Средний</option>
-                        <option>Продвинутый</option>
-                    </select>
-                </div>
+        <form method="get" action="/jump-group" class="d-flex flex-column gap-3">
+
+            <div>
+                <label>Место прыжка</label>
+                <input name="places"
+                       class="form-control"
+                       placeholder="Например: Коломна"/>
             </div>
 
-            <div class="search-row">
-                <div>
-                    <label>Дата от:</label>
-                    <input type="date" />
-                </div>
-                <div>
-                    <label>Дата до:</label>
-                    <input type="date" />
-                </div>
-                <div>
-                    <label>Время от:</label>
-                    <input type="time" />
-                </div>
-                <div>
-                    <label>Время до:</label>
-                    <input type="time" />
-                </div>
-                <button type="submit">Найти группу</button>
+            <div>
+                <label>Уровень подготовки</label>
+                <select name="trainingLevel" class="form-select">
+                    <option value="">Любой</option>
+                    <th:block th:each="level : ${trainingLevels}">
+                        <option th:value="${level.id}" th:text="${level.levelName}"></option>
+                    </th:block>
+                </select>
             </div>
+
+            <div>
+                <label>Дата от</label>
+                <input type="datetime-local" name="jumpDateTimeStart" class="form-control"/>
+            </div>
+
+            <div>
+                <label>Дата до</label>
+                <input type="datetime-local" name="jumpDateTimeEnd" class="form-control"/>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input"
+                       type="checkbox"
+                       name="isParticipant"
+                       value="true"
+                       id="myGroups">
+                <label class="form-check-label" for="myGroups">
+                    Только мои группы
+                </label>
+            </div>
+
+            <button class="btn btn-primary w-100">
+                Найти
+            </button>
         </form>
-    </section>
 
-    <section class="groups">
-        <div class="group-card">
-            <h3>FS Formation — Дропзона «Аэроград»</h3>
-            <span class="group-type">Тип: Командный прыжок</span>
-            <p class="datetime-inline"><strong>22.12.2025</strong> • <strong>11:00</strong> • Средний уровень</p>
-            <p class="group-description">Тренировочный прыжок в формации 4-way FS. Ищем двух участников для полёта.</p>
-            <button class="details-btn" onclick="openGroupPage('fs-formation')">Подробнее</button>
+        <a th:href="@{/jump-group/create-group}"
+           class="btn btn-success w-100 mt-3">
+            + Создать новую группу
+        </a>
+    </aside>
+
+    <!-- CENTER: GROUPS -->
+    <main class="d-flex flex-column gap-3">
+
+        <div th:if="${#lists.isEmpty(groupsPage.content)}"
+             class="text-center text-muted">
+            Группы не найдены
         </div>
 
-        <div class="group-card">
-            <h3>Wingsuit Flight — «Кубинка»</h3>
-            <span class="group-type">Тип: Wingsuit</span>
-            <p class="datetime-inline"><strong>24.12.2025</strong> • <strong>13:30</strong> • Продвинутый уровень</p>
-            <p class="group-description">Полёт в костюмах wingsuit с высоты 4000 м. Нужен оператор для съёмки и участники в формации.</p>
-            <button class="details-btn" onclick="openGroupPage('wingsuit-flight')">Подробнее</button>
+        <div th:each="group : ${groupsPage.content}"
+             class="group-card">
+
+            <div class="group-head">
+                <div class="group-title"
+                     th:text="${group.groupName}">
+                    Название группы
+                </div>
+
+                <span class="badge-level"
+                      th:text="'Уровень ' + ${group.trainingLevel}">
+                    Уровень
+                </span>
+            </div>
+
+            <div th:text="${group.description}"
+                 class="text-muted">
+                Описание группы
+            </div>
+
+            <div class="group-meta">
+                <span>
+                    📍 <span th:text="${group.jumpPlace}">Место</span>
+                </span>
+                <span>
+                    🕒
+                    <span th:text="${#temporals.format(group.jumpDateTime,'dd MMM yyyy HH:mm')}">
+                        Дата
+                    </span>
+                </span>
+                <span>
+                    👤 Организатор:
+                    <strong th:text="${group.organizerUsername}">user</strong>
+                </span>
+                <span class="participants">
+                    👥
+                    <span th:text="${#lists.size(group.participants)}"></span>
+                    /
+                    <span th:text="${group.maxParticipants}"></span>
+                </span>
+                <span th:if="${group.isParticipant}" class="joined">
+                    ✔ Вы участник
+                </span>
+            </div>
+
+            <a th:href="@{'/jump-group/' + ${group.id}}"
+               class="btn btn-outline-primary btn-sm align-self-start">
+                Открыть группу
+            </a>
         </div>
-    </section>
-</main>
 
-<button class="create-btn" title="Создать группу">＋</button>
+        <!-- PAGINATION -->
+        <nav th:if="${groupsPage.totalPages > 1}">
+            <ul class="pagination">
 
-<script>
-    // --- Теговый ввод для дропзон ---
-    const tagContainer = document.getElementById('dropzone-input');
-    const input = tagContainer.querySelector('input');
-    const tags = [];
+                <li class="page-item"
+                    th:classappend="${groupsPage.page == 0} ? ' disabled'">
+                    <a class="page-link"
+                       th:href="@{/jump-group(page=${groupsPage.page - 1})}">
+                        Назад
+                    </a>
+                </li>
 
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && input.value.trim() !== '') {
-            e.preventDefault();
-            addTag(input.value.trim());
-            input.value = '';
-        }
-    });
+                <li class="page-item"
+                    th:each="i : ${#numbers.sequence(0, groupsPage.totalPages - 1)}"
+                    th:classappend="${i == groupsPage.page} ? ' active'">
+                    <a class="page-link"
+                       th:text="${i + 1}"
+                       th:href="@{/jump-group(page=${i})}">
+                    </a>
+                </li>
 
-    function addTag(text) {
-        if (tags.includes(text)) return;
-        tags.push(text);
-        const tag = document.createElement('div');
-        tag.className = 'tag';
-        tag.innerHTML = `${text} <span title="Удалить">×</span>`;
-        tag.querySelector('span').addEventListener('click', () => removeTag(tag, text));
-        tagContainer.insertBefore(tag, input);
-    }
+                <li class="page-item"
+                    th:classappend="${groupsPage.last} ? ' disabled'">
+                    <a class="page-link"
+                       th:href="@{/jump-group(page=${groupsPage.page + 1})}">
+                        Вперёд
+                    </a>
+                </li>
 
-    function removeTag(element, text) {
-        element.remove();
-        const index = tags.indexOf(text);
-        if (index >= 0) tags.splice(index, 1);
-    }
+            </ul>
+        </nav>
 
-    // --- Поиск ---
-    document.getElementById('search-form').addEventListener('submit', e => {
-        e.preventDefault();
-        alert(`Поиск групп по дропзонам: ${tags.join(', ')}`);
-    });
+    </main>
 
-    // --- Пример перехода на страницу группы ---
-    function openGroupPage(id) {
-        window.location.href = `group.html?id=${id}`;
-    }
-</script>
+</div>
+
+<div th:replace="fragments/footer :: site-footer"></div>
 
 </body>
 </html>

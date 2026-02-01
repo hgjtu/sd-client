@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${group} != null ? 'Редактировать группу' : 'Создать группу'"></title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<!-- Header -->
+<div th:replace="fragments/header :: site-header"></div>
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 th:text="${group} != null ? 'Редактировать группу' : 'Создать новую группу'"></h4>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{${actionUrl}}" method="post">
+
+                <!-- Название группы -->
+                <div class="mb-3">
+                    <label for="groupName" class="form-label">Название группы</label>
+                    <input type="text"
+                           id="groupName"
+                           name="groupName"
+                           class="form-control"
+                           required
+                           th:value="${group != null} ? ${group.groupName} : ''">
+                </div>
+
+                <!-- Уровень подготовки -->
+                <div class="mb-3">
+                    <label for="trainingLevel" class="form-label">Уровень подготовки</label>
+                    <select id="trainingLevel"
+                            name="trainingLevel"
+                            class="form-select"
+                            required>
+                        <option value="">-- Выберите уровень --</option>
+                        <option th:each="level : ${trainingLevels}"
+                                th:value="${level.id}"
+                                th:text="${level.levelName}"
+                                th:selected="${group != null} ? ${level.id} == ${group.trainingLevel} : false">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Дата и время прыжка -->
+                <div class="mb-3">
+                    <label for="jumpDateTime" class="form-label">Дата и время прыжка</label>
+                    <input type="datetime-local"
+                           id="jumpDateTime"
+                           name="jumpDateTime"
+                           class="form-control"
+                           required
+                           th:value="${group != null && group.jumpDateTime != null} ?
+                                     ${#temporals.format(group.jumpDateTime, 'yyyy-MM-dd''T''HH:mm')} : ''">
+                </div>
+
+                <!-- Место прыжка -->
+                <div class="mb-3">
+                    <label for="jumpPlace" class="form-label">Место прыжка</label>
+                    <input type="text"
+                           id="jumpPlace"
+                           name="jumpPlace"
+                           class="form-control"
+                           th:value="${group != null} ? ${group.jumpPlace} : ''">
+                </div>
+
+                <!-- Максимальное количество участников -->
+                <div class="mb-3">
+                    <label for="maxParticipants" class="form-label">Максимум участников</label>
+                    <input type="number"
+                           id="maxParticipants"
+                           name="maxParticipants"
+                           class="form-control"
+                           min="1"
+                           required
+                           th:value="${group != null} ? ${group.maxParticipants} : ''">
+                </div>
+
+                <!-- Описание -->
+                <div class="mb-3">
+                    <label for="description" class="form-label">Описание</label>
+                    <textarea id="description"
+                              name="description"
+                              class="form-control"
+                              rows="4"
+                              th:text="${group != null} ? ${group.description} : ''"></textarea>
+                </div>
+
+                <!-- Кнопки -->
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="/jump-group" class="btn btn-secondary me-2">Отмена</a>
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Ошибка -->
+    <div th:if="${error}"
+         class="alert alert-danger mt-3"
+         th:text="${error}">
+    </div>
+</div>
+
+<!-- Footer -->
+<div th:replace="fragments/footer :: site-footer"></div>
+
+</body>
+</html>
