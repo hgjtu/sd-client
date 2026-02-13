@@ -150,4 +150,10 @@ public class JumpGroupController {
                 .then(Mono.empty());
     }
 
+    @PostMapping("/join-group/{id}")
+    public Mono<String> joinGroup (@PathVariable Integer id) {
+        return jumpGroupService.joinGroup(id)
+                .then(Mono.just("redirect:/jump-group/{id}"));
+    }
+
 }

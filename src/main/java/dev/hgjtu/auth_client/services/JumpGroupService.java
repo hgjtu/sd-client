@@ -147,4 +147,11 @@ public class JumpGroupService {
                 .bodyToMono(String.class);
     }
 
+    public Mono<String> joinGroup(Integer groupId) {
+        return webClient.post()
+                .uri(gatewayServiceURL + jumpGroupResourcePrefix + "/groups/join-group/{groupId}", groupId)
+                .retrieve()
+                .bodyToMono(String.class);
+    }
+
 }

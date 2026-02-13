@@ -464,7 +464,7 @@
             <div class="head">
                 <div class="head-left">
                     <h3 th:text="${group.groupName}">Название группы</h3>
-                    <p th:if="${group.isParticipant == true}">Вы участник</p>
+                    <p th:if="${group.participantBool == true}">Вы участник</p>
                 </div>
 
                 <span th:text="${#temporals.format(group.jumpDateTime,'dd MMM yyyy HH:mm')}">
@@ -496,18 +496,18 @@
             <div class="post-actions">
 
                 <!-- Вступить -->
-                <form th:if="${group.isParticipant != true}"
-                      th:action="@{'/jump-group/' + ${group.id} + '/join'}"
+                <form th:if="${group.participantBool != true}"
+                      th:action="@{'/jump-group/join-group' + ${group.id}}"
                       method="post"
                       style="display:inline;">
                     <button class="btn btn-primary">
-                        ➕ Вступить ВООБЩЕ НЕТ ТАКОГО ФУНКЦИОНАЛА АХХАХАХАХ
+                        ➕ Вступить
                     </button>
                 </form>
 
                 <!-- Выйти -->
-                <form th:if="${group.isParticipant == true}"
-                      th:action="@{'/jump-group/' + ${group.id} + '/leave'}"
+                <form th:if="${group.participantBool == true}"
+                      th:action="@{'/jump-group/join-group' + ${group.id}}"
                       method="post"
                       style="display:inline;">
                     <button class="btn btn-outline-danger">

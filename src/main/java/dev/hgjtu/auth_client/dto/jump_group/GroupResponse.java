@@ -16,9 +16,9 @@ public class GroupResponse {
     private String jumpPlace;
     private LocalDateTime createdAt;
     private List<CommentResponse> comments;
-    private Boolean isParticipant;
+    private Boolean participantBool;
 
-    public GroupResponse(Integer id, Long organizerId, String organizerUsername, Short trainingLevel, String groupName, String description, LocalDateTime jumpDateTime, Short maxParticipants, List<Long> participants, String jumpPlace, LocalDateTime createdAt, List<CommentResponse> comments, Boolean isParticipant) {
+    public GroupResponse(Integer id, Long organizerId, String organizerUsername, Short trainingLevel, String groupName, String description, LocalDateTime jumpDateTime, Short maxParticipants, List<Long> participants, String jumpPlace, LocalDateTime createdAt, List<CommentResponse> comments, Boolean participantBool) {
         this.id = id;
         this.organizerId = organizerId;
         this.organizerUsername = organizerUsername;
@@ -31,7 +31,7 @@ public class GroupResponse {
         this.jumpPlace = jumpPlace;
         this.createdAt = createdAt;
         this.comments = comments;
-        this.isParticipant = isParticipant;
+        this.participantBool = participantBool;
     }
 
     public Integer getId() {
@@ -82,7 +82,7 @@ public class GroupResponse {
         return comments;
     }
 
-    public Boolean getIsParticipant() {
-        return isParticipant;
+    public Boolean getParticipantBool() {
+        return participantBool;
     }
 }
