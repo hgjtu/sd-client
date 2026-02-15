@@ -80,12 +80,10 @@ public class JumpGroupService {
     }
 
     public Mono<GroupResponse> getGroupById(Integer id) {
-        Mono<GroupResponse> qw =  webClient.get()
+       return webClient.get()
                 .uri(gatewayServiceURL + jumpGroupResourcePrefix + "/groups/{id}", id)
                 .retrieve()
                 .bodyToMono(GroupResponse.class);
-
-        return qw;
     }
 
     public Flux<TrainingLevelResponse> getTrainingLevels() {

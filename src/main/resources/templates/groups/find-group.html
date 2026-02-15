@@ -124,15 +124,21 @@
 
     <!-- LEFT: FILTERS -->
     <aside class="filters">
-        <h5>Поиск групп ОН НЕ РАБОТАЕТ</h5>
+        <h5>Поиск групп</h5>
 
         <form method="get" action="/jump-group" class="d-flex flex-column gap-3">
 
             <div>
                 <label>Место прыжка</label>
-                <input name="places"
+
+                <!-- Поле ввода -->
+                <input type="text"
+                       id="placeInput"
                        class="form-control"
-                       placeholder="Например: Коломна"/>
+                       placeholder="Введите место и нажмите Enter"/>
+
+                <!-- Контейнер выбранных мест -->
+                <div id="placesContainer" class="d-flex flex-wrap gap-2 mt-2"></div>
             </div>
 
             <div>
@@ -162,7 +168,7 @@
                        value="true"
                        id="myGroups">
                 <label class="form-check-label" for="myGroups">
-                    Только мои группы
+                    Только мои группы НЕ РАБОТАЕТ
                 </label>
             </div>
 
@@ -275,4 +281,42 @@
 <div th:replace="fragments/footer :: site-footer"></div>
 
 </body>
+
+<script>
+    const input = document.getElementById('placeInput');
+    const container = document.getElementById('placesContainer');
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+
+            const value = input.value.trim();
+            if (!value) return;
+
+            // создаем визуальный бейдж
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-primary d-flex align-items-center gap-2';
+            badge.innerHTML = `
+                ${value}
+                <button type="button" class="btn-close btn-close-white btn-sm"></button>
+            `;
+
+            // создаем скрытый input для отправки
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'places';
+            hiddenInput.value = value;
+
+            badge.querySelector('button').addEventListener('click', function () {
+                badge.remove();
+                hiddenInput.remove();
+            });
+
+            container.appendChild(badge);
+            container.appendChild(hiddenInput);
+
+            input.value = '';
+        }
+    });
+</script>
 </html>

@@ -497,7 +497,7 @@
 
                 <!-- Вступить -->
                 <form th:if="${group.participantBool != true}"
-                      th:action="@{'/jump-group/join-group' + ${group.id}}"
+                      th:action="@{'/jump-group/join-group/' + ${group.id}}"
                       method="post"
                       style="display:inline;">
                     <button class="btn btn-primary">
@@ -507,7 +507,7 @@
 
                 <!-- Выйти -->
                 <form th:if="${group.participantBool == true}"
-                      th:action="@{'/jump-group/join-group' + ${group.id}}"
+                      th:action="@{'/jump-group/join-group/' + ${group.id}}"
                       method="post"
                       style="display:inline;">
                     <button class="btn btn-outline-danger">
