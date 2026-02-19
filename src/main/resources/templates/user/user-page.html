@@ -271,8 +271,9 @@
             // 1️⃣ Получаем presigned URL
             const uploadResponse = await fetch("/media/USERS/upload-url", {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
-                [csrfHeader]: csrfToken,
+                headers: {"Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
                 body: JSON.stringify({
                     fileName: file.name,
                     contentType: file.type
@@ -290,8 +291,6 @@
             // 2️⃣ Загружаем в MinIO
             const s3Response = await fetch(uploadUrl, {
                 method: "PUT",
-                headers: {"Content-Type": file.type},
-                [csrfHeader]: csrfToken,
                 body: file
             });
 
@@ -301,12 +300,18 @@
 
             // 3️⃣ Подтверждаем загрузку
             await fetch(`/media/USER/complete/${mediaId}`, {
-                method: "POST"
+                method: "POST",
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
             });
 
             // 4️⃣ Обновляем фото пользователя через отдельный endpoint
             const profileResponse = await fetch(`/profile/edit/media/${mediaId}`, {
-                method: "POST"
+                method: "POST",
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
             });
             // const profileResponse = await fetch("/profile/edit/media", {
             //     method: "POST",
