@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Controller
 @RequiredArgsConstructor
 public class UserController {
@@ -62,6 +64,12 @@ public class UserController {
     @PostMapping("/profile/edit")
     public Mono<String> editUser(@ModelAttribute UserEditRequest userEditRequest) {
         return userService.editUser(userEditRequest)
+                .then(Mono.just("redirect:/profile"));
+    }
+
+    @PostMapping("/profile/edit/media/{mediaId}")
+    public Mono<String> editUserMedia(@PathVariable UUID mediaId) {
+        return userService.editUserMedia(mediaId)
                 .then(Mono.just("redirect:/profile"));
     }
 

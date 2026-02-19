@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -28,11 +31,10 @@ public class UserService {
     }
 
     public Mono<UserResponse> getUserInfoByUsername(String username) {
-        Mono<UserResponse> qw =  webClient.get()
+        return webClient.get()
                 .uri(gatewayServiceURL + userResourcePrefix + "/users/username/{username}", username)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
-        return qw;
     }
 
     public Mono<UserResponse> editUser(UserEditRequest userEditRequest) {
@@ -42,6 +44,13 @@ public class UserService {
                 .bodyValue(userEditRequest)
                 .retrieve()
                 .bodyToMono(UserResponse.class);
+    }
+
+    public Mono<String> editUserMedia(UUID mediaId){
+        return webClient.post()
+                .uri(gatewayServiceURL + userResourcePrefix + "/media/{mediaId}", mediaId)
+                .retrieve()
+                .bodyToMono(String.class);
     }
 
     public Mono<UserResponse> addJump(JumpRequest jumpRequest){
