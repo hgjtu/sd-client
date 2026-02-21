@@ -299,12 +299,16 @@
             }
 
             // 3️⃣ Подтверждаем загрузку
-            await fetch(`/media/USER/complete/${mediaId}`, {
+            const completeResponse = await fetch(`/media/USERS/complete/${mediaId}`, {
                 method: "POST",
                 headers: {
                     [csrfHeader]: csrfToken
                 },
             });
+
+            if (!completeResponse.ok) {
+                throw new Error("Ошибка подтверждения загрузки в S3");
+            }
 
             // 4️⃣ Обновляем фото пользователя через отдельный endpoint
             const profileResponse = await fetch(`/profile/edit/media/${mediaId}`, {
@@ -324,10 +328,8 @@
                 throw new Error("Ошибка обновления профиля");
             }
 
-            const result = await profileResponse.json();
-
             // 5️⃣ Обновляем аватар без перезагрузки
-            avatarImg.src = result.profileMediaURL + "?t=" + new Date().getTime();
+            avatarImg.src = await profileResponse.text();
 
         } catch (e) {
             console.error(e);

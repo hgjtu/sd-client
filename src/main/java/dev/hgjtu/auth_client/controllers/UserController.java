@@ -4,15 +4,13 @@ import dev.hgjtu.auth_client.dto.user.JumpRequest;
 import dev.hgjtu.auth_client.dto.user.UserEditRequest;
 import dev.hgjtu.auth_client.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -67,10 +65,10 @@ public class UserController {
                 .then(Mono.just("redirect:/profile"));
     }
 
-    @PostMapping("/profile/edit/media/{mediaId}")
+    @PostMapping(value = "/profile/edit/media/{mediaId}", produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
     public Mono<String> editUserMedia(@PathVariable UUID mediaId) {
-        return userService.editUserMedia(mediaId)
-                .then(Mono.just("redirect:/profile"));
+        return userService.editUserMedia(mediaId);
     }
 
     @PostMapping("/logbook/add")

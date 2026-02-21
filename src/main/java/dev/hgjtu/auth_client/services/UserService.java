@@ -48,7 +48,7 @@ public class UserService {
 
     public Mono<String> editUserMedia(UUID mediaId){
         return webClient.post()
-                .uri(gatewayServiceURL + userResourcePrefix + "/media/{mediaId}", mediaId)
+                .uri(gatewayServiceURL + userResourcePrefix + "/users/media/{mediaId}", mediaId)
                 .retrieve()
                 .bodyToMono(String.class);
     }
