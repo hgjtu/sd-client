@@ -45,6 +45,7 @@
                 <div class="position-relative d-inline-block">
                     <img id="profileAvatar"
                          th:src="${user.photoUrl != null} ? ${user.photoUrl} : '/default-avatar.png'"
+                         th:onerror="this.onerror=null; this.src='/default-avatar.png'"
                          alt="Фото пользователя"
                          class="img-fluid rounded-circle border"
                          style="width:200px;height:200px;object-fit:cover;">
