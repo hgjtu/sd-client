@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,8 @@ public class MarketService {
         return serverWebClient.get()
                 .uri(gatewayServiceURL + marketResourcePrefix + "/categories")
                 .retrieve()
-                .bodyToFlux(CategoryResponse.class);
+                .bodyToFlux(CategoryResponse.class)
+                .sort(Comparator.comparing(CategoryResponse::getId));
     }
 
 //    public Mono<CategoryResponse> getCategoryById(Integer id) {

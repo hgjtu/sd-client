@@ -72,7 +72,8 @@
         <div class="col-12 col-md-6 col-lg-4" th:each="category : ${categories}">
             <div class="card category-card h-100"
                  th:attr="data-slug=${category.name}">
-                <img th:src="@{/images/{name}.jpg(name=${category.name})}"
+                <img th:src="${category.categoryMediaURL != null} ? ${category.categoryMediaURL} : '/default-category.png'"
+                     th:onerror="this.onerror=null; this.src='/default-category.png'"
                      class="category-img"
                      th:alt="${category.nameRu}">
                 <div class="card-body">
