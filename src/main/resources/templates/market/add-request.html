@@ -65,14 +65,6 @@
                           th:text="${itemRequest != null} ? ${itemRequest.description} : ''"></textarea>
             </div>
 
-            <!-- Ссылки на изображения -->
-            <div class="mb-3">
-                <label for="imagesUrls" class="form-label">Ссылки на изображения (через запятую, если есть)</label>
-                <input type="text" class="form-control" id="imagesUrls" name="imagesUrls"
-                       placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg"
-                       th:value="${itemRequest != null} ? ${itemRequest.imagesUrls} : ''">
-            </div>
-
             <!-- Местоположение -->
             <div class="mb-3">
                 <label for="location" class="form-label">Местоположение</label>

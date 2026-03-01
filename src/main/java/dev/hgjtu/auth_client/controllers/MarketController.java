@@ -75,7 +75,6 @@ public class MarketController {
                     return Mono.just("market/add-item");
                 });
     }
-
     @PostMapping("/add-item")
     public Mono<String> addItem (@ModelAttribute ItemRequest itemRequest) {
         itemRequest.setType("buy");
@@ -97,7 +96,6 @@ public class MarketController {
                     return Mono.just("market/add-request");
                 });
     }
-
     @PostMapping("/add-request")
     public Mono<String> addRequest (@ModelAttribute ItemRequest itemRequest) {
         itemRequest.setType("sell");

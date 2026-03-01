@@ -76,7 +76,9 @@
             <div class="card item-card h-100"
                  th:data-id="${item.id}"
                  th:data-mode="${mode}">
-                <img th:src="${item.mainImageUrl}" class="item-img" th:alt="${item.title}">
+                <img th:src="${item.mainImageUrl != null} ? ${item.mainImageUrl} : '/default-item.png'"
+                     th:onerror="this.onerror=null; this.src='/default-item.png'"
+                     th:alt="${item.title}">
                 <div class="card-body">
                     <h5 class="card-title mb-1" th:text="${item.title}">Название товара</h5>
                     <p class="card-text text-muted small mb-0" th:text="${item.price} + ' ₽'">Цена</p>

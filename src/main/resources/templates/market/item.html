@@ -58,7 +58,14 @@
         <!-- Изображения товара -->
         <div class="col-12 col-md-6">
             <div class="item-images mb-3" th:if="${item.imagesUrls}">
-                <img th:each="imgUrl : ${item.imagesUrls}" th:src="${imgUrl}" th:alt="${item.title}">
+                <img th:if="${not #lists.isEmpty(item.imagesUrls)}"
+                     th:each="imgUrl : ${item.imagesUrls}"
+                     th:src="${imgUrl}"
+                     th:alt="${item.title}">
+
+                <img th:if="${#lists.isEmpty(item.imagesUrls)}"
+                     src="/default-item.png"
+                     th:alt="${item.title}">
             </div>
         </div>
 
