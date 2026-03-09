@@ -272,7 +272,8 @@
             // 1️⃣ Получаем presigned URL
             const uploadResponse = await fetch("/media/USERS/upload-url", {
                 method: "POST",
-                headers: {"Content-Type": "application/json",
+                headers: {
+                    "Content-Type": "application/json",
                     [csrfHeader]: csrfToken
                 },
                 body: JSON.stringify({

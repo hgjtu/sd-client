@@ -6,14 +6,19 @@ import dev.hgjtu.auth_client.dto.market.ItemRequest;
 import dev.hgjtu.auth_client.dto.market.ItemResponse;
 import dev.hgjtu.auth_client.services.MarketService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Controller
@@ -72,13 +77,15 @@ public class MarketController {
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
-                    return Mono.just("market/add-item");
+                    return Mono.just("error");
                 });
     }
-    @PostMapping("/add-item")
-    public Mono<String> addItem (@ModelAttribute ItemRequest itemRequest) {
+
+    @PostMapping(value = "/add-item", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.MULTIPART_MIXED_VALUE})
+    public Mono<String> addItem(@RequestPart("item") ItemRequest itemRequest,
+                                @RequestPart(value = "medias", required = false) List<MultipartFile> medias) {
         itemRequest.setType("buy");
-        return marketService.addItem(itemRequest)
+        return marketService.addItemWithMediaFiles(itemRequest, medias)
                 .then(Mono.just("redirect:/market"));
     }
 
@@ -93,7 +100,7 @@ public class MarketController {
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
-                    return Mono.just("market/add-request");
+                    return Mono.just("market/add-request"); // TODO эта вообще про медиа ничего не знает
                 });
     }
     @PostMapping("/add-request")

@@ -7,14 +7,12 @@ public class PostRequest {
     private Short categoryId;
     private Long userId;
     private String content;
-    private List<String> mediaUrls;
 
-    public PostRequest(Short sectionId, Short categoryId, Long userId, String content, List<String> mediaUrls) {
+    public PostRequest(Short sectionId, Short categoryId, Long userId, String content) {
         this.sectionId = sectionId;
         this.categoryId = categoryId;
         this.userId = userId;
         this.content = content;
-        this.mediaUrls = mediaUrls;
     }
 
     public Short getSectionId() {
@@ -33,10 +31,6 @@ public class PostRequest {
         return content;
     }
 
-    public List<String> getMediaUrls() {
-        return mediaUrls;
-    }
-
     public void setSectionId(Short sectionId) {
         this.sectionId = sectionId;
     }
@@ -51,9 +45,5 @@ public class PostRequest {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public void setMediaUrls(List<String> mediaUrls) {
-        this.mediaUrls = mediaUrls;
     }
 }

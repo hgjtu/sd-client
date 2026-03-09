@@ -4,8 +4,7 @@ package dev.hgjtu.auth_client.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.*;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.*;
@@ -21,11 +20,29 @@ public class WebClientConfig {
     private String ccClientId;
 
     @Bean
-    public WebClient webClient(ClientRegistrationRepository clientRegistrations,
-                               OAuth2AuthorizedClientRepository authorizedClients) {
+    public OAuth2AuthorizedClientManager authorizedClientManager(
+            ClientRegistrationRepository clientRegistrationRepository,
+            OAuth2AuthorizedClientService clientService) {
 
+        OAuth2AuthorizedClientProvider authorizedClientProvider =
+                OAuth2AuthorizedClientProviderBuilder.builder()
+                        .refreshToken()
+                        .clientCredentials()
+                        .build();
+
+        AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
+                new AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository, clientService);
+
+        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+
+        return authorizedClientManager;
+    }
+
+    @Bean
+    public WebClient webClient(OAuth2AuthorizedClientManager authorizedClientManager) {
         ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
-                new ServletOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
+                new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+
         oauth2.setDefaultOAuth2AuthorizedClient(true);
         oauth2.setDefaultClientRegistrationId(clientId);
 
@@ -35,11 +52,7 @@ public class WebClientConfig {
     }
 
     @Bean
-    public WebClient serverWebClient(ClientRegistrationRepository clientRegistrations,
-                                     OAuth2AuthorizedClientService authorizedClientService) {
-        var authorizedClientManager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
-                clientRegistrations, authorizedClientService);
-
+    public WebClient serverWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
         ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
                 new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
 

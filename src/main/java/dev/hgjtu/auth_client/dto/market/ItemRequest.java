@@ -11,7 +11,6 @@ public class ItemRequest {
     private String title;
     private Integer categoryId;
     private String description;
-    private List<String> imagesUrls;
     private Integer price;
     private String location;
     private String type;

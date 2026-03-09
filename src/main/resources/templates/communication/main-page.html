@@ -417,13 +417,12 @@
     <aside class="left">
         <div class="profile">
             <!-- Фото или инициалы -->
-            <div th:if="${user.photoUrl}" class="avatar">
-                <img th:src="${user.photoUrl}" alt="Avatar" />
-            </div>
-            <div th:if="${user.photoUrl == null}" class="avatar"
-                 th:text="${user.firstName.substring(0,1)} + ${user.lastName.substring(0,1)}">
-                SF
-            </div>
+            <img
+                th:src="${user.photoUrl != null} ? ${user.photoUrl} : '/default-avatar.png'"
+                th:onerror="this.onerror=null; this.src='/default-avatar.png'"
+                alt="Фото пользователя"
+                class="img-fluid rounded-circle border avatar"
+                style="width:200px;height:200px;object-fit:cover;">
 
             <h4 th:text="${user.firstName + ' ' + user.lastName}">SkyFriends</h4>
             <p th:text="${user.username}">Мой профиль клуба</p>
