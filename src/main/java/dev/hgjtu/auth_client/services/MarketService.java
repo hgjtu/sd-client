@@ -1,5 +1,6 @@
 package dev.hgjtu.auth_client.services;
 
+import dev.hgjtu.auth_client.dto.MediaUploadResponse;
 import dev.hgjtu.auth_client.dto.UploadUrlRequest;
 import dev.hgjtu.auth_client.dto.market.CategoryResponse;
 import dev.hgjtu.auth_client.dto.market.ItemMinResponse;
@@ -77,8 +78,9 @@ public class MarketService {
     }
 
     public Mono<Long> addItemWithMediaFiles(ItemRequest itemRequest, List<MultipartFile> mediaFiles) {
-        return addItem(itemRequest)
-                .flatMap(itemId -> processMediaFiles(itemId, mediaFiles));
+        Mono<Long> qw =  addItem(itemRequest);
+        processMediaFiles(qw.block(), mediaFiles).subscribe();
+        return qw;
     }
 
     private Mono<Long> processMediaFiles(Long itemId, List<MultipartFile> mediaFiles) {
@@ -99,7 +101,7 @@ public class MarketService {
     }
 
     private Mono<UUID> processSingleMediaFile(Long itemId, MultipartFile fileInfo) {
-        return mediaService.getUploadUrlForItem(AvailableResources.MARKET,
+        return getUploadUrlForItem(AvailableResources.MARKET,
                         new UploadUrlRequest(fileInfo.getName(), fileInfo.getContentType()), itemId)
                 .flatMap(uploadResponse -> {
                     UUID mediaId = uploadResponse.getId();
@@ -109,6 +111,17 @@ public class MarketService {
                             .then(mediaService.completeMedia(AvailableResources.MARKET, mediaId))
                             .thenReturn(mediaId);
                 });
+    }
+
+    public Mono<MediaUploadResponse> getUploadUrlForItem(AvailableResources resourceName,
+                                                         UploadUrlRequest uploadUrlRequest,
+                                                         Long itemId){
+        return webClient.post()
+                .uri(gatewayServiceURL + marketResourcePrefix + "/media/upload-url/item/{itemId}", itemId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(uploadUrlRequest)
+                .retrieve()
+                .bodyToMono(MediaUploadResponse.class);
     }
 
     private Mono<Void> uploadFileToS3(String uploadUrl, MultipartFile fileInfo) {

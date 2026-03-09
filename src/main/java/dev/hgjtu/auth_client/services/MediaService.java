@@ -52,17 +52,6 @@ public class MediaService {
                 .bodyToMono(MediaUploadResponse.class);
     }
 
-    public Mono<MediaUploadResponse> getUploadUrlForItem(AvailableResources resourceName,
-                                                         UploadUrlRequest uploadUrlRequest,
-                                                         Long itemId){
-        return webClient.post()
-                .uri(gatewayServiceURL + selectResource(resourceName) + "/media/upload-url/item/{itemId}", itemId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(uploadUrlRequest)
-                .retrieve()
-                .bodyToMono(MediaUploadResponse.class);
-    }
-
     public Mono<MediaUploadResponse> completeMedia(AvailableResources resourceName, UUID mediaId){
         return webClient.post()
                 .uri(gatewayServiceURL + selectResource(resourceName) + "/media/complete/{id}", mediaId)
