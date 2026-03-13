@@ -177,6 +177,15 @@ public class MarketService {
                 .bodyToMono(Long.class);
     }
 
+    public Mono<Void> addMediaToItem(Long itemId, List<UUID> mediaIds) {
+        return webClient.post()
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/add-media/{itemId}", itemId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(mediaIds)
+                .retrieve()
+                .bodyToMono(Void.class);
+    }
+
     public Mono<ItemResponse> editItem(Long id, ItemRequest itemRequest) {
         return webClient.patch()
                 .uri(gatewayServiceURL + marketResourcePrefix + "/items/edit/{id}", id)

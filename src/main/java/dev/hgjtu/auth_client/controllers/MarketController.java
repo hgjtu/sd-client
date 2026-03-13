@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -103,6 +104,13 @@ public class MarketController {
         itemRequest.setPrice(0);
         return marketService.addItem(itemRequest)
                 .then(Mono.just("redirect:/market"));
+    }
+
+    @PostMapping("/items/add-media/{itemId}")
+    @ResponseBody
+    public Mono<Void> addMediaToItem(@PathVariable Long itemId,
+                                     @RequestBody List<UUID> mediaIds) {
+        return marketService.addMediaToItem(itemId, mediaIds);
     }
 
     @GetMapping("/my-items")

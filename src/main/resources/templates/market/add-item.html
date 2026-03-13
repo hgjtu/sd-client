@@ -218,7 +218,7 @@
 
         await uploadAllPhotos(itemId);
 
-        // window.location.href = "/market/items/" + itemId;
+        window.location.href = "/market/items/" + itemId;
     });
 
     /* ================================
@@ -247,9 +247,6 @@
             const uploadUrl = uploadData.uploadUrl;
             const mediaId = uploadData.id;
 
-            alert(uploadUrl)
-            alert(mediaId)
-
             // Загружаем в S3 / MinIO
             const s3Response = await fetch(uploadUrl, {
                 method: "PUT",
@@ -267,7 +264,7 @@
             if (!completeResponse.ok) throw new Error("Ошибка подтверждения");
 
             // Привязываем к item
-            await fetch(`/api/market-resource/items/add-media/${itemId}`, {
+            await fetch(`/market/items/add-media/${itemId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
