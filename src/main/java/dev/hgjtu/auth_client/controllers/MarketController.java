@@ -108,9 +108,9 @@ public class MarketController {
 
     @PostMapping("/items/add-media/{itemId}")
     @ResponseBody
-    public Mono<Void> addMediaToItem(@PathVariable Long itemId,
+    public Mono<Void> attachMediaToItem(@PathVariable Long itemId,
                                      @RequestBody List<UUID> mediaIds) {
-        return marketService.addMediaToItem(itemId, mediaIds);
+        return marketService.attachMediaToItem(itemId, mediaIds);
     }
 
     @GetMapping("/my-items")

@@ -56,13 +56,6 @@ public class MarketService {
                 .sort(Comparator.comparing(CategoryResponse::getId));
     }
 
-//    public Mono<CategoryResponse> getCategoryById(Integer id) {
-//        return webClient.get()
-//                .uri(marketResourceServerUrl + "/api/categories/{id}", id)
-//                .retrieve()
-//                .bodyToMono(CategoryResponse.class);
-//    }
-
     public Mono<CategoryResponse> getCategoryByName(String name) {
         return webClient.get()
                 .uri(gatewayServiceURL + marketResourcePrefix + "/categories/{name}", name)
@@ -87,77 +80,9 @@ public class MarketService {
                 .bodyToFlux(ItemMinResponse.class);
     }
 
-    public Mono<Long> addItemWithMediaFiles(ItemRequest itemRequest, List<MultipartFile> mediaFiles) {
-        Mono<Long> itemId =  addItem(itemRequest);
-        return processMediaFiles(itemId.block(), mediaFiles);
-    }
-
-    private Mono<Long> processMediaFiles(Long itemId, List<MultipartFile> mediaFiles) {
-        if (mediaFiles == null || mediaFiles.isEmpty()) {
-            return Mono.just(itemId);
-        }
-
-        List<UUID> mediaIds = Flux.fromIterable(mediaFiles)
-                .flatMap(media -> processSingleMediaFile(itemId, media)).collectList().block();
-        return Flux.fromIterable(mediaIds)
-                .flatMapSequential(mediaId -> attachMediaToItem(itemId, Collections.singletonList(mediaId)))
-                .then(Mono.just(itemId));
-    }
-
-    private Mono<UUID> processSingleMediaFile(Long itemId, MultipartFile fileInfo) {
-        Pair<UUID, String> pair = getUploadUrlForItem(AvailableResources.MARKET,
-                new UploadUrlRequest(fileInfo.getName(), fileInfo.getContentType()), itemId)
-                .map(uploadResponse -> Pair.of(uploadResponse.getId(), uploadResponse.getUploadUrl())).block();
-//                    UUID mediaId = uploadResponse.getId();
-//                    String uploadUrl = uploadResponse.getUploadUrl();
-
-        uploadFileToS3(pair.getSecond(), fileInfo).subscribe();
-        return mediaService.completeMedia(AvailableResources.MARKET, pair.getFirst())
-                .thenReturn(pair.getFirst());
-    }
-
-    public Mono<MediaUploadResponse> getUploadUrlForItem(AvailableResources resourceName,
-                                                         UploadUrlRequest uploadUrlRequest,
-                                                         Long itemId){
-        return webClient.post()
-                .uri(gatewayServiceURL + marketResourcePrefix + "/media/upload-url/item/{itemId}", itemId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(uploadUrlRequest)
-                .retrieve()
-                .bodyToMono(MediaUploadResponse.class);
-    }
-
-    private Mono<Void> uploadFileToS3(String uploadUrl, MultipartFile fileInfo) {
-        return Mono.fromCallable(() -> {
-            try {
-                HttpClient client = HttpClient.newHttpClient();
-
-                // Читаем файл в массив байтов для определения размера
-                byte[] fileBytes = fileInfo.getBytes();
-
-                // Используем ofByteArray, который автоматически устанавливает Content-Length
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(uploadUrl))
-                        .PUT(HttpRequest.BodyPublishers.ofByteArray(fileBytes))
-                        .header("Content-Type", fileInfo.getContentType())
-                        .build();
-
-                HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
-
-                if (response.statusCode() == 200 || response.statusCode() == 201) {
-                    return (Void) null;
-                } else {
-                    throw new RuntimeException("Ошибка загрузки, статус: " + response.statusCode());
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Ошибка при загрузке файла через HttpClient", e);
-            }
-        }).subscribeOn(Schedulers.boundedElastic());
-    }
-
-    public Mono<String> attachMediaToItem(Long itemId, List<UUID> mediaIds) {
+    public Mono<Void> attachMediaToItem(Long itemId, List<UUID> mediaIds) {
         if (mediaIds.isEmpty()) {
-            return Mono.just("");
+            return Mono.empty();
         }
 
         return webClient.post()
@@ -165,7 +90,7 @@ public class MarketService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(mediaIds)
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(Void.class);
     }
 
     public Mono<Long> addItem(ItemRequest itemRequest) {
@@ -175,15 +100,6 @@ public class MarketService {
                 .bodyValue(itemRequest)
                 .retrieve()
                 .bodyToMono(Long.class);
-    }
-
-    public Mono<Void> addMediaToItem(Long itemId, List<UUID> mediaIds) {
-        return webClient.post()
-                .uri(gatewayServiceURL + marketResourcePrefix + "/items/add-media/{itemId}", itemId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(mediaIds)
-                .retrieve()
-                .bodyToMono(Void.class);
     }
 
     public Mono<ItemResponse> editItem(Long id, ItemRequest itemRequest) {
