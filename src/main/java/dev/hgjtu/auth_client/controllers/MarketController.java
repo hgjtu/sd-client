@@ -117,11 +117,11 @@ public class MarketController {
     public Mono<String> myItems(Model model,
                                 @RequestParam(defaultValue = "buy") String mode,
                                 @AuthenticationPrincipal OAuth2User principal) {
-        return marketService.getUserItemsAndRequests(principal.getAttribute("sub"), mode)
+        return marketService.getUserItemsAndRequests(principal.getAttribute("sub"), mode.equals("buy") ? "sell" : "buy")
                 .collectList()
                 .map(items -> {
-                    model.addAttribute("categoryName", mode);
-                    model.addAttribute("categoryDescription", mode);
+                    model.addAttribute("categoryName", "Мои товары");
+                    model.addAttribute("categoryDescription", "Здесь отображаются ваши товары и заявки.");
                     model.addAttribute("mode", mode);
                     model.addAttribute("items", items);
 
@@ -203,7 +203,8 @@ public class MarketController {
     }
 
     @PostMapping("/{type}/edit/{id}")
-    public Mono<String> editItemById (@PathVariable String type, @PathVariable Long id,
+    @ResponseBody
+    public Mono<Long> editItemById (@PathVariable String type, @PathVariable Long id,
                                       @ModelAttribute ItemRequest itemRequest) {
 
         if(Objects.equals(type, "item")){
@@ -213,8 +214,7 @@ public class MarketController {
             itemRequest.setType("sell");
             itemRequest.setPrice(0);
         }
-        return marketService.editItem(id, itemRequest)
-                .then(Mono.just("redirect:/market/item/{id}"));
+        return marketService.editItem(id, itemRequest);
     }
 
     @GetMapping("/item/delete/{id}")

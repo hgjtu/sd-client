@@ -84,8 +84,8 @@
 
             <div th:if="${#authentication != null and #authentication.name == item.getUsername()}">
                 <a class="btn btn-warning mt-3"
-                   th:href="@{${mode} == 'buy' ? '/market/item/edit/' + ${item.id} : '/market/request/edit/' + ${item.id}}">
-                    ✏️ <span th:text="${mode} == 'buy' ? 'Редактировать товар' : 'Редактировать запрос'"></span>
+                   th:href="@{${item.type} == 'buy' ? '/market/item/edit/' + ${item.id} : '/market/request/edit/' + ${item.id}}">
+                    ✏️ <span th:text="${item.type} == 'buy' ? 'Редактировать товар' : 'Редактировать запрос'"></span>
                 </a>
 
                 <a class="btn btn-danger mt-3"

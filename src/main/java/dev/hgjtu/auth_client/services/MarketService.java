@@ -102,13 +102,13 @@ public class MarketService {
                 .bodyToMono(Long.class);
     }
 
-    public Mono<ItemResponse> editItem(Long id, ItemRequest itemRequest) {
+    public Mono<Long> editItem(Long id, ItemRequest itemRequest) {
         return webClient.patch()
                 .uri(gatewayServiceURL + marketResourcePrefix + "/items/edit/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(itemRequest)
                 .retrieve()
-                .bodyToMono(ItemResponse.class);
+                .bodyToMono(Long.class);
     }
 
     public Mono<String> deleteItem(Long id){
