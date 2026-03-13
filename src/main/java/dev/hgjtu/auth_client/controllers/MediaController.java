@@ -25,6 +25,13 @@ public class MediaController {
         return mediaService.getUploadUrl(resourceName, uploadUrlRequest);
     }
 
+    @PostMapping("/media/{resourceName}/upload-url/item/{itemId}")
+    public Mono<MediaUploadResponse> getUploadUrlForItem(@PathVariable("itemId") Long itemId,
+                                               @RequestBody UploadUrlRequest uploadUrlRequest,
+                                               @PathVariable AvailableResources resourceName) {
+        return mediaService.getUploadUrlForItem(itemId, resourceName, uploadUrlRequest);
+    }
+
     @PostMapping("/media/{resourceName}/complete/{mediaId}")
     public Mono<MediaUploadResponse> completeMedia(@PathVariable AvailableResources resourceName,
                                                    @PathVariable UUID mediaId) {

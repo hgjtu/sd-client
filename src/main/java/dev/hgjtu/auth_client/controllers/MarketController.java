@@ -6,19 +6,14 @@ import dev.hgjtu.auth_client.dto.market.ItemRequest;
 import dev.hgjtu.auth_client.dto.market.ItemResponse;
 import dev.hgjtu.auth_client.services.MarketService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Controller
@@ -81,12 +76,11 @@ public class MarketController {
                 });
     }
 
-    @PostMapping(value = "/add-item", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.MULTIPART_MIXED_VALUE})
-    public Mono<String> addItem(@RequestPart("item") ItemRequest itemRequest,
-                                @RequestPart(value = "medias", required = false) List<MultipartFile> medias) {
+    @PostMapping(value = "/add-item")
+    @ResponseBody
+    public Mono<Long> addItem(@RequestBody ItemRequest itemRequest) {
         itemRequest.setType("buy");
-        return marketService.addItemWithMediaFiles(itemRequest, medias)
-                .then(Mono.just("redirect:/market"));
+        return marketService.addItem(itemRequest);
     }
 
     @GetMapping("/add-request")

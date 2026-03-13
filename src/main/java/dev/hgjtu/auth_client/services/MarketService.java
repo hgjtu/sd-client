@@ -10,8 +10,10 @@ import dev.hgjtu.auth_client.models.AvailableResources;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,9 +23,17 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.nio.file.Path;
 import java.util.*;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.io.InputStream;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
@@ -78,9 +88,8 @@ public class MarketService {
     }
 
     public Mono<Long> addItemWithMediaFiles(ItemRequest itemRequest, List<MultipartFile> mediaFiles) {
-        Mono<Long> qw =  addItem(itemRequest);
-        processMediaFiles(qw.block(), mediaFiles).subscribe();
-        return qw;
+        Mono<Long> itemId =  addItem(itemRequest);
+        return processMediaFiles(itemId.block(), mediaFiles);
     }
 
     private Mono<Long> processMediaFiles(Long itemId, List<MultipartFile> mediaFiles) {
@@ -88,29 +97,23 @@ public class MarketService {
             return Mono.just(itemId);
         }
 
-        return Flux.fromIterable(mediaFiles)
-                .flatMap(media -> processSingleMediaFile(itemId, media))
-                .collectList()
-                .flatMap(mediaIds -> {
-                    if (mediaIds.isEmpty()) {
-                        return Mono.just(itemId);
-                    }
-                    return attachMediaToItem(itemId, mediaIds)
-                            .thenReturn(itemId);
-                });
+        List<UUID> mediaIds = Flux.fromIterable(mediaFiles)
+                .flatMap(media -> processSingleMediaFile(itemId, media)).collectList().block();
+        return Flux.fromIterable(mediaIds)
+                .flatMapSequential(mediaId -> attachMediaToItem(itemId, Collections.singletonList(mediaId)))
+                .then(Mono.just(itemId));
     }
 
     private Mono<UUID> processSingleMediaFile(Long itemId, MultipartFile fileInfo) {
-        return getUploadUrlForItem(AvailableResources.MARKET,
-                        new UploadUrlRequest(fileInfo.getName(), fileInfo.getContentType()), itemId)
-                .flatMap(uploadResponse -> {
-                    UUID mediaId = uploadResponse.getId();
-                    String uploadUrl = uploadResponse.getUploadUrl();
+        Pair<UUID, String> pair = getUploadUrlForItem(AvailableResources.MARKET,
+                new UploadUrlRequest(fileInfo.getName(), fileInfo.getContentType()), itemId)
+                .map(uploadResponse -> Pair.of(uploadResponse.getId(), uploadResponse.getUploadUrl())).block();
+//                    UUID mediaId = uploadResponse.getId();
+//                    String uploadUrl = uploadResponse.getUploadUrl();
 
-                    return uploadFileToS3(uploadUrl, fileInfo)
-                            .then(mediaService.completeMedia(AvailableResources.MARKET, mediaId))
-                            .thenReturn(mediaId);
-                });
+        uploadFileToS3(pair.getSecond(), fileInfo).subscribe();
+        return mediaService.completeMedia(AvailableResources.MARKET, pair.getFirst())
+                .thenReturn(pair.getFirst());
     }
 
     public Mono<MediaUploadResponse> getUploadUrlForItem(AvailableResources resourceName,
@@ -126,38 +129,43 @@ public class MarketService {
 
     private Mono<Void> uploadFileToS3(String uploadUrl, MultipartFile fileInfo) {
         return Mono.fromCallable(() -> {
-                    try {
-                        return fileInfo.getInputStream();
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to get file input stream", e);
-                    }
-                })
-                .flatMapMany(inputStream ->
-                        DataBufferUtils.read((Path) inputStream,
-                                new DefaultDataBufferFactory(),
-                                4096))
-                .as(dataBufferFlux ->
-                        webClient.put()
-                                .uri(uploadUrl)
-                                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                                .contentLength(fileInfo.getSize())
-                                .body(BodyInserters.fromDataBuffers(dataBufferFlux))
-                                .retrieve()
-                                .bodyToMono(Void.class)
-                );
+            try {
+                HttpClient client = HttpClient.newHttpClient();
+
+                // Читаем файл в массив байтов для определения размера
+                byte[] fileBytes = fileInfo.getBytes();
+
+                // Используем ofByteArray, который автоматически устанавливает Content-Length
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(uploadUrl))
+                        .PUT(HttpRequest.BodyPublishers.ofByteArray(fileBytes))
+                        .header("Content-Type", fileInfo.getContentType())
+                        .build();
+
+                HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+
+                if (response.statusCode() == 200 || response.statusCode() == 201) {
+                    return (Void) null;
+                } else {
+                    throw new RuntimeException("Ошибка загрузки, статус: " + response.statusCode());
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Ошибка при загрузке файла через HttpClient", e);
+            }
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
-    public Mono<Long> attachMediaToItem(Long itemId, List<UUID> mediaIds) {
+    public Mono<String> attachMediaToItem(Long itemId, List<UUID> mediaIds) {
         if (mediaIds.isEmpty()) {
-            return Mono.just(itemId);
+            return Mono.just("");
         }
 
         return webClient.post()
-                .uri(gatewayServiceURL + marketResourcePrefix + "/items//add-media/{itemId}", itemId)
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/add-media/{itemId}", itemId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(mediaIds)
                 .retrieve()
-                .bodyToMono(Long.class);
+                .bodyToMono(String.class);
     }
 
     public Mono<Long> addItem(ItemRequest itemRequest) {
