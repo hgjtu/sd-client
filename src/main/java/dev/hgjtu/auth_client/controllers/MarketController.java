@@ -99,11 +99,11 @@ public class MarketController {
                 });
     }
     @PostMapping("/add-request")
-    public Mono<String> addRequest (@ModelAttribute ItemRequest itemRequest) {
+    @ResponseBody
+    public Mono<Long> addRequest (@RequestBody ItemRequest itemRequest) {
         itemRequest.setType("sell");
         itemRequest.setPrice(0);
-        return marketService.addItem(itemRequest)
-                .then(Mono.just("redirect:/market"));
+        return marketService.addItem(itemRequest);
     }
 
     @PostMapping("/items/add-media/{itemId}")
@@ -188,12 +188,9 @@ public class MarketController {
 
         return Mono.zip(categoriesMono, itemMono)
                 .map(tuple -> {
-                    List<CategoryResponse> categories = tuple.getT1();
-                    ItemResponse item = tuple.getT2();
-
-                    model.addAttribute("categories", categories);
-                    model.addAttribute("itemRequest", item);
-                    model.addAttribute("actionUrl", "/market/request/edit/" + item.getId());
+                    model.addAttribute("categories", tuple.getT1());
+                    model.addAttribute("item", tuple.getT2());
+                    model.addAttribute("actionUrl", "/market/request/edit/" + tuple.getT2().getId());
                     return "market/add-request";
                 })
                 .onErrorResume(Exception.class, e -> {
