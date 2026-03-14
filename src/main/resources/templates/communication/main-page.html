@@ -472,14 +472,25 @@
 
         <!-- Посты -->
         <div th:each="post : ${posts}" class="post">
-            <div class="avatar-small" th:text="${post.authorUsername.substring(0,1)}">H</div>
+            <div class="avatar-small">
+                <img th:if="${post.authorInfo.profileMediaUrl != null}"
+                     th:src="${post.authorInfo.profileMediaUrl}"
+                     th:onerror="this.onerror=null; this.src='/default-avatar.png'"
+                     alt="avatar"
+                     style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                <div th:unless="${post.authorInfo.profileMediaUrl != null}"
+                     th:text="${post.authorInfo.username.substring(0,1)}"
+                     style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+                    H
+                </div>
+            </div>
 
             <div class="body">
                 <div class="head">
                     <div style="display: flex; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 5px; margin-right: 15px;">
-                            <h4 style="margin: 0;" th:text="${post.authorUsername}">Никнейм</h4>
-                            <p style="margin: 0;" th:if="${post.authorUsername == #authentication.name}">Вы</p>
+                            <h4 style="margin: 0;" th:text="${post.authorInfo.username}">Никнейм</h4>
+                            <p style="margin: 0;" th:if="${post.authorInfo.username == #authentication.name}">Вы</p>
                         </div>
                         <a th:href="@{'/communication/post/' + ${post.id}}"
                            style="font-size:13px;color:var(--accent);text-decoration:none;">Открыть</a>

@@ -11,8 +11,7 @@ public class PostResponse {
     private Long id;
     private Short sectionId;
     private Short categoryId;
-    private Long userId;
-    private String authorUsername;
+    private UserWithMediaForResources authorInfo;
     private String content;
     private List<MediaUploadResponse> medias;
     private LocalDateTime publicationDateTime;
@@ -32,9 +31,6 @@ public class PostResponse {
         return categoryId;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
 
     public String getContent() {
         return content;
@@ -56,11 +52,11 @@ public class PostResponse {
         return comments;
     }
 
-    public String getAuthorUsername() {
-        return authorUsername;
-    }
-
     public String getIsReacted() {
         return isReacted;
+    }
+
+    public UserWithMediaForResources getAuthorInfo() {
+        return authorInfo;
     }
 }
