@@ -95,18 +95,19 @@
 
                 <div id="previewContainer" class="d-flex flex-wrap gap-2 mt-3">
 
-                    <th:block th:each="imageUrl : ${item != null ? item.imagesUrls : {}}">
-                        <div th:each="imageUrl : ${item.imagesUrls}"
+                    <th:block th:if="${item != null && !item.medias.isEmpty()}">
+                        <div th:each="media : ${item.medias}"
                              class="position-relative"
-                             th:attr="data-url=${imageUrl}">
+                             th:attr="data-media-id=${media.id}, data-url=${media.uploadUrl}">
 
-                            <img th:src="${imageUrl}"
+                            <img th:src="${media.uploadUrl}"
                                  style="width:120px;height:120px;object-fit:cover"
-                                 class="rounded border"/>
+                                 class="rounded border"
+                                 th:alt="${media.uploadUrl}"/>
 
                             <button type="button"
                                     class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                    th:attr="onclick=|deleteExistingMedia('${imageUrl}', this)|">
+                                    th:attr="onclick=|deleteExistingMedia('${media.id}', this)|">
                                 &times;
                             </button>
                         </div>
@@ -140,7 +141,8 @@
 
     const MAX_FILES = 10;
     let pendingFiles = [];
-    let itemId = null;
+
+    let itemId = [[${item != null ? item.id : null}]];
 
     /* ================================
        📸 Выбор файлов
@@ -214,9 +216,9 @@
             return;
         }
 
-        const itemId = await saveResponse.text();
+        itemId = await saveResponse.text();
 
-        await uploadAllPhotos(itemId);
+        await uploadAllPhotos();
 
         window.location.href = "/market/item/" + itemId;
     });
@@ -224,7 +226,7 @@
     /* ================================
        ☁️ Загрузка всех фото
     ================================ */
-    async function uploadAllPhotos(itemId) {
+    async function uploadAllPhotos() {
 
         for (const file of pendingFiles) {
 
@@ -310,9 +312,21 @@
     /* ================================
        🗑 Удаление существующих
     ================================ */
-    function deleteExistingMedia(imageUrl, button) {
+    async function deleteExistingMedia(mediaId, button) {
         if (confirm('Удалить фото?')) {
-            button.closest('.position-relative').remove();
+            const deleteMediaResponse = await fetch(`/market/items/delete-media/${itemId}/${mediaId}`, {
+                method: "DELETE",
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
+            });
+
+            if(deleteMediaResponse.ok){
+                button.closest('.position-relative').remove();
+            }
+            else{
+                alert("Ошибка удаления");
+            }
         }
     }
 </script>

@@ -57,15 +57,18 @@
     <div class="row g-4">
         <!-- Изображения товара -->
         <div class="col-12 col-md-6">
-            <div class="item-images mb-3" th:if="${item.imagesUrls}">
-                <img th:if="${not #lists.isEmpty(item.imagesUrls)}"
-                     th:each="imgUrl : ${item.imagesUrls}"
-                     th:src="${imgUrl}"
-                     th:alt="${item.title}">
+            <div class="item-images mb-3" th:if="${item != null && item.medias != null}">
+                <th:block th:if="${!item.medias.isEmpty()}">
+                    <img th:each="media : ${item.medias}"
+                         th:src="${media.uploadUrl}"
+                         th:alt="${item.title}"
+                         th:title="${item.title}"/>
+                </th:block>
 
-                <img th:if="${#lists.isEmpty(item.imagesUrls)}"
+                <img th:if="${item.medias.isEmpty()}"
                      src="/default-item.png"
-                     th:alt="${item.title}">
+                     th:alt="${item.title}"
+                     th:title="${item.title}"/>
             </div>
         </div>
 

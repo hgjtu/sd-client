@@ -220,5 +220,12 @@ public class MarketController {
                 .then(Mono.just("redirect:/market"));
     }
 
+    @DeleteMapping("/items/delete-media/{itemId}/{mediaId}")
+    @ResponseBody
+    public Mono<Void> deleteMediaToItem(@PathVariable Long itemId,
+                                        @PathVariable UUID mediaId) {
+        return marketService.deleteMediaToItem(itemId, mediaId);
+    }
+
     // TODO нет комментариев
 }

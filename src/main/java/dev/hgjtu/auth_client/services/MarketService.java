@@ -118,6 +118,16 @@ public class MarketService {
                 .bodyToMono(String.class);
     }
 
+    public Mono<Void> deleteMediaToItem(Long itemId, UUID mediaId){
+        Map<String, String> params = new HashMap<>();
+        params.put("itemId", itemId.toString());
+        params.put("mediaId", mediaId.toString());
+        return webClient.delete()
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/delete-media/{itemId}/{mediaId}", params)
+                .retrieve()
+                .bodyToMono(Void.class);
+    }
+
     public Mono<ItemResponse> getItemById(Long id) {
         return webClient.get()
                 .uri(gatewayServiceURL + marketResourcePrefix + "/items/{id}", id)
