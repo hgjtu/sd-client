@@ -95,7 +95,7 @@ public class MarketController {
                 })
                 .onErrorResume(Exception.class, e -> {
                     model.addAttribute("error", "Ошибка при вызове API: " + e.getMessage());
-                    return Mono.just("market/add-request"); // TODO эта вообще про медиа ничего не знает
+                    return Mono.just("market/add-request");
                 });
     }
     @PostMapping("/add-request")
@@ -190,7 +190,7 @@ public class MarketController {
                 .map(tuple -> {
                     model.addAttribute("categories", tuple.getT1());
                     model.addAttribute("item", tuple.getT2());
-                    model.addAttribute("actionUrl", "/market/request/edit/" + tuple.getT2().getId());
+                    model.addAttribute("actionUrl", "/market/request/edit/" + id);
                     return "market/add-request";
                 })
                 .onErrorResume(Exception.class, e -> {

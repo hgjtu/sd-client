@@ -213,13 +213,13 @@
 
         await uploadAllPhotos();
 
-        window.location.href = "/market/request/" + itemId;
+        window.location.href = "/market/item/" + itemId;
     });
 
     /* ================================
        ☁️ Загрузка всех фото
     ================================ */
-    async function uploadAllPhotos(itemId) {
+    async function uploadAllPhotos() {
 
         for (const file of pendingFiles) {
 
@@ -256,17 +256,18 @@
                 headers: {[csrfHeader]: csrfToken}
             });
 
-            if (!completeResponse.ok) throw new Error("Ошибка подтверждения");
-
-            // Привязываем к item
-            await fetch(`/market/items/add-media/${itemId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    [csrfHeader]: csrfToken
-                },
-                body: JSON.stringify([mediaId])
-            });
+            if (completeResponse.ok) {
+                // Привязываем к item
+                await fetch(`/market/items/add-media/${itemId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify([mediaId])
+                });
+            }
+            else throw new Error("Ошибка подтверждения");
         }
 
         pendingFiles = [];

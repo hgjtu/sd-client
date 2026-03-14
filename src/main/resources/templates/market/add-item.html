@@ -263,17 +263,18 @@
                 headers: {[csrfHeader]: csrfToken}
             });
 
-            if (!completeResponse.ok) throw new Error("Ошибка подтверждения");
-
-            // Привязываем к item
-            await fetch(`/market/items/add-media/${itemId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    [csrfHeader]: csrfToken
-                },
-                body: JSON.stringify([mediaId])
-            });
+            if (completeResponse.ok) {
+                // Привязываем к item
+                await fetch(`/market/items/add-media/${itemId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify([mediaId])
+                });
+            }
+            else throw new Error("Ошибка подтверждения");
         }
 
         pendingFiles = [];
