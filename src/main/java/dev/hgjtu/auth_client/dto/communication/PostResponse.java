@@ -1,5 +1,6 @@
 package dev.hgjtu.auth_client.dto.communication;
 
+import dev.hgjtu.auth_client.dto.MediaUploadResponse;
 import dev.hgjtu.auth_client.models.PostComment;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ public class PostResponse {
     private Long userId;
     private String authorUsername;
     private String content;
-    private List<String> mediaUrls;
+    private List<MediaUploadResponse> medias;
     private LocalDateTime publicationDateTime;
     private Map<String, Integer> smileyReactions;
     private List<PostComment> comments;
@@ -39,8 +40,8 @@ public class PostResponse {
         return content;
     }
 
-    public List<String> getMediaUrls() {
-        return mediaUrls;
+    public List<MediaUploadResponse> getMedias() {
+        return medias;
     }
 
     public LocalDateTime getPublicationDateTime() {

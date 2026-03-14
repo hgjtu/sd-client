@@ -428,6 +428,11 @@
             <p th:text="${user.username}">Мой профиль клуба</p>
         </div>
 
+        <!-- Кнопки действий -->
+        <div class="actions d-flex justify-content-end gap-2">
+            <button id="create-post-btn" class="btn btn-primary">Создать пост</button>
+        </div>
+
         <div class="news-block">
             <h5>Мои посты</h5>
 
@@ -448,12 +453,6 @@
                 <a th:href="@{'/communication/post/' + ${post.id}}"
                    style="font-size:13px;color:var(--accent);text-decoration:none;">Открыть</a>
             </div>
-        </div>
-
-
-        <!-- Кнопки действий -->
-        <div class="actions d-flex justify-content-end gap-2">
-            <button id="create-post-btn" class="btn btn-primary">Создать пост</button>
         </div>
 
     </aside>
@@ -497,8 +496,8 @@
                 </div>
 
                 <!-- Медиа -->
-                <div class="media" th:if="${post.mediaUrls != null}">
-                    <img th:each="url : ${post.mediaUrls}" th:src="${url}" alt="media" style="max-width:100%;border-radius:6px;margin-top:5px;"/>
+                <div class="media" th:if="${post.medias != null and !post.medias.isEmpty()}">
+                    <img th:each="url : ${post.medias[0].uploadUrl}" th:src="${url}" alt="media" style="max-width:100%;border-radius:6px;margin-top:5px;"/>
                 </div>
 
                 <!-- Реакции -->
@@ -514,39 +513,37 @@
 
 
                 <!-- Комментарии -->
-                <div class="comments"
-                     th:attr="data-post-id=${post.id}, data-current-user-id=${user.id}">
+<!--                <div class="comments"-->
+<!--                     th:attr="data-post-id=${post.id}, data-current-user-id=${user.id}">-->
 
-                    <!-- Скрытые элементы — плоский список комментариев, которые прочитает JS -->
-                    <div class="raw-comments" style="display:none;">
-                        <div class="raw-comment"
-                             th:each="c : ${post.comments}"
-                             th:attr="
-                                data-id=${c.id},
-                                data-post-id=${c.postId},
-                                data-user-id=${c.userId},
-                                data-reply-id=${c.replyCommentId},
-                                data-content=${c.content},
-                                data-likes=${c.likes},
-                                data-created=${#temporals.format(c.createdAt, 'dd.MM.yyyy HH:mm')}
-                                ">
-                        </div>
-                    </div>
+<!--                    &lt;!&ndash; Скрытые элементы — плоский список комментариев, которые прочитает JS &ndash;&gt;-->
+<!--                    <div class="raw-comments" style="display:none;">-->
+<!--                        <div class="raw-comment"-->
+<!--                             th:each="c : ${post.comments}"-->
+<!--                             th:attr="-->
+<!--                                data-id=${c.id},-->
+<!--                                data-post-id=${c.postId},-->
+<!--                                data-user-id=${c.userId},-->
+<!--                                data-reply-id=${c.replyCommentId},-->
+<!--                                data-content=${c.content},-->
+<!--                                data-likes=${c.likes},-->
+<!--                                data-created=${#temporals.format(c.createdAt, 'dd.MM.yyyy HH:mm')}-->
+<!--                                ">-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                    <!-- Контейнер, куда JS отрисует уже иерархические комментарии -->
-                    <div class="comments-rendered"></div>
+<!--                    &lt;!&ndash; Контейнер, куда JS отрисует уже иерархические комментарии &ndash;&gt;-->
+<!--                    <div class="comments-rendered"></div>-->
 
-                    <!-- Форма добавления нового (верхнего) комментария -->
-                    <div class="add-comment">
-                        <input type="text" placeholder="Напишите комментарий..." />
-                        <button class="send-comment-btn">Отправить</button>
-                    </div>
+<!--                    &lt;!&ndash; Форма добавления нового (верхнего) комментария &ndash;&gt;-->
+<!--                    <div class="add-comment">-->
+<!--                        <input type="text" placeholder="Напишите комментарий..." />-->
+<!--                        <button class="send-comment-btn">Отправить</button>-->
+<!--                    </div>-->
+<!--                </div>-->
                 </div>
-
             </div>
-        </div>
-    </main>
-
+        </main>
 
     <!-- RIGHT -->
     <aside class="right">
