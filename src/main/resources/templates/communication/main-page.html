@@ -508,7 +508,21 @@
 
                 <!-- Медиа -->
                 <div class="media" th:if="${post.medias != null and !post.medias.isEmpty()}">
-                    <img th:each="url : ${post.medias[0].uploadUrl}" th:src="${url}" alt="media" style="max-width:100%;border-radius:6px;margin-top:5px;"/>
+                    <div th:each="media : ${post.medias}" style="margin-bottom:10px;">
+                        <!-- Фото -->
+                        <img th:if="${media.typeAsString == 'IMAGE'}"
+                             th:src="${media.uploadUrl}"
+                             alt="media"
+                             style="max-width:100%;border-radius:6px;"/>
+
+                        <!-- Видео -->
+                        <video th:if="${media.typeAsString == 'VIDEO'}"
+                               controls
+                               style="max-width:100%;border-radius:6px;">
+                            <source th:src="${media.uploadUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
                 </div>
 
                 <!-- Реакции -->

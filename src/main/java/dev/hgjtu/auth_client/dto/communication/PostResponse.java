@@ -13,7 +13,7 @@ public class PostResponse {
     private Short categoryId;
     private UserWithMediaForResources authorInfo;
     private String content;
-    private List<MediaUploadResponse> medias;
+    private List<MediaResponse> medias;
     private LocalDateTime publicationDateTime;
     private Map<String, Integer> smileyReactions;
     private List<PostComment> comments;
@@ -36,7 +36,7 @@ public class PostResponse {
         return content;
     }
 
-    public List<MediaUploadResponse> getMedias() {
+    public List<MediaResponse> getMedias() {
         return medias;
     }
 
