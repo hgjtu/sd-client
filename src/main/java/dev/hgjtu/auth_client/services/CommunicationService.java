@@ -11,7 +11,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -97,11 +99,37 @@ public class CommunicationService {
                 .bodyToMono(Long.class);
     }
 
+    public Mono<Void> attachMediaToPost(Long postId, List<UUID> mediaIds) {
+        if (mediaIds.isEmpty()) {
+            return Mono.empty();
+        }
+
+        return webClient.post()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/add-media/{itemId}", postId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(mediaIds)
+                .retrieve()
+                .bodyToMono(Void.class);
+    }
+
     public Mono<String> deletePost(Long postId) {
         return webClient.delete()
-                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/{id}", postId)
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/{postId}", postId)
                 .retrieve()
                 .bodyToMono(String.class);
+    }
+
+    public Mono<Void> deleteMediaToPost(Long postId, List<UUID> mediaIds) {
+        if (mediaIds.isEmpty()) {
+            return Mono.empty();
+        }
+
+        return webClient.post()
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/add-media/{postId}", postId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(mediaIds)
+                .retrieve()
+                .bodyToMono(Void.class);
     }
 
     public Mono<Void> addReaction(Long postId, String reactionType) {

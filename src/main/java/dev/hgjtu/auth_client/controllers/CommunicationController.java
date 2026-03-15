@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -87,7 +88,7 @@ public class CommunicationController {
 
     @PostMapping("/post/create")
     @ResponseBody
-    public Mono<Long> createPost (@ModelAttribute PostRequest postRequest) {
+    public Mono<Long> createPost (@RequestBody PostRequest postRequest) {
         return communicationService.createPost(postRequest);
     }
 
@@ -115,15 +116,29 @@ public class CommunicationController {
 
     @PostMapping("/post/edit/{id}")
     @ResponseBody
-    public Mono<Long> editPost (@ModelAttribute PostRequest postRequest,
+    public Mono<Long> editPost (@RequestBody PostRequest postRequest,
                                   @PathVariable Long id) {
         return communicationService.updatePost(id, postRequest);
+    }
+
+    @PostMapping("/post/add-media/{postId}")
+    @ResponseBody
+    public Mono<Void> attachMediaToItem(@PathVariable Long postId,
+                                        @RequestBody List<UUID> mediaIds) {
+        return communicationService.attachMediaToPost(postId, mediaIds);
     }
 
     @GetMapping("/post/delete/{id}")
     public Mono<String> deleteItemById (@PathVariable Long id) {
         return communicationService.deletePost(id)
                 .then(Mono.just("redirect:/communication"));
+    }
+
+    @GetMapping("/post/delete-media/{postId}")
+    @ResponseBody
+    public Mono<Void> deleteItemById (@PathVariable Long postId,
+                                        @RequestBody List<UUID> mediaIds) {
+        return communicationService.deleteMediaToPost(postId, mediaIds);
     }
 
     @GetMapping("/post/{postId}/add-reaction/{reactionType}")
