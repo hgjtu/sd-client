@@ -128,13 +128,13 @@ public class CommunicationController {
         return communicationService.attachMediaToPost(postId, mediaIds);
     }
 
-    @GetMapping("/post/delete/{id}")
+    @DeleteMapping("/post/delete/{id}")
     public Mono<String> deleteItemById (@PathVariable Long id) {
         return communicationService.deletePost(id)
                 .then(Mono.just("redirect:/communication"));
     }
 
-    @GetMapping("/post/delete-media/{postId}")
+    @DeleteMapping("/post/delete-media/{postId}")
     @ResponseBody
     public Mono<Void> deleteItemById (@PathVariable Long postId,
                                         @RequestBody List<UUID> mediaIds) {

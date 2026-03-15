@@ -125,7 +125,7 @@ public class CommunicationService {
         }
 
         return webClient.post()
-                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/add-media/{postId}", postId)
+                .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/delete-media/{postId}", postId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(mediaIds)
                 .retrieve()
