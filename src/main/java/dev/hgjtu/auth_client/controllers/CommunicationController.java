@@ -86,9 +86,9 @@ public class CommunicationController {
     }
 
     @PostMapping("/post/create")
-    public Mono<String> createPost (@ModelAttribute PostRequest postRequest) {
-        return communicationService.createPost(postRequest)
-                .then(Mono.just("redirect:/communication"));
+    @ResponseBody
+    public Mono<Long> createPost (@ModelAttribute PostRequest postRequest) {
+        return communicationService.createPost(postRequest);
     }
 
     @GetMapping("/post/edit/{id}")
@@ -114,10 +114,10 @@ public class CommunicationController {
     }
 
     @PostMapping("/post/edit/{id}")
-    public Mono<String> editPost (@ModelAttribute PostRequest postRequest,
+    @ResponseBody
+    public Mono<Long> editPost (@ModelAttribute PostRequest postRequest,
                                   @PathVariable Long id) {
-        return communicationService.updatePost(id, postRequest)
-                .then(Mono.just("redirect:/communication"));
+        return communicationService.updatePost(id, postRequest);
     }
 
     @GetMapping("/post/delete/{id}")

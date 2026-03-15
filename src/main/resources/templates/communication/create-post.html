@@ -2,94 +2,166 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="${post} != null ? 'Редактировать пост' : 'Создать пост'"></title>
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        .media-preview {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+            border: 1px solid #dee2e6;
+        }
+        .preview-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
 <!-- Подключаем header -->
 <div th:replace="fragments/header :: site-header"></div>
 
-<div class="container mt-5">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h4 th:text="${post} != null ? 'Редактировать пост' : 'Создать новый пост'"></h4>
-        </div>
-        <div class="card-body">
-            <form th:action="@{${actionUrl}}" th:object="${post}" method="post">
-                <!-- Section -->
-                <div class="mb-3">
-                    <label for="section" class="form-label">Секция</label>
-                    <select id="section" name="sectionId" class="form-select" required>
-                        <option value="">-- Выберите секцию --</option>
-                        <option th:each="section : ${sections}"
-                                th:value="${section.id}"
-                                th:text="${section.nameRu != null ? section.nameRu : section.name}"
-                                th:selected="${post != null} ? ${section.id} == ${post.sectionId} : false">
-                        </option>
-                    </select>
-                </div>
-
-                <!-- Category -->
-                <div class="mb-3">
-                    <label for="category" class="form-label">Категория</label>
-                    <select id="category" name="categoryId" class="form-select" required>
-                        <option value="">-- Выберите категорию --</option>
-                        <!-- Категории группируются по секциям для фильтрации -->
-                        <th:block th:each="section : ${sections}">
-                            <optgroup th:label="${section.nameRu != null ? section.nameRu : section.name}"
-                                      th:attr="data-section-id=${section.id}">
-                                <option th:each="category : ${categories}"
-                                        th:if="${category.sectionId == section.id}"
-                                        th:value="${category.id}"
-                                        th:text="${category.nameRu != null ? category.nameRu : category.name}"
-                                        th:selected="${post != null} ? ${category.id} == ${post.categoryId} : false">
-                                </option>
-                            </optgroup>
-                        </th:block>
-                    </select>
-                </div>
-
-                <!-- Content -->
-                <div class="mb-3">
-                    <label for="content" class="form-label">Содержимое поста</label>
-                    <textarea id="content" name="content" class="form-control" rows="5" required
-                              th:text="${post != null} ? ${post.content} : ''"></textarea>
-                </div>
-
-                <!-- Media URLs -->
-                <div class="mb-3">
-                    <label class="form-label">Медиа URL-ы</label>
-                    <div id="mediaUrlsContainer">
-                        <div class="input-group mb-2"
-                             th:each="url, stat : ${post != null && post.mediaUrls != null ? post.mediaUrls : {''}}">
-                            <input type="url" name="mediaUrls" th:value="${url}"
-                                   class="form-control" placeholder="Введите URL картинки/видео">
-                            <button type="button" class="btn btn-outline-danger remove-media">✕</button>
-                        </div>
-                    </div>
-                    <button type="button" id="addMediaUrl" class="btn btn-outline-primary btn-sm">+ Добавить медиа</button>
-                </div>
-
-                <div class="d-flex justify-content-end mt-4">
-                    <a href="/communication" class="btn btn-secondary me-2">Отмена</a>
-                    <button type="submit" class="btn btn-success">Сохранить</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
+<div class="container">
     <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}"></div>
+
+    <div class="form-container">
+        <h2 class="mb-4" th:text="${post} != null ? 'Редактировать пост' : 'Создать новый пост'"></h2>
+
+        <form id="postForm" th:action="@{${actionUrl}}" method="post">
+            <!-- Section -->
+            <div class="mb-3">
+                <label for="section" class="form-label">Секция</label>
+                <select id="section" name="sectionId" class="form-select" required>
+                    <option value="">-- Выберите секцию --</option>
+                    <option th:each="section : ${sections}"
+                            th:value="${section.id}"
+                            th:text="${section.nameRu != null ? section.nameRu : section.name}"
+                            th:selected="${post != null} ? ${section.id} == ${post.sectionId} : false">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Category -->
+            <div class="mb-3">
+                <label for="category" class="form-label">Категория</label>
+                <select id="category" name="categoryId" class="form-select" required>
+                    <option value="">-- Выберите категорию --</option>
+                    <!-- Категории группируются по секциям для фильтрации -->
+                    <th:block th:each="section : ${sections}">
+                        <optgroup th:label="${section.nameRu != null ? section.nameRu : section.name}"
+                                  th:attr="data-section-id=${section.id}">
+                            <option th:each="category : ${categories}"
+                                    th:if="${category.sectionId == section.id}"
+                                    th:value="${category.id}"
+                                    th:text="${category.nameRu != null ? category.nameRu : category.name}"
+                                    th:selected="${post != null} ? ${category.id} == ${post.categoryId} : false">
+                            </option>
+                        </optgroup>
+                    </th:block>
+                </select>
+            </div>
+
+            <!-- Content -->
+            <div class="mb-3">
+                <label for="content" class="form-label">Содержимое поста</label>
+                <textarea id="content" name="content" class="form-control" rows="5" required
+                          th:text="${post != null} ? ${post.content} : ''"
+                          placeholder="Введите содержимое поста"></textarea>
+            </div>
+
+            <!-- Media -->
+            <div class="mb-3">
+                <label class="form-label">Медиа (изображения/видео)</label>
+                <input type="file"
+                       class="form-control"
+                       id="mediaInput"
+                       accept="image/*,video/*"
+                       multiple>
+
+                <div id="previewContainer" class="d-flex flex-wrap gap-2 mt-3">
+                    <!-- Существующие медиа -->
+                    <th:block th:if="${post != null && !post.medias.isEmpty()}">
+                        <div th:each="mediaUrl : ${post.medias}"
+                             class="preview-wrapper"
+                             th:attr="data-media-url=${mediaUrl}">
+
+                            <!-- Проверка на тип медиа (можно расширить) -->
+                            <th:block th:if="${#strings.contains(mediaUrl, '.mp4') or #strings.contains(mediaUrl, '.webm')}">
+                                <video class="media-preview" controls>
+                                    <source th:src="${mediaUrl}" type="video/mp4">
+                                </video>
+                            </th:block>
+                            <th:block th:unless="${#strings.contains(mediaUrl, '.mp4') or #strings.contains(mediaUrl, '.webm')}">
+                                <img th:src="${mediaUrl}" class="media-preview" alt="Media preview">
+                            </th:block>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                    th:attr="onclick=|deleteExistingMedia('${mediaUrl}', this)|">
+                                &times;
+                            </button>
+                        </div>
+                    </th:block>
+                </div>
+                <small class="text-muted">Можно загрузить до 10 файлов (изображения или видео). Максимальный размер: 10MB</small>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <a href="javascript:history.back()" class="btn btn-secondary me-2">Отмена</a>
+                <button type="submit" class="btn btn-success"
+                        th:text="${post != null} ? 'Сохранить изменения' : 'Создать пост'">
+                    Создать пост
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Подключаем footer -->
 <div th:replace="fragments/footer :: site-footer"></div>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        // CSRF токены
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute("content");
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute("content");
+
+        // Элементы формы
         const sectionSelect = document.getElementById("section");
         const categorySelect = document.getElementById("category");
+        const form = document.getElementById("postForm");
+        const mediaInput = document.getElementById("mediaInput");
+        const previewContainer = document.getElementById("previewContainer");
+
+        // Константы
+        const MAX_FILES = 10;
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+        // Состояние
+        let pendingFiles = [];
+        let postId = [[${post != null ? post.id : null}]];
 
         // === Фильтрация категорий по секции ===
         function filterCategories() {
@@ -127,27 +199,244 @@
             });
         }
 
-        // === Добавление/удаление полей для медиа URL ===
-        const addMediaBtn = document.getElementById("addMediaUrl");
-        const mediaContainer = document.getElementById("mediaUrlsContainer");
+        /* ================================
+           📸 Выбор файлов
+        ================================ */
+        mediaInput?.addEventListener("change", function (event) {
+            const files = Array.from(event.target.files);
 
-        if (addMediaBtn && mediaContainer) {
-            addMediaBtn.addEventListener("click", () => {
-                const div = document.createElement("div");
-                div.classList.add("input-group", "mb-2");
-                div.innerHTML = `
-                    <input type="url" name="mediaUrls" class="form-control" placeholder="Введите URL картинки/видео">
-                    <button type="button" class="btn btn-outline-danger remove-media">✕</button>
-                `;
-                mediaContainer.appendChild(div);
-            });
+            if (pendingFiles.length + files.length > MAX_FILES) {
+                alert(`Можно загрузить максимум ${MAX_FILES} файлов`);
+                return;
+            }
 
-            mediaContainer.addEventListener("click", (e) => {
-                if (e.target.classList.contains("remove-media")) {
-                    e.target.closest(".input-group").remove();
+            for (const file of files) {
+                // Проверка типа файла
+                if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
+                    alert("Можно загружать только изображения и видео");
+                    continue;
                 }
+
+                // Проверка размера
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`Максимальный размер файла — ${MAX_FILE_SIZE / 1024 / 1024}MB`);
+                    continue;
+                }
+
+                // Добавляем файл в массив
+                pendingFiles.push(file);
+
+                // Создаём preview
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    createPreview(e.target.result, file);
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Очищаем input
+            mediaInput.value = "";
+        });
+
+        /* ================================
+           🚀 СОХРАНЕНИЕ ПОСТА
+        ================================ */
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const postData = Object.fromEntries(formData.entries());
+
+            // Обработка mediaUrls для существующих медиа
+            const existingMediaUrls = [];
+            previewContainer.querySelectorAll('[data-media-url]').forEach(wrapper => {
+                const url = wrapper.dataset.mediaUrl;
+                if (url) existingMediaUrls.push(url);
             });
+
+            if (existingMediaUrls.length > 0) {
+                postData.mediaUrls = existingMediaUrls;
+            }
+
+            console.log('Saving post:', postData); // Для отладки
+
+            try {
+                // Сохраняем пост
+                const saveResponse = await fetch(form.action, {
+                    method: form.method || "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify(postData)
+                });
+
+                if (!saveResponse.ok) {
+                    const errorText = await saveResponse.text();
+                    throw new Error(errorText || "Ошибка сохранения");
+                }
+
+                // Получаем ID поста (если это новый пост)
+                if (!postId) {
+                    postId = await saveResponse.text();
+                }
+
+                // Загружаем новые медиа
+                if (pendingFiles.length > 0) {
+                    await uploadAllMedia();
+                }
+
+                // Перенаправляем на страницу поста (или список постов)
+                window.location.href = "/communication/post/" + postId;
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Ошибка при сохранении: " + error.message);
+            }
+        });
+
+        /* ================================
+           ☁️ Загрузка медиа
+        ================================ */
+        async function uploadAllMedia() {
+            for (const file of pendingFiles) {
+                try {
+                    // Получаем presigned URL
+                    const uploadResponse = await fetch(`/media/COMMUNICATION/upload-url/post/${postId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify({
+                            fileName: file.name,
+                            contentType: file.type
+                        })
+                    });
+
+                    if (!uploadResponse.ok) {
+                        throw new Error("Ошибка получения upload-url");
+                    }
+
+                    const uploadData = await uploadResponse.json();
+                    const uploadUrl = uploadData.uploadUrl;
+                    const mediaId = uploadData.id;
+
+                    // Загружаем в S3 / MinIO
+                    const s3Response = await fetch(uploadUrl, {
+                        method: "PUT",
+                        body: file,
+                        headers: {
+                            'Content-Type': file.type
+                        }
+                    });
+
+                    if (!s3Response.ok) {
+                        throw new Error("Ошибка загрузки в хранилище");
+                    }
+
+                    // Подтверждаем загрузку
+                    const completeResponse = await fetch(`/media/COMMUNICATION/complete/${mediaId}`, {
+                        method: "POST",
+                        headers: {
+                            [csrfHeader]: csrfToken
+                        }
+                    });
+
+                    if (!completeResponse.ok) {
+                        throw new Error("Ошибка подтверждения загрузки");
+                    }
+
+                    // Получаем URL загруженного медиа
+                    const mediaData = await completeResponse.json();
+                    const mediaUrl = mediaData.url;
+
+                    // Добавляем URL к посту
+                    await fetch(`/communication/posts/add-media/${postId}`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify([mediaUrl])
+                    });
+
+                } catch (error) {
+                    console.error('Error uploading file:', file.name, error);
+                    alert(`Ошибка при загрузке файла ${file.name}: ${error.message}`);
+                }
+            }
+
+            pendingFiles = [];
         }
+
+        /* ================================
+           🖼 Предпросмотр
+        ================================ */
+        function createPreview(src, file) {
+            const wrapper = document.createElement("div");
+            wrapper.className = "preview-wrapper";
+            wrapper.dataset.filename = file.name;
+
+            // Создаем элемент в зависимости от типа
+            let mediaElement;
+            if (file.type.startsWith("video/")) {
+                mediaElement = document.createElement("video");
+                mediaElement.controls = true;
+                const source = document.createElement("source");
+                source.src = src;
+                source.type = file.type;
+                mediaElement.appendChild(source);
+            } else {
+                mediaElement = document.createElement("img");
+                mediaElement.src = src;
+                mediaElement.alt = "Preview";
+            }
+
+            mediaElement.className = "media-preview";
+
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.innerHTML = "&times;";
+            removeBtn.className = "btn btn-sm btn-danger position-absolute top-0 end-0";
+            removeBtn.onclick = () => {
+                pendingFiles = pendingFiles.filter(f => f !== file);
+                wrapper.remove();
+                console.log('Удалён файл:', file.name);
+            };
+
+            wrapper.appendChild(mediaElement);
+            wrapper.appendChild(removeBtn);
+            previewContainer.appendChild(wrapper);
+        }
+
+        /* ================================
+           🗑 Удаление существующих медиа
+        ================================ */
+        window.deleteExistingMedia = async function(mediaUrl, button) {
+            if (!confirm('Удалить медиа?')) return;
+
+            try {
+                // Здесь должен быть endpoint для удаления медиа
+                const deleteResponse = await fetch(`/communication/posts/delete-media/${postId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify([mediaUrl])
+                });
+
+                if (deleteResponse.ok) {
+                    button.closest('.preview-wrapper').remove();
+                } else {
+                    throw new Error("Ошибка удаления");
+                }
+            } catch (error) {
+                console.error('Error deleting media:', error);
+                alert("Ошибка при удалении медиа");
+            }
+        };
     });
 </script>
 

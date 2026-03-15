@@ -79,22 +79,22 @@ public class CommunicationService {
                 .bodyToMono(PostResponse.class);
     }
 
-    public Mono<PostResponse> createPost(PostRequest postRequest) {
+    public Mono<Long> createPost(PostRequest postRequest) {
         return webClient.post()
                 .uri(gatewayServiceURL + communicationResourcePrefix + "/posts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(postRequest)
                 .retrieve()
-                .bodyToMono(PostResponse.class);
+                .bodyToMono(Long.class);
     }
 
-    public Mono<PostResponse> updatePost(Long postId, PostRequest postRequest) {
+    public Mono<Long> updatePost(Long postId, PostRequest postRequest) {
         return webClient.patch()
                 .uri(gatewayServiceURL + communicationResourcePrefix + "/posts/{id}", postId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(postRequest)
                 .retrieve()
-                .bodyToMono(PostResponse.class);
+                .bodyToMono(Long.class);
     }
 
     public Mono<String> deletePost(Long postId) {
