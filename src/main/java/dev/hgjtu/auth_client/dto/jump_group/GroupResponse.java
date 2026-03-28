@@ -1,27 +1,27 @@
 package dev.hgjtu.auth_client.dto.jump_group;
 
+import dev.hgjtu.auth_client.dto.communication.UserWithMediaForResources;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class GroupResponse {
     private Integer id;
-    private Long organizerId;
-    private String organizerUsername;
+    private UserWithMediaForResources organizerInfo;
     private Short trainingLevel;
     private String groupName;
     private String description;
     private LocalDateTime jumpDateTime;
     private Short maxParticipants;
-    private List<Long> participants;
+    private List<UserWithMediaForResources> participants;
     private String jumpPlace;
     private LocalDateTime createdAt;
     private List<CommentResponse> comments;
     private Boolean participantBool;
 
-    public GroupResponse(Integer id, Long organizerId, String organizerUsername, Short trainingLevel, String groupName, String description, LocalDateTime jumpDateTime, Short maxParticipants, List<Long> participants, String jumpPlace, LocalDateTime createdAt, List<CommentResponse> comments, Boolean participantBool) {
+    public GroupResponse(Integer id, UserWithMediaForResources organizerInfo, Short trainingLevel, String groupName, String description, LocalDateTime jumpDateTime, Short maxParticipants, List<UserWithMediaForResources> participants, String jumpPlace, LocalDateTime createdAt, List<CommentResponse> comments, Boolean participantBool) {
         this.id = id;
-        this.organizerId = organizerId;
-        this.organizerUsername = organizerUsername;
+        this.organizerInfo = organizerInfo;
         this.trainingLevel = trainingLevel;
         this.groupName = groupName;
         this.description = description;
@@ -36,14 +36,6 @@ public class GroupResponse {
 
     public Integer getId() {
         return id;
-    }
-
-    public Long getOrganizerId() {
-        return organizerId;
-    }
-
-    public String getOrganizerUsername() {
-        return organizerUsername;
     }
 
     public Short getTrainingLevel() {
@@ -66,7 +58,7 @@ public class GroupResponse {
         return maxParticipants;
     }
 
-    public List<Long> getParticipants() {
+    public List<UserWithMediaForResources> getParticipants() {
         return participants;
     }
 
@@ -84,5 +76,9 @@ public class GroupResponse {
 
     public Boolean getParticipantBool() {
         return participantBool;
+    }
+
+    public UserWithMediaForResources getOrganizerInfo() {
+        return organizerInfo;
     }
 }

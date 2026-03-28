@@ -126,7 +126,7 @@
     <aside class="filters">
         <h5>Поиск групп</h5>
 
-        <form method="get" action="/jump-group" class="d-flex flex-column gap-3">
+        <form method="get" action="/jump-group" class="d-flex flex-column gap-3" accept-charset="UTF-8">
 
             <div>
                 <label>Место прыжка</label>
@@ -223,7 +223,7 @@
                 </span>
                 <span>
                     👤 Организатор:
-                    <strong th:text="${group.organizerUsername}">user</strong>
+                    <strong th:text="${group.organizerInfo.username}">user</strong>
                 </span>
                 <span class="participants">
                     👥
