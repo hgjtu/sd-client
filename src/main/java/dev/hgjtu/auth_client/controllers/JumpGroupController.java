@@ -32,7 +32,7 @@ public class JumpGroupController {
                                       @RequestParam(defaultValue = "10") Integer size,
                                       @RequestParam(defaultValue = "jumpDateTime") String sort,
                                       @RequestParam(defaultValue = "DESC") String direction,
-                                      @RequestBody(required = false) List<String> places,
+                                      @RequestParam(required = false) List<String> places,
                                       @RequestParam(required = false) Short trainingLevel,
                                       @RequestParam(required = false) LocalDateTime jumpDateTimeStart,
                                       @RequestParam(required = false) LocalDateTime jumpDateTimeEnd,
