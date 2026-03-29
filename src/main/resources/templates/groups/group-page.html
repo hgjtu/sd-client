@@ -426,6 +426,44 @@
         .edit-input { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #d1d5db; }
         .save-edit-btn { background:var(--accent); color:#fff; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; margin-left:8px; }
 
+        /* Стили для меток пользователей */
+        .comment-badges {
+            margin-left: 8px;
+            display: inline-flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .badge-organizer {
+            background: linear-gradient(135deg, #ff9f43, #ff6b35);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-participant {
+            background: #10b981;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .comment-author {
+            font-weight: 700;
+            font-size: 14px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
 
         @media(max-width:768px){
             .post {
@@ -477,7 +515,7 @@
                 <p>
                     📍 <strong th:text="${group.jumpPlace}">Место</strong><br>
                     👤 Организатор:
-                    <strong th:text="${group.organizerUsername}">user</strong><br>
+                    <strong th:text="${group.organizerInfo.username}">user</strong><br>
                     🎯 Уровень подготовки:
                     <strong th:text="${group.trainingLevel}"></strong><br>
                     👥 Участников:
@@ -528,7 +566,7 @@
 
             <!-- ================= COMMENTS ================= -->
             <div class="comments"
-                 th:attr="data-group-id=${group.id}, data-current-user-id=${user.id}">
+                 th:attr="data-group-id=${group.id}, data-current-user-id=${user.id}, data-organizer-id=${group.organizerInfo.id}">
 
                 <h4>Комментарии</h4>
 
@@ -537,13 +575,14 @@
                     <div class="raw-comment"
                          th:each="c : ${group.comments}"
                          th:attr="
-                            data-id=${c.id},
-                            data-user-id=${c.userId},
-                            data-reply-id=${c.replyCommentId},
-                            data-content=${c.content},
-                            data-likes=${c.likes},
-                            data-created=${#temporals.format(c.createdAt,'dd.MM.yyyy HH:mm')}
-                         ">
+                                data-id=${c.comment.id},
+                                data-user-id=${c.comment.userId},
+                                data-reply-id=${c.comment.replyCommentId},
+                                data-content=${c.comment.content},
+                                data-likes=${c.comment.likes},
+                                data-created=${#temporals.format(c.comment.createdAt,'dd.MM.yyyy HH:mm')},
+                                data-is-participant=${c.participant}
+                             ">
                     </div>
                 </div>
 
@@ -576,6 +615,7 @@
 
             const groupId = block.dataset.groupId;
             const currentUserId = block.dataset.currentUserId;
+            const organizerId = block.dataset.organizerId;
 
             const raw = Array.from(block.querySelectorAll('.raw-comment')).map(rc => ({
                 id: rc.dataset.id,
@@ -583,7 +623,9 @@
                 replyId: rc.dataset.replyId === 'null' || rc.dataset.replyId === '' ? null : rc.dataset.replyId,
                 content: rc.dataset.content,
                 likes: rc.dataset.likes || 0,
-                created: rc.dataset.created
+                created: rc.dataset.created,
+                isParticipant: rc.dataset.isParticipant === 'true',
+                username: rc.dataset.username || `Пользователь #${rc.dataset.userId}`
             }));
 
             const rendered = block.querySelector('.comments-rendered');
@@ -607,16 +649,37 @@
                     .replaceAll('>','&gt;');
             }
 
+            function getBadges(comment) {
+                let badges = '';
+
+                // Метка организатора (владелец группы)
+                if (String(comment.userId) === String(organizerId)) {
+                    badges += '<span class="badge-organizer">👑 Организатор</span> ';
+                }
+
+                // Метка участника
+                if (comment.isParticipant && String(comment.userId) !== String(organizerId)) {
+                    badges += '<span class="badge-participant">✓ Участник</span> ';
+                }
+
+                return badges;
+            }
+
             function render(nodes, parent) {
                 nodes.forEach(n => {
                     const el = document.createElement('div');
                     el.className = 'comment-node';
                     el.dataset.commentId = n.id;
 
+                    const badges = getBadges(n);
+
                     el.innerHTML = `
             <div class="comment-header">
                 <div>
-                    <div class="comment-author">Пользователь #${n.userId}</div>
+                    <div class="comment-author">
+                        ${escapeHtml(n.username)}
+                        ${badges ? `<span class="comment-badges">${badges}</span>` : ''}
+                    </div>
                     <div class="comment-meta">${n.created}</div>
                 </div>
             </div>
@@ -637,7 +700,7 @@
 
                         const form = document.createElement('div');
                         form.className = 'inline-reply';
-                        form.innerHTML = `<input type="text"><button>Отправить</button>`;
+                        form.innerHTML = `<input type="text" placeholder="Напишите ответ..."><button>Отправить</button>`;
                         el.appendChild(form);
 
                         form.querySelector('button').onclick = async () => {
@@ -731,7 +794,6 @@
                     }
                 });
             }
-
 
             render(roots, rendered);
 

@@ -3,6 +3,7 @@ package dev.hgjtu.auth_client.services;
 import dev.hgjtu.auth_client.dto.PageResponse;
 import dev.hgjtu.auth_client.dto.jump_group.GroupRequest;
 import dev.hgjtu.auth_client.dto.jump_group.GroupResponse;
+import dev.hgjtu.auth_client.dto.jump_group.SearchRequest;
 import dev.hgjtu.auth_client.dto.jump_group.TrainingLevelResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,52 +39,56 @@ public class JumpGroupService {
                                                        LocalDateTime jumpDateTimeStart,
                                                        LocalDateTime jumpDateTimeEnd,
                                                        Boolean isParticipant) {
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .fromUriString(gatewayServiceURL + jumpGroupResourcePrefix + "/groups");
+        SearchRequest searchRequest = new SearchRequest();
 
         // Добавляем параметры если они не null
         if (page != null) {
-            uriBuilder.queryParam("page", page);
+            searchRequest.setPage(page);
         }
         if (size != null) {
-            uriBuilder.queryParam("size", size);
+            searchRequest.setSize(size);
         }
         if (sort != null) {
-            uriBuilder.queryParam("sort", sort);
+            searchRequest.setSort(sort);
         }
         if (direction != null) {
-            uriBuilder.queryParam("direction", direction);
+            searchRequest.setDirection(direction);
+        }
+        if(places != null) {
+            searchRequest.setPlacesList(places);
         }
         if (trainingLevel != null) {
-            uriBuilder.queryParam("trainingLevel", trainingLevel);
+            searchRequest.setTrainingLevel(trainingLevel);
         }
         if (jumpDateTimeStart != null) {
-            uriBuilder.queryParam("jumpDateTimeStart", jumpDateTimeStart);
+           searchRequest.setJumpDateTimeStart(jumpDateTimeStart);
         }
         if (jumpDateTimeEnd != null) {
-            uriBuilder.queryParam("jumpDateTimeEnd", jumpDateTimeEnd);
+            searchRequest.setJumpDateTimeEnd(jumpDateTimeEnd);
         }
         if (isParticipant != null) {
-            uriBuilder.queryParam("isParticipant", isParticipant);
+            searchRequest.setParticipant(isParticipant);
         }
 
         // Для списка добавляем каждый элемент отдельно
-        if (places != null && !places.isEmpty()) {
-            places.forEach(place -> uriBuilder.queryParam("places", place));
-        }
+//        if (places != null && !places.isEmpty()) {
+//            places.forEach(place -> uriBuilder.queryParam("places", place));
+//        }
 
-        return webClient.get()
-                .uri(uriBuilder.build().toUri())
+        return webClient.post()
+                .uri(gatewayServiceURL + jumpGroupResourcePrefix + "/groups/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(searchRequest)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<PageResponse<GroupResponse>>() {});
     }
 
     public Mono<GroupResponse> getGroupById(Integer id) {
-       return webClient.get()
+        Mono<GroupResponse> qw =  webClient.get()
                 .uri(gatewayServiceURL + jumpGroupResourcePrefix + "/groups/{id}", id)
                 .retrieve()
                 .bodyToMono(GroupResponse.class);
+        return qw;
     }
 
     public Flux<TrainingLevelResponse> getTrainingLevels() {
