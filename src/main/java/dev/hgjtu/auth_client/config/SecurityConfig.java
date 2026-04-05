@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
@@ -60,11 +61,15 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
+                        .deleteCookies("JSESSIONID", "CLIENT_SESSION")
                         .permitAll()
                 )
+                .sessionManagement(session -> session
+//                        .invalidSessionStrategy()
+                        .invalidSessionUrl("/oauth2/authorization/web-client")
+                )
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/oauth2/authorization/web-client"))
                 );
 
         return http.build();
