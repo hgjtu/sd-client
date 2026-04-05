@@ -47,4 +47,19 @@ public class BaseService {
                 .retrieve()
                 .toBodilessEntity();
     }
+
+    public Mono<ResponseEntity<Void>> changeEmail(String newEmail) {
+        return webClient.post()
+                .uri(authServerUrl + "/auth/change-email")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newEmail)
+                .retrieve()
+                .toBodilessEntity()
+                .then(serverWebClient.post()
+                        .uri(gatewayServiceURL + userResourcePrefix + "/auth/change-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(newEmail)
+                        .retrieve()
+                        .toBodilessEntity());
+    }
 }

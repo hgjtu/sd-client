@@ -70,4 +70,12 @@ public class BaseController {
                         .status(responseEntity.getStatusCode())
                         .build()));
     }
+
+    @PostMapping("/profile/change-email")
+    public Mono<ResponseEntity<Void>> changeEmail(@RequestBody String newEmail) {
+        return baseService.changeEmail(newEmail)
+                .flatMap(responseEntity -> Mono.just(ResponseEntity
+                        .status(responseEntity.getStatusCode())
+                        .build()));
+    }
 }
