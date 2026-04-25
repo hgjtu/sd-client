@@ -4,55 +4,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Skydive Club — Регистрация</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
 
-<!-- Подключаем header -->
+    <title>Skydive Club — Регистрация</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+
+<body class="profile-page">
+
+<!-- Header -->
 <div th:replace="fragments/header :: site-header"></div>
 
-<!-- Основной контент -->
-<main class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4>Регистрация</h4>
-                </div>
-                <div class="card-body">
-                    <!-- Сообщения об ошибках и успехе -->
-                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-                    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+<main class="container py-5">
 
-                    <form th:action="@{/register}" th:object="${registrationRequest}" method="post">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <!-- CARD -->
+            <div class="card auth-card border-0 shadow-lg">
+
+                <!-- HEADER -->
+                <div class="card-header auth-header text-center">
+                    <div class="auth-icon mb-2">
+                        <i class="bi bi-person-plus"></i>
+                    </div>
+                    <h4 class="mb-0">Регистрация</h4>
+                    <p class="auth-subtitle mb-0">Создайте аккаунт парашютиста</p>
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body p-4">
+
+                    <!-- alerts -->
+                    <div th:if="${error}" class="alert alert-danger">
+                        <span th:text="${error}"></span>
+                    </div>
+
+                    <div th:if="${success}" class="alert alert-success">
+                        <span th:text="${success}"></span>
+                    </div>
+
+                    <form th:action="@{/register}"
+                          th:object="${registrationRequest}"
+                          method="post"
+                          class="auth-form">
+
+                        <!-- username -->
                         <div class="mb-3">
-                            <label for="username" class="form-label">Имя пользователя</label>
-                            <input type="text" class="form-control" id="username" th:field="*{username}" required>
+                            <label class="form-label">Имя пользователя</label>
+                            <input type="text"
+                                   class="form-control auth-input"
+                                   th:field="*{username}"
+                                   required>
                         </div>
+
+                        <!-- email -->
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                            <label class="form-label">Email</label>
+                            <input type="email"
+                                   class="form-control auth-input"
+                                   th:field="*{email}"
+                                   required>
                         </div>
+
+                        <!-- password -->
                         <div class="mb-3">
-                            <label for="password" class="form-label">Пароль</label>
-                            <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                            <label class="form-label">Пароль</label>
+                            <input type="password"
+                                   class="form-control auth-input"
+                                   th:field="*{password}"
+                                   required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
+
+                        <!-- submit -->
+                        <button type="submit" class="btn auth-btn w-100">
+                            Создать аккаунт
+                        </button>
+
                     </form>
 
-                    <div class="mt-3 text-center">
-                        <a  href="/oauth2/authorization/web-client">Уже есть аккаунт? Войти</a>
+                    <div class="text-center mt-4">
+                        <a class="auth-link"
+                           href="/oauth2/authorization/web-client">
+                            Уже есть аккаунт? Войти
+                        </a>
                     </div>
+
                 </div>
             </div>
+
         </div>
     </div>
+
 </main>
 
-<!-- Подключаем footer -->
+<!-- Footer -->
 <div th:replace="fragments/footer :: site-footer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
