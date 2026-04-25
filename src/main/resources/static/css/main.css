@@ -1,0 +1,159 @@
+/* =================================================
+   HEADER
+   ================================================= */
+
+.modern-navbar{
+    margin:18px auto 28px;
+    width:calc(100% - 32px);
+    max-width:1320px;
+
+    background:rgba(255,255,255,.72);
+    backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,.6);
+    border-radius:20px;
+
+    box-shadow:0 12px 30px rgba(15,23,42,.06);
+
+    padding:10px 18px;
+}
+
+.modern-brand{
+    font-size:1.15rem;
+    font-weight:800;
+    color:#0f172a !important;
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.brand-dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#38bdf8,#0284c7);
+    box-shadow:0 0 0 4px rgba(56,189,248,.12);
+}
+
+.modern-link{
+    color:#334155 !important;
+    font-weight:600;
+    padding:10px 14px !important;
+    border-radius:12px;
+    transition:.2s ease;
+}
+
+.modern-link:hover{
+    background:#eff6ff;
+    color:#0284c7 !important;
+}
+
+.nav-register-btn{
+    background:#38bdf8;
+    color:#fff !important;
+    border-radius:12px;
+    padding:10px 16px !important;
+    font-weight:700;
+}
+
+.nav-register-btn:hover{
+    background:#0ea5e9;
+}
+
+.nav-profile-btn{
+    background:#e0f2fe;
+    color:#0369a1 !important;
+    border-radius:12px;
+    padding:10px 16px !important;
+    font-weight:700;
+}
+
+.nav-profile-btn:hover{
+    background:#bae6fd;
+}
+
+.modern-toggler{
+    border:none;
+    box-shadow:none !important;
+}
+
+
+/* =================================================
+   FOOTER
+   ================================================= */
+
+.modern-footer{
+    margin-top:50px;
+    padding:0 16px 24px;
+}
+
+.footer-inner{
+    background:rgba(255,255,255,.72);
+    backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:22px;
+
+    box-shadow:0 10px 28px rgba(15,23,42,.05);
+
+    padding:22px 28px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    flex-wrap:wrap;
+}
+
+.footer-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#0f172a;
+}
+
+.footer-copy{
+    color:#64748b;
+    font-size:.95rem;
+}
+
+.footer-contact a{
+    color:#0284c7;
+    text-decoration:none;
+    font-weight:700;
+}
+
+.footer-contact a:hover{
+    color:#0369a1;
+}
+
+
+/* =================================================
+   MOBILE
+   ================================================= */
+
+@media(max-width:991px){
+
+    .modern-navbar{
+        width:calc(100% - 20px);
+        margin:12px auto 22px;
+    }
+
+    .navbar-nav{
+        margin-top:14px;
+    }
+
+    .modern-link,
+    .nav-register-btn,
+    .nav-profile-btn{
+        margin-bottom:8px;
+        display:block;
+        text-align:center;
+    }
+
+    .footer-inner{
+        flex-direction:column;
+        text-align:center;
+    }
+}

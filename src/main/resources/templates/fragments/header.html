@@ -1,45 +1,74 @@
 <!-- fragments/header.html -->
-<header th:fragment="site-header" >
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" th:href="@{/}">Skydive Club</a>
+<header th:fragment="site-header">
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav" aria-controls="navbarNav"
-                    aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand-lg modern-navbar">
+
+        <div class="container">
+
+            <a class="navbar-brand modern-brand" th:href="@{/}">
+                <span class="brand-dot"></span>
+                Skydive Club
+            </a>
+
+            <button class="navbar-toggler modern-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <!-- Основные разделы -->
-<!--                    <li class="nav-item">-->
-<!--                        <a class="nav-link" th:href="@{/about}">О нас</a>-->
-<!--                    </li>-->
+
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/market}">Барахолка</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/communication}">Общение</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/jump-group}">Группы</a>
+                        <a class="nav-link modern-link" th:href="@{/market}">
+                            Барахолка
+                        </a>
                     </li>
 
-                    <!-- Если пользователь не авторизован -->
-                    <li class="nav-item" sec:authorize="!isAuthenticated()">
-                        <a class="nav-link" href="/oauth2/authorization/web-client">Вход</a>
-                    </li>
-                    <li class="nav-item" sec:authorize="!isAuthenticated()">
-                        <a class="nav-link" th:href="@{/register}">Регистрация</a>
+                    <li class="nav-item">
+                        <a class="nav-link modern-link" th:href="@{/communication}">
+                            Общение
+                        </a>
                     </li>
 
-                    <!-- Если пользователь авторизован -->
+                    <li class="nav-item">
+                        <a class="nav-link modern-link" th:href="@{/jump-group}">
+                            Группы
+                        </a>
+                    </li>
+
+                    <!-- НЕ авторизован -->
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link modern-link" href="/oauth2/authorization/web-client">
+                            Вход
+                        </a>
+                    </li>
+
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link nav-register-btn" th:href="@{/register}">
+                            Регистрация
+                        </a>
+                    </li>
+
+                    <!-- Авторизован -->
                     <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link" th:href="@{/profile}">Профиль</a>
+                        <a class="nav-link nav-profile-btn" th:href="@{/profile}">
+                            Профиль
+                        </a>
                     </li>
+
                 </ul>
+
             </div>
+
         </div>
+
     </nav>
+
 </header>

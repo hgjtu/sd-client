@@ -3,120 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${userEditRequest.username} + ' — Редактирование профиля'">Редактирование профиля</title>
+    <title th:text="${userEditRequest.username} + ' — Редактирование профиля'">
+        Редактирование профиля
+    </title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .tag-input-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            border: 1px solid #ced4da;
-            border-radius: 0.375rem;
-            background-color: #fff;
-        }
-        .tag {
-            background-color: #0d6efd;
-            color: #fff;
-            border-radius: 20px;
-            padding: 0.25rem 0.75rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .tag button {
-            background: none;
-            border: none;
-            color: #fff;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .tag-input-container input {
-            border: none;
-            outline: none;
-            flex-grow: 1;
-            min-width: 100px;
-        }
-    </style>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- ТВОЙ ОБЩИЙ CSS -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/profile-edit.css}">
 </head>
-<body class="bg-light">
+
+<body class="profile-page">
 
 <!-- Header -->
 <div th:replace="fragments/header :: site-header"></div>
 
 <main class="container py-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Редактировать профиль</h5>
+
+    <!-- Верхняя плашка -->
+    <section class="hero-profile">
+        <h1 th:text="${userEditRequest.username}">Username</h1>
+        <p>Редактирование профиля</p>
+    </section>
+
+    <!-- Карточка -->
+    <div class="card border-0 shadow-lg edit-card">
+
+        <div class="card-header edit-header">
+            <h5 class="mb-0">
+                <i class="bi bi-person-gear me-2"></i>
+                Настройки профиля
+            </h5>
         </div>
-        <div class="card-body">
-            <form th:action="@{/profile/edit}" th:object="${userEditRequest}" method="post" class="row g-3">
-                <!-- Имя пользователя -->
+
+        <div class="card-body p-4 p-lg-5">
+
+            <form th:action="@{/profile/edit}"
+                  th:object="${userEditRequest}"
+                  method="post"
+                  class="row g-4">
+
+                <!-- Username -->
                 <div class="col-md-6">
-                    <label for="username" class="form-label">Имя пользователя</label>
-                    <input type="text" id="username" th:value="${userEditRequest.username}"  name="username"
-                           class="form-control" readonly>
+                    <label for="username" class="form-label modern-label">
+                        Имя пользователя
+                    </label>
+
+                    <input type="text"
+                           id="username"
+                           th:value="${userEditRequest.username}"
+                           name="username"
+                           class="form-control modern-input readonly-input"
+                           readonly>
                 </div>
 
-                <!-- Имя -->
+                <!-- First name -->
                 <div class="col-md-6">
-                    <label for="firstName" class="form-label">Имя</label>
-                    <input type="text" id="firstName" th:value="${userEditRequest.firstName}" th:field="*{firstName}"
-                           class="form-control" placeholder="Введите имя">
+                    <label for="firstName" class="form-label modern-label">
+                        Имя
+                    </label>
+
+                    <input type="text"
+                           id="firstName"
+                           th:value="${userEditRequest.firstName}"
+                           th:field="*{firstName}"
+                           class="form-control modern-input"
+                           placeholder="Введите имя">
                 </div>
 
-                <!-- Фамилия -->
+                <!-- Last name -->
                 <div class="col-md-6">
-                    <label for="lastName" class="form-label">Фамилия</label>
-                    <input type="text" id="lastName" th:value="${userEditRequest.lastName}" th:field="*{lastName}"
-                           class="form-control" placeholder="Введите фамилию">
+                    <label for="lastName" class="form-label modern-label">
+                        Фамилия
+                    </label>
+
+                    <input type="text"
+                           id="lastName"
+                           th:value="${userEditRequest.lastName}"
+                           th:field="*{lastName}"
+                           class="form-control modern-input"
+                           placeholder="Введите фамилию">
                 </div>
 
-                <!-- Аэродром -->
+                <!-- Dropzone -->
                 <div class="col-md-6">
-                    <label for="homeDropzone" class="form-label">Базовый аэродром</label>
-                    <input type="text" id="homeDropzone" th:value="${userEditRequest.homeDropzone}" th:field="*{homeDropzone}"
-                           class="form-control" placeholder="Введите название аэродрома">
+                    <label for="homeDropzone" class="form-label modern-label">
+                        Базовый аэродром
+                    </label>
+
+                    <input type="text"
+                           id="homeDropzone"
+                           th:value="${userEditRequest.homeDropzone}"
+                           th:field="*{homeDropzone}"
+                           class="form-control modern-input"
+                           placeholder="Введите название аэродрома">
                 </div>
 
-                <!-- Лицензии -->
+                <!-- Licenses -->
                 <div class="col-12">
-                    <label class="form-label">Лицензии</label>
-                    <div id="licenseInput" class="tag-input-container">
-                        <!-- существующие лицензии -->
-                        <span class="tag" th:each="license : ${userEditRequest.licenses}">
+                    <label class="form-label modern-label">
+                        Лицензии
+                    </label>
+
+                    <div id="licenseInput" class="tag-input-container modern-license-box">
+
+                        <span class="tag"
+                              th:each="license : ${userEditRequest.licenses}">
                             <span th:text="${license}"></span>
                             <button type="button" onclick="removeTag(this)">×</button>
                         </span>
-                        <input type="text" id="licenseTextInput" placeholder="Введите и нажмите Enter">
+
+                        <input type="text"
+                               id="licenseTextInput"
+                               placeholder="Введите и нажмите Enter">
+
                     </div>
-                    <!-- скрытое поле для отправки -->
-                    <input type="hidden" id="licensesHidden" th:field="*{licenses}">
-                    <small class="text-muted">Нажмите Enter или запятую, чтобы добавить лицензию.</small>
+
+                    <input type="hidden"
+                           id="licensesHidden"
+                           th:field="*{licenses}">
+
+                    <small class="text-muted">
+                        Нажмите Enter или запятую, чтобы добавить лицензию
+                    </small>
                 </div>
 
-                <!-- О себе -->
+                <!-- Bio -->
                 <div class="col-12">
-                    <label for="bio" class="form-label">О себе</label>
-                    <textarea id="bio" th:text="${userEditRequest.bio}" th:field="*{bio}" class="form-control"
-                              rows="4" placeholder="Расскажите о себе..."></textarea>
+                    <label for="bio" class="form-label modern-label">
+                        О себе
+                    </label>
+
+                    <textarea id="bio"
+                              th:text="${userEditRequest.bio}"
+                              th:field="*{bio}"
+                              class="form-control modern-input"
+                              rows="5"
+                              placeholder="Расскажите о себе..."></textarea>
                 </div>
 
-                <!-- Кнопки -->
-                <div class="col-12 d-flex justify-content-between mt-3">
-                    <a th:href="@{/profile}" class="btn btn-outline-secondary">Отмена</a>
-                    <button type="submit" class="btn btn-success" onclick="serializeLicenses()">Сохранить изменения</button>
+                <!-- Buttons -->
+                <div class="col-12 d-flex justify-content-between flex-wrap gap-3 pt-2">
+
+                    <a th:href="@{/profile}"
+                       class="btn cancel-btn">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Отмена
+                    </a>
+
+                    <button type="submit"
+                            class="btn save-btn"
+                            onclick="serializeLicenses()">
+
+                        <i class="bi bi-check-circle me-2"></i>
+                        Сохранить изменения
+                    </button>
+
                 </div>
+
             </form>
+
         </div>
     </div>
+
 </main>
 
 <!-- Footer -->
 <div th:replace="fragments/footer :: site-footer"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JS НЕ МЕНЯЕМ -->
 <script>
     const input = document.getElementById('licenseTextInput');
     const container = document.getElementById('licenseInput');
@@ -133,7 +194,8 @@
             if (value !== '') {
                 const tag = document.createElement('span');
                 tag.className = 'tag';
-                tag.innerHTML = `<span>${value}</span><button type="button" onclick="removeTag(this)">×</button>`;
+                tag.innerHTML =
+                    `<span>${value}</span><button type="button" onclick="removeTag(this)">×</button>`;
                 container.insertBefore(tag, input);
                 input.value = '';
             }
@@ -141,9 +203,13 @@
     });
 
     function serializeLicenses() {
-        const tags = Array.from(container.querySelectorAll('.tag span')).map(el => el.textContent);
+        const tags =
+            Array.from(container.querySelectorAll('.tag span'))
+                .map(el => el.textContent);
+
         hiddenInput.value = tags.join(',');
     }
 </script>
+
 </body>
 </html>
