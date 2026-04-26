@@ -7,137 +7,43 @@
     <title>SkyFriends — группы прыжков</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --bg:#f5f8fb;
-            --card:#fff;
-            --accent:#1fb6ff;
-            --accent-2:#ff9f43;
-            --muted:#6b7280;
-            --radius:14px;
-            --shadow:0 6px 18px rgba(22,28,37,0.08);
-        }
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: linear-gradient(180deg,#eaf6ff 0%,#f5f8fb 60%);
-            padding: 24px;
-            color: #111827;
-        }
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-        .container {
-            max-width: 1300px;
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 22px;
-        }
-
-        /* LEFT FILTERS */
-        .filters {
-            position: sticky;
-            top: 24px;
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 18px;
-        }
-
-        .filters h5 {
-            margin-bottom: 14px;
-        }
-
-        .filters label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #374151;
-        }
-
-        /* GROUP CARD */
-        .group-card {
-            background: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .group-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .group-title {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .badge-level {
-            background: #eef2ff;
-            color: #3730a3;
-            border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .group-meta {
-            font-size: 14px;
-            color: var(--muted);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-        }
-
-        .participants {
-            font-weight: 600;
-        }
-
-        .joined {
-            color: #16a34a;
-            font-weight: 600;
-        }
-
-        /* PAGINATION */
-        .pagination {
-            margin-top: 20px;
-            justify-content: center;
-        }
-
-        @media (max-width: 1000px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/find-group.css}">
 </head>
 
 <body>
 
 <div th:replace="fragments/header :: site-header"></div>
 
-<div class="container">
+<section class="hero-groups">
+    <div>
+        <h1>Группы прыжков</h1>
+        <p>Найди команду, участвуй в прыжках и создавай свои группы</p>
+    </div>
+</section>
 
-    <!-- LEFT: FILTERS -->
+<div class="page-container">
+
+    <!-- FILTERS -->
     <aside class="filters">
         <h5>Поиск групп</h5>
 
-        <form method="get" action="/jump-group" class="d-flex flex-column gap-3" accept-charset="UTF-8">
+        <form method="get" action="/jump-group" class="d-flex flex-column gap-3">
 
             <div>
                 <label>Место прыжка</label>
 
-                <!-- Поле ввода -->
                 <input type="text"
                        id="placeInput"
                        class="form-control"
-                       placeholder="Введите место и нажмите Enter"/>
+                       placeholder="Введите место и Enter"/>
 
-                <!-- Контейнер выбранных мест -->
                 <div id="placesContainer" class="d-flex flex-wrap gap-2 mt-2"></div>
             </div>
 
@@ -168,7 +74,7 @@
                        value="true"
                        id="myGroups">
                 <label class="form-check-label" for="myGroups">
-                    Только мои группы НЕ РАБОТАЕТ
+                    Только мои группы
                 </label>
             </div>
 
@@ -179,58 +85,45 @@
 
         <a th:href="@{/jump-group/create-group}"
            class="btn btn-success w-100 mt-3">
-            + Создать новую группу
+            + Создать группу
         </a>
     </aside>
 
-    <!-- CENTER: GROUPS -->
+    <!-- GROUPS -->
     <main class="d-flex flex-column gap-3">
 
-        <div th:if="${#lists.isEmpty(groupsPage.content)}"
-             class="text-center text-muted">
+        <div th:if="${#lists.isEmpty(groupsPage.content)}" class="empty">
             Группы не найдены
         </div>
 
-        <div th:each="group : ${groupsPage.content}"
-             class="group-card">
+        <div th:each="group : ${groupsPage.content}" class="group-card">
 
             <div class="group-head">
-                <div class="group-title"
-                     th:text="${group.groupName}">
-                    Название группы
+                <div class="group-title" th:text="${group.groupName}">
+                    Название
                 </div>
 
                 <span class="badge-level"
                       th:text="'Уровень ' + ${group.trainingLevel}">
-                    Уровень
                 </span>
             </div>
 
-            <div th:text="${group.description}"
-                 class="text-muted">
-                Описание группы
+            <div class="text-muted" th:text="${group.description}">
+                Описание
             </div>
 
             <div class="group-meta">
-                <span>
-                    📍 <span th:text="${group.jumpPlace}">Место</span>
+                <span>📍 <span th:text="${group.jumpPlace}"></span></span>
+                <span>🕒
+                    <span th:text="${#temporals.format(group.jumpDateTime,'dd MMM yyyy HH:mm')}"></span>
                 </span>
-                <span>
-                    🕒
-                    <span th:text="${#temporals.format(group.jumpDateTime,'dd MMM yyyy HH:mm')}">
-                        Дата
-                    </span>
-                </span>
-                <span>
-                    👤 Организатор:
-                    <strong th:text="${group.organizerInfo.username}">user</strong>
-                </span>
+                <span>👤 <strong th:text="${group.organizerInfo.username}"></strong></span>
+
                 <span class="participants">
-                    👥
-                    <span th:text="${#lists.size(group.participants)}"></span>
-                    /
-                    <span th:text="${group.maxParticipants}"></span>
+                    👥 <span th:text="${#lists.size(group.participants)}"></span>
+                    / <span th:text="${group.maxParticipants}"></span>
                 </span>
+
                 <span th:if="${group.participantBool}" class="joined">
                     ✔ Вы участник
                 </span>
@@ -238,7 +131,7 @@
 
             <a th:href="@{'/jump-group/' + ${group.id}}"
                class="btn btn-outline-primary btn-sm align-self-start">
-                Открыть группу
+                Открыть
             </a>
         </div>
 
@@ -246,8 +139,7 @@
         <nav th:if="${groupsPage.totalPages > 1}">
             <ul class="pagination">
 
-                <li class="page-item"
-                    th:classappend="${groupsPage.page == 0} ? ' disabled'">
+                <li class="page-item" th:classappend="${groupsPage.page == 0} ? ' disabled'">
                     <a class="page-link"
                        th:href="@{/jump-group(page=${groupsPage.page - 1})}">
                         Назад
@@ -275,12 +167,9 @@
         </nav>
 
     </main>
-
 </div>
 
 <div th:replace="fragments/footer :: site-footer"></div>
-
-</body>
 
 <script>
     const input = document.getElementById('placeInput');
@@ -293,15 +182,10 @@
             const value = input.value.trim();
             if (!value) return;
 
-            // создаем визуальный бейдж
             const badge = document.createElement('span');
             badge.className = 'badge bg-primary d-flex align-items-center gap-2';
-            badge.innerHTML = `
-                ${value}
-                <button type="button" class="btn-close btn-close-white btn-sm"></button>
-            `;
+            badge.innerHTML = `${value} <button type="button" class="btn-close btn-close-white btn-sm"></button>`;
 
-            // создаем скрытый input для отправки
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = 'places';
@@ -319,4 +203,6 @@
         }
     });
 </script>
+
+</body>
 </html>

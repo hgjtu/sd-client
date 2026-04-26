@@ -1,0 +1,190 @@
+body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:
+            radial-gradient(circle at top right,#7dd3fc 0%,transparent 30%),
+            radial-gradient(circle at left,#dbeafe 0%,transparent 35%),
+            linear-gradient(135deg,#f8fbff,#eef6ff,#e0f2fe);
+    min-height:100vh;
+    color:#111827;
+    padding:24px;
+}
+
+/* HERO */
+
+.hero-groups{
+    border-radius:22px;
+    padding:18px 28px;
+    background:linear-gradient(135deg,#41addd,#2796cf);
+    color:#fff;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+
+    margin:0 auto 24px;
+    max-width:1320px;
+}
+
+.hero-groups h1{
+    margin:0;
+    font-size:1.7rem;
+    font-weight:800;
+}
+
+.hero-groups p{
+    margin:0;
+    opacity:.9;
+}
+
+/* LAYOUT */
+.page-container{
+    max-width:1320px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:320px 1fr;
+    gap:22px;
+}
+
+/* LEFT FILTERS (как профиль card) */
+.filters{
+    position:sticky;
+    top:24px;
+    background:rgba(255,255,255,.72);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:22px;
+    box-shadow:0 10px 28px rgba(15,23,42,.05);
+    padding:18px;
+}
+
+.filters h5{
+    font-weight:800;
+    margin-bottom:14px;
+    color:#0f172a;
+}
+
+.filters label{
+    font-size:13px;
+    font-weight:600;
+    color:#374151;
+}
+
+.form-control,.form-select{
+    border-radius:12px;
+}
+
+/* GROUP CARD (как profile-card) */
+.group-card{
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:24px;
+    box-shadow:0 10px 28px rgba(15,23,42,.05);
+    padding:18px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition:.2s ease;
+}
+
+.group-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 18px 40px rgba(15,23,42,.08);
+}
+
+.group-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.group-title{
+    font-size:18px;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.badge-level{
+    background:linear-gradient(135deg,#41addd,#2796cf);
+    color:#fff;
+    border-radius:999px;
+    padding:6px 12px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.group-meta{
+    font-size:14px;
+    color:#64748b;
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+}
+
+.participants{
+    font-weight:700;
+    color:#0f172a;
+}
+
+.joined{
+    color:#16a34a;
+    font-weight:700;
+}
+
+/* BUTTONS (как профиль) */
+.btn-primary{
+    background:#38bdf8;
+    border-color:#38bdf8;
+    border-radius:14px;
+    font-weight:600;
+}
+
+.btn-primary:hover{
+    background:#0ea5e9;
+    border-color:#0ea5e9;
+}
+
+.btn-outline-primary{
+    border-radius:14px;
+}
+
+.btn-success{
+    border-radius:14px;
+    font-weight:600;
+}
+
+/* PAGINATION */
+.pagination{
+    justify-content:center;
+    margin-top:20px;
+}
+
+.page-link{
+    border-radius:12px;
+    margin:0 4px;
+}
+
+.page-item.active .page-link{
+    background:#38bdf8;
+    border-color:#38bdf8;
+}
+
+/* EMPTY STATE */
+.empty{
+    text-align:center;
+    color:#64748b;
+    padding:40px;
+}
+
+@media(max-width:1000px){
+    .page-container{
+        grid-template-columns:1fr;
+    }
+
+    .filters{
+        position:relative;
+        top:auto;
+    }
+}

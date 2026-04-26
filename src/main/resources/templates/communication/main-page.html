@@ -1,593 +1,213 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <title>SkyFriends — клуб парашютистов</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <style>
-        :root {
-            --bg:#f5f8fb;
-            --card:#fff;
-            --accent:#1fb6ff;
-            --accent-2:#ff9f43;
-            --muted:#6b7280;
-            --radius:14px;
-            --shadow:0 6px 18px rgba(22,28,37,0.08);
-        }
-
-        * {box-sizing:border-box;}
-        body {
-            margin:0;
-            font-family:'Inter',system-ui,sans-serif;
-            background:linear-gradient(180deg,#eaf6ff 0%,#f5f8fb 60%);
-            color:#111827;
-            padding:24px;
-        }
-
-        /* layout */
-        .container {
-            max-width:1300px;
-            margin:0 auto;
-            display:grid;
-            grid-template-columns:280px 1fr 300px;
-            gap:22px;
-        }
-
-        /* LEFT: mini profile + news */
-        .left {
-            position:sticky;
-            top:24px;
-            align-self:start;
-            display:flex;
-            flex-direction:column;
-            gap:18px;
-        }
-
-        .profile {
-            background:var(--card);
-            border-radius:var(--radius);
-            box-shadow:var(--shadow);
-            padding:18px;
-            text-align:center;
-        }
-        .profile .avatar {
-            width:80px;height:80px;margin:0 auto 10px;
-            border-radius:50%;
-            background:linear-gradient(135deg,var(--accent),#4fd1c5);
-            display:flex;align-items:center;justify-content:center;
-            color:#fff;font-weight:700;font-size:24px;
-        }
-        .profile h4 {margin:0;}
-        .profile p {color:var(--muted);font-size:13px;margin:4px 0 0;}
-
-        .news-block {
-            background:var(--card);
-            border-radius:var(--radius);
-            box-shadow:var(--shadow);
-            padding:16px;
-        }
-        .news-block h5 {margin:0 0 8px 0;}
-        .announce {
-            padding:8px 0;
-            border-bottom:1px solid #f1f5f9;
-        }
-        .announce:last-child {border:0;}
-        .announce strong {display:block;color:#0f172a;font-size:14px;}
-        .announce p {margin:2px 0 0;font-size:13px;color:var(--muted);}
-
-        /* CENTER: main feed */
-        .center {
-            display:flex;
-            flex-direction:column;
-            gap:18px;
-        }
-
-        /* category tabs */
-        .tabs {
-            display:flex;
-            gap:10px;
-            background:var(--card);
-            border-radius:var(--radius);
-            box-shadow:var(--shadow);
-            padding:8px;
-            justify-content:space-around;
-            font-weight:600;
-        }
-        .tab {
-            flex:1;
-            text-align:center;
-            padding:10px 0;
-            border-radius:10px;
-            cursor:pointer;
-            color:var(--muted);
-            transition:all .2s;
-        }
-        .tab.active {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 4px 10px rgba(31,182,255,0.2);
-            transform: translateY(-2px);
-        }
-
-        /* posts */
-        .post {
-            background:var(--card);
-            border-radius:var(--radius);
-            box-shadow:var(--shadow);
-            padding:16px;
-            display:flex;
-            gap:12px;
-        }
-        .post .avatar-small {
-            width:56px;height:56px;border-radius:50%;
-            background:linear-gradient(135deg,#ff7ab6,#7c3aed);
-            color:white;font-weight:700;
-            display:flex;align-items:center;justify-content:center;
-            flex-shrink:0;
-        }
-        .post .body {flex:1;}
-        .post .head {display:flex;justify-content:space-between;align-items:center;}
-        .post .head h4 {margin:0;font-size:15px;}
-        .post .head p {margin:0;font-size:13px;color:var(--muted);}
-        .post .content {margin-top:8px;font-size:15px;line-height:1.45;}
-        .tags {margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;}
-        .tag {font-size:13px;background:#eef2ff;padding:6px 10px;border-radius:999px;color:#3730a3;}
-
-        /* reactions + comments */
-        .interactions {
-            margin-top:12px;
-            border-top:1px solid #f1f5f9;
-            padding-top:10px;
-        }
-        .reactions {
-            display:flex;gap:8px;flex-wrap:wrap;
-        }
-        .reaction {
-            background:#f8fafc;
-            border:1px solid #e5e7eb;
-            border-radius:20px;
-            padding:6px 12px;
-            font-size:14px;
-            display:flex;
-            align-items:center;
-            gap:6px;
-            cursor:pointer;
-            transition:.2s;
-        }
-        .reaction:hover {
-            background:#e0f2fe;
-            border-color:#bae6fd;
-        }
-        .reaction.reacted {
-            font-weight: bold;
-            color: #ff4500; /* яркий цвет для активной реакции */
-            text-shadow: 0 0 3px #ff4500;
-        }
-
-        .comments {
-            margin-top:10px;
-            background:#f9fafb;
-            border-radius:10px;
-            padding:10px;
-        }
-        .comment {
-            border-bottom:1px solid #e5e7eb;
-            padding:6px 0;
-        }
-        .comment:last-child {border:0;}
-        .comment strong {font-size:14px;}
-        .comment p {margin:2px 0 0;font-size:13px;color:#374151;}
-        .add-comment {
-            display:flex;
-            gap:8px;
-            margin-top:8px;
-        }
-        .add-comment input {
-            flex:1;
-            border:1px solid #d1d5db;
-            border-radius:8px;
-            padding:8px 10px;
-        }
-        .add-comment button {
-            background:var(--accent);
-            border:0;
-            color:white;
-            padding:8px 14px;
-            border-radius:8px;
-            cursor:pointer;
-        }
-
-        /* RIGHT: subcategories */
-        .right {
-            position:sticky;
-            top:24px;
-            align-self:start;
-        }
-        .right .category {
-            background:var(--card);
-            border-radius:var(--radius);
-            box-shadow:var(--shadow);
-            padding:14px;
-        }
-        .right h5 {margin:0 0 8px 0;}
-        .subcat {
-            padding:8px 10px;
-            border-radius:8px;
-            cursor:pointer;
-            color:#0f172a;
-            margin-bottom:4px;
-            transition:.2s;
-        }
-        .subcat.active {
-            background: var(--accent);
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(31,182,255,0.25);
-        }
-        .subcat:hover {
-            background: #e0f2fe;
-            color: #0369a1;
-        }
-
-        .comment-actions {
-            margin-top: 6px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .comment-actions button {
-            background: none;
-            border: none;
-            color: var(--accent);
-            font-size: 13px;
-            cursor: pointer;
-            padding: 0;
-            transition: color 0.2s;
-        }
-
-        .comment-actions button:hover {
-            color: var(--accent-2);
-        }
-        .comment-actions .delete-comment-btn {
-            color: #ef4444;
-        }
-        .comment-actions .delete-comment-btn:hover {
-            color: #dc2626;
-        }
-
-        /* === Комментарии и ответы === */
-        .comments {
-            margin-top: 15px;
-            background: #f9fafb;
-            border-radius: 10px;
-            padding: 12px;
-        }
-
-        .comment-thread {
-            border-bottom: 1px solid #e5e7eb;
-            padding: 8px 0;
-        }
-
-        .comment-thread:last-child {
-            border-bottom: none;
-        }
-
-        .comment-main {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .comment-content {
-            margin: 0;
-            font-size: 14px;
-            color: #374151;
-        }
-
-        .comment-meta {
-            font-size: 12px;
-            color: #6b7280;
-            display: flex;
-            gap: 10px;
-        }
-
-        .comment-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 6px;
-        }
-
-        .comment-actions button {
-            background: none;
-            border: none;
-            font-size: 13px;
-            cursor: pointer;
-            color: var(--accent);
-            transition: color 0.2s;
-            padding: 0;
-        }
-
-        .comment-actions button:hover {
-            color: var(--accent-2);
-        }
-
-        .comment-actions .delete-comment-btn {
-            color: #ef4444;
-        }
-        .comment-actions .delete-comment-btn:hover {
-            color: #dc2626;
-        }
-
-        .replies {
-            margin-left: 20px;
-            border-left: 2px solid #e5e7eb;
-            padding-left: 10px;
-        }
-
-        .reply {
-            background: #f3f4f6;
-            border-radius: 8px;
-            padding: 6px;
-            margin-top: 6px;
-        }
-
-        .add-reply {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .add-reply input,
-        .add-comment input {
-            flex: 1;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 8px 10px;
-        }
-
-        .add-reply button,
-        .add-comment button {
-            background: var(--accent);
-            border: 0;
-            color: white;
-            padding: 8px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        /* === Комментарии (дерево) === */
-        .comments { margin-top: 15px; background: #f9fafb; border-radius: 10px; padding: 12px; }
-        .comments-rendered { display: flex; flex-direction: column; gap: 8px; }
-
-        .comment-node {
-            background: #fff;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 1px 3px rgba(16,24,40,0.04);
-            border: 1px solid #eef2f5;
-        }
-
-        .comment-header { display:flex; justify-content:space-between; align-items:center; gap:10px; }
-        .comment-author { font-weight:600; font-size:14px; color:#0f172a; }
-        .comment-content { margin:6px 0 8px; font-size:14px; color:#374151; white-space:pre-wrap; }
-        .comment-meta { font-size:12px; color:#6b7280; display:flex; gap:10px; align-items:center; }
-
-        .comment-actions { margin-top:8px; display:flex; gap:8px; }
-        .comment-actions button {
-            background:none;border:0;color:var(--accent);cursor:pointer;padding:0;font-size:13px;
-        }
-        .comment-actions button:hover { color:var(--accent-2); }
-        .comment-actions .delete-comment-btn { color:#ef4444; }
-        .comment-actions .delete-comment-btn:hover { color:#dc2626; }
-
-        /* Вложенные ответы */
-        .comment-children { margin-left: 18px; margin-top:8px; display:flex; flex-direction:column; gap:8px; }
-        /* Форма для быстрого ответа */
-        .inline-reply { display:flex; gap:8px; margin-top:8px; }
-        .inline-reply input { flex:1; border:1px solid #d1d5db; border-radius:8px; padding:8px 10px; }
-        .inline-reply button { background:var(--accent); border:0; color:white; padding:8px 12px; border-radius:8px; cursor:pointer; }
-
-        /* Поле редактирования комментария (инлайн) */
-        .edit-input { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #d1d5db; }
-        .save-edit-btn { background:var(--accent); color:#fff; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; margin-left:8px; }
-
-
-        .actions { margin-bottom: 8px; }
-
-        /* responsive */
-        @media (max-width:1000px){
-            .container{grid-template-columns:1fr;gap:16px;}
-            .right{order:3;}
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/communication.css}">
 </head>
-<body>
 
-<!-- Подключаем header -->
+<body class="communication-page">
+
 <div th:replace="fragments/header :: site-header"></div>
 
-<div class="container">
+<main class="container py-5">
 
-    <!-- LEFT -->
-    <aside class="left">
-        <div class="profile">
-            <!-- Фото или инициалы -->
-            <img
-                th:src="${user.photoUrl != null} ? ${user.photoUrl} : '/default-avatar.png'"
-                th:onerror="this.onerror=null; this.src='/default-avatar.png'"
-                alt="Фото пользователя"
-                class="img-fluid rounded-circle border avatar"
-                style="width:200px;height:200px;object-fit:cover;">
+    <div class="community-layout">
 
-            <h4 th:text="${user.firstName + ' ' + user.lastName}">SkyFriends</h4>
-            <p th:text="${user.username}">Мой профиль клуба</p>
-        </div>
+        <!-- LEFT -->
+        <aside class="left-column">
 
-        <!-- Кнопки действий -->
-        <div class="actions d-flex justify-content-end gap-2">
-            <button id="create-post-btn" class="btn btn-primary">Создать пост</button>
-        </div>
+            <div class="glass-card profile-card-modern">
 
-        <div class="news-block">
-            <h5>Мои посты</h5>
+                <img
+                        th:src="${user.photoUrl != null} ? ${user.photoUrl} : '/default-avatar.png'"
+                        th:onerror="this.onerror=null; this.src='/default-avatar.png'"
+                        alt="Фото пользователя"
+                        class="profile-avatar-modern">
 
-            <!-- Если список пуст -->
-            <div th:if="${#lists.isEmpty(myPosts)}">
-                <p style="font-size:14px;color:var(--muted);margin:0;">У вас пока нет постов.</p>
+                <h4 th:text="${user.firstName + ' ' + user.lastName}">Имя</h4>
+                <p th:text="${user.username}">@username</p>
+
+                <button id="create-post-btn" class="btn btn-primary modern-btn w-100 mt-3">
+                    <i class="bi bi-plus-circle me-2"></i>Создать пост
+                </button>
+
             </div>
 
-            <!-- Список постов -->
-            <div th:each="post : ${myPosts}" class="announce">
-                <!-- Отображаем первые 40 символов контента -->
-                <strong th:text="${post.content.length() > 40 ? post.content.substring(0, 40) + '…' : post.content}">
-                    Текст поста...
-                </strong>
+            <div class="glass-card side-card">
 
-                <p th:text="${#temporals.format(post.publicationDateTime, 'dd MMM yyyy HH:mm')}">01 ноя 2025</p>
-
-                <a th:href="@{'/communication/post/' + ${post.id}}"
-                   style="font-size:13px;color:var(--accent);text-decoration:none;">Открыть</a>
-            </div>
-        </div>
-
-    </aside>
-
-
-    <!-- CENTER -->
-    <main class="center">
-        <!-- Вкладки (разделы) -->
-        <div class="tabs">
-            <div class="tab"
-                 th:each="section : ${sections}"
-                 th:text="${section.nameRu}"
-                 th:attr="data-section-id=${section.id}"
-                 th:classappend="${section.id == param.sectionId} ? ' active' : ''">
-            </div>
-        </div>
-
-        <!-- Посты -->
-        <div th:each="post : ${posts}" class="post">
-            <div class="avatar-small">
-                <img th:if="${post.authorInfo.profileMediaUrl != null}"
-                     th:src="${post.authorInfo.profileMediaUrl}"
-                     th:onerror="this.onerror=null; this.src='/default-avatar.png'"
-                     alt="avatar"
-                     style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
-                <div th:unless="${post.authorInfo.profileMediaUrl != null}"
-                     th:text="${post.authorInfo.username.substring(0,1)}"
-                     style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
-                    H
+                <div class="section-title">
+                    <span></span>
+                    <h5>Мои посты</h5>
                 </div>
+
+                <div th:if="${#lists.isEmpty(myPosts)}" class="empty-mini">
+                    У вас пока нет постов.
+                </div>
+
+                <div th:each="post : ${myPosts}" class="mini-post">
+
+                    <strong th:text="${post.content.length() > 40 ? post.content.substring(0, 40) + '…' : post.content}">
+                        Текст поста
+                    </strong>
+
+                    <small th:text="${#temporals.format(post.publicationDateTime, 'dd MMM yyyy HH:mm')}">
+                        01 ноя 2025
+                    </small>
+
+                    <a th:href="@{'/communication/post/' + ${post.id}}">
+                        Открыть
+                    </a>
+
+                </div>
+
             </div>
 
-            <div class="body">
-                <div class="head">
-                    <div style="display: flex; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 5px; margin-right: 15px;">
-                            <h4 style="margin: 0;" th:text="${post.authorInfo.username}">Никнейм</h4>
-                            <p style="margin: 0;" th:if="${post.authorInfo.username == #authentication.name}">Вы</p>
-                        </div>
-                        <a th:href="@{'/communication/post/' + ${post.id}}"
-                           style="font-size:13px;color:var(--accent);text-decoration:none;">Открыть</a>
+        </aside>
+
+        <!-- CENTER -->
+        <section class="center-column">
+
+            <!-- HERO -->
+            <div class="hero-community">
+                <h1>Сообщество SkyFriends</h1>
+                <p>Общение, новости, посты и обмен опытом</p>
+            </div>
+
+            <!-- TABS -->
+            <div class="glass-card tabs-wrap">
+
+                <div class="tabs">
+
+                    <div class="tab"
+                         th:each="section : ${sections}"
+                         th:text="${section.nameRu}"
+                         th:attr="data-section-id=${section.id}"
+                         th:classappend="${section.id == param.sectionId} ? ' active' : ''">
                     </div>
-                    <span style="font-size:13px;color:var(--muted)"
-                          th:text="${#temporals.format(post.publicationDateTime, 'dd MMM yyyy HH:mm')}">
-                        1 час назад
-                    </span>
+
                 </div>
 
-                <!-- Контент поста -->
-                <div class="content" th:text="${post.content}">
-                    Текст поста
+            </div>
+
+            <!-- POSTS -->
+            <div th:each="post : ${posts}" class="glass-card post-card">
+
+                <div class="post-head">
+
+                    <div class="post-user">
+
+                        <div class="avatar-small">
+
+                            <img th:if="${post.authorInfo.profileMediaUrl != null}"
+                                 th:src="${post.authorInfo.profileMediaUrl}"
+                                 th:onerror="this.onerror=null; this.src='/default-avatar.png'"
+                                 alt="avatar">
+
+                            <span th:unless="${post.authorInfo.profileMediaUrl != null}"
+                                  th:text="${post.authorInfo.username.substring(0,1)}">
+                            A
+                        </span>
+
+                        </div>
+
+                        <div>
+                            <h5>
+                                <span th:text="${post.authorInfo.username}">username</span>
+                                <small th:if="${post.authorInfo.username == #authentication.name}">Вы</small>
+                            </h5>
+
+                            <p th:text="${#temporals.format(post.publicationDateTime, 'dd MMM yyyy HH:mm')}">
+                                дата
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <a th:href="@{'/communication/post/' + ${post.id}}" class="open-link">
+                        Открыть
+                    </a>
+
                 </div>
 
-                <!-- Медиа -->
-                <div class="media" th:if="${post.medias != null and !post.medias.isEmpty()}">
-                    <div th:each="media : ${post.medias}" style="margin-bottom:10px;">
-                        <!-- Фото -->
+                <div class="post-content"
+                     th:text="${post.content}">
+                    Контент поста
+                </div>
+
+                <!-- MEDIA -->
+                <div class="post-media"
+                     th:if="${post.medias != null and !post.medias.isEmpty()}">
+
+                    <div th:each="media : ${post.medias}" class="media-box">
+
                         <img th:if="${media.typeAsString == 'IMAGE'}"
                              th:src="${media.uploadUrl}"
-                             alt="media"
-                             style="max-width:100%;border-radius:6px;"/>
+                             alt="media">
 
-                        <!-- Видео -->
                         <video th:if="${media.typeAsString == 'VIDEO'}"
-                               controls
-                               style="max-width:100%;border-radius:6px;">
+                               controls>
                             <source th:src="${media.uploadUrl}" type="video/mp4">
-                            Your browser does not support the video tag.
                         </video>
+
                     </div>
+
                 </div>
 
-                <!-- Реакции -->
-                <div class="reactions" style="margin-top:10px;" th:attr="data-post-id=${post.id}">
-                    <span class="reaction"
-                          th:each="entry : ${post.smileyReactions.entrySet()}"
-                          th:utext="${entry.key == 'hearts' ? '❤️ ' : (entry.key == 'likes' ? '👍 ' : entry.key)} + ${entry.value}"
-                          th:attr="data-reaction-id=${entry.key}"
-                          th:classappend="${post.isReacted == entry.key} ? ' reacted' : ''"
-                          style="margin-right:10px;cursor:pointer;">
-                    </span>
+                <!-- REACTIONS -->
+                <div class="reactions"
+                     th:attr="data-post-id=${post.id}">
+
+                <span class="reaction"
+                      th:each="entry : ${post.smileyReactions.entrySet()}"
+                      th:utext="${entry.key == 'hearts' ? '❤️ ' : (entry.key == 'likes' ? '👍 ' : entry.key)} + ${entry.value}"
+                      th:attr="data-reaction-id=${entry.key}"
+                      th:classappend="${post.isReacted == entry.key} ? ' reacted' : ''">
+                </span>
+
                 </div>
 
-
-                <!-- Комментарии -->
-<!--                <div class="comments"-->
-<!--                     th:attr="data-post-id=${post.id}, data-current-user-id=${user.id}">-->
-
-<!--                    &lt;!&ndash; Скрытые элементы — плоский список комментариев, которые прочитает JS &ndash;&gt;-->
-<!--                    <div class="raw-comments" style="display:none;">-->
-<!--                        <div class="raw-comment"-->
-<!--                             th:each="c : ${post.comments}"-->
-<!--                             th:attr="-->
-<!--                                data-id=${c.id},-->
-<!--                                data-post-id=${c.postId},-->
-<!--                                data-user-id=${c.userId},-->
-<!--                                data-reply-id=${c.replyCommentId},-->
-<!--                                data-content=${c.content},-->
-<!--                                data-likes=${c.likes},-->
-<!--                                data-created=${#temporals.format(c.createdAt, 'dd.MM.yyyy HH:mm')}-->
-<!--                                ">-->
-<!--                        </div>-->
-<!--                    </div>-->
-
-<!--                    &lt;!&ndash; Контейнер, куда JS отрисует уже иерархические комментарии &ndash;&gt;-->
-<!--                    <div class="comments-rendered"></div>-->
-
-<!--                    &lt;!&ndash; Форма добавления нового (верхнего) комментария &ndash;&gt;-->
-<!--                    <div class="add-comment">-->
-<!--                        <input type="text" placeholder="Напишите комментарий..." />-->
-<!--                        <button class="send-comment-btn">Отправить</button>-->
-<!--                    </div>-->
-<!--                </div>-->
-                </div>
             </div>
-        </main>
 
-    <!-- RIGHT -->
-    <aside class="right">
-        <div class="category">
-            <h5>Подтемы раздела</h5>
-            <div class="subcat"
-                 th:each="cat : ${categories}"
-                 th:text="${cat.nameRu}"
-                 th:attr="data-category-id=${cat.id}"
-                 th:classappend="${cat.id == param.categoryId} ? ' active' : ''">
-                Категория
+        </section>
+
+        <!-- RIGHT -->
+        <aside class="right-column">
+
+            <div class="glass-card side-card">
+
+                <div class="section-title">
+                    <span></span>
+                    <h5>Подтемы</h5>
+                </div>
+
+                <div class="subcat"
+                     th:each="cat : ${categories}"
+                     th:text="${cat.nameRu}"
+                     th:attr="data-category-id=${cat.id}"
+                     th:classappend="${cat.id == param.categoryId} ? ' active' : ''">
+                </div>
+
             </div>
-        </div>
-    </aside>
 
-</div>
+        </aside>
 
-<!-- Подключаем footer -->
+    </div>
+
+</main>
+
 <div th:replace="fragments/footer :: site-footer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
@@ -902,7 +522,6 @@
 
     });
 </script>
-
 
 </body>
 </html>
