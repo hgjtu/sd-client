@@ -1,0 +1,240 @@
+/* /static/css/market.css */
+
+body.market-page{
+    background:
+            radial-gradient(circle at top right,#7dd3fc 0%,transparent 30%),
+            radial-gradient(circle at left,#dbeafe 0%,transparent 35%),
+            linear-gradient(135deg,#f8fbff,#eef6ff,#e0f2fe);
+    min-height:100vh;
+    color:#111827;
+}
+
+/* HERO */
+
+.hero-market{
+    border-radius:22px;
+    padding:18px 28px;
+    background:linear-gradient(135deg,#41addd,#2796cf);
+    color:#fff;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+
+    margin-bottom:24px;
+}
+
+.hero-market h1{
+    margin:0;
+    font-size:1.7rem;
+    font-weight:800;
+}
+
+.hero-market p{
+    margin:0;
+    opacity:.9;
+}
+
+/* PANEL */
+
+.market-panel{
+    border-radius:24px;
+    overflow:hidden;
+    background:rgba(255,255,255,.82);
+    backdrop-filter:blur(18px);
+    box-shadow:0 14px 35px rgba(15,23,42,.07);
+    padding:24px;
+    margin-bottom:26px;
+}
+
+.market-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+/* левая часть — режим */
+.mode-wrap{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+}
+
+/* правая часть — кнопки */
+.actions-wrap{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+/* MOBILE */
+@media(max-width:991px){
+
+    .market-toolbar{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .mode-wrap{
+        width:100%;
+        justify-content:flex-start;
+    }
+
+    .mode-wrap .btn-group{
+        display:flex;
+        gap:20px;
+    }
+
+    .mode-wrap .mode-pill{
+        border-radius:14px !important;
+        min-width:120px;
+    }
+
+    .actions-wrap{
+        width:100%;
+        display:grid !important;
+        grid-template-columns:1fr;
+        justify-content:stretch;
+    }
+}
+
+/* TITLE */
+
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.section-title span{
+    width:30px;
+    height:4px;
+    border-radius:50px;
+    background:#0ea5e9;
+}
+
+.section-title h5{
+    margin:0;
+    font-weight:700;
+}
+
+/* BUTTONS */
+
+.modern-btn{
+    border-radius:14px;
+    padding:10px 18px;
+    font-weight:600;
+}
+
+.mode-pill{
+    min-width:120px;
+    border-radius:14px !important;
+    font-weight:700;
+    padding:10px 18px;
+}
+
+.btn-outline-primary.mode-pill.active{
+    background:#38bdf8;
+    border-color:#38bdf8;
+    color:#fff;
+}
+
+.btn-outline-danger.mode-pill.active{
+    background:#ef4444;
+    border-color:#ef4444;
+    color:#fff;
+}
+
+/* CATEGORY CARD */
+
+.category-card{
+    cursor:pointer;
+    transition:.18s ease;
+    border:none;
+    border-radius:22px;
+    overflow:hidden;
+    background:rgba(255,255,255,.9);
+    box-shadow:0 12px 28px rgba(15,23,42,.06);
+    height:100%;
+}
+
+.category-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 20px 35px rgba(15,23,42,.12);
+}
+
+.category-img{
+    width:100%;
+    height:190px;
+    object-fit:cover;
+}
+
+.category-card .card-body{
+    padding:20px;
+}
+
+.category-card .card-title{
+    font-weight:800;
+    margin-bottom:8px;
+    color:#0f172a;
+}
+
+.category-card .card-text{
+    color:#64748b !important;
+}
+
+/* ALERT */
+
+.alert{
+    border-radius:16px;
+    border:none;
+    box-shadow:0 10px 24px rgba(0,0,0,.06);
+}
+
+/* MOBILE */
+
+@media(max-width:991px){
+
+    .hero-market{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .hero-market h1{
+        font-size:1.45rem;
+    }
+
+    .market-panel{
+        padding:20px;
+    }
+
+    .mode-wrap{
+        width:100%;
+    }
+
+    .mode-wrap .btn-group{
+        width:100%;
+    }
+
+    .mode-wrap .mode-pill{
+        flex:1;
+    }
+
+    .actions-wrap{
+        width:100%;
+        display:grid !important;
+        grid-template-columns:1fr;
+    }
+
+    .category-img{
+        height:180px;
+    }
+}
