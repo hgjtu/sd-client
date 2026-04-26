@@ -1,5 +1,6 @@
 package dev.hgjtu.auth_client.controllers;
 
+import dev.hgjtu.auth_client.dto.market.CommentRequest;
 import dev.hgjtu.auth_client.dto.market.CategoryResponse;
 import dev.hgjtu.auth_client.dto.market.ItemMinResponse;
 import dev.hgjtu.auth_client.dto.market.ItemRequest;
@@ -227,5 +228,25 @@ public class MarketController {
         return marketService.deleteMediaToItem(itemId, mediaId);
     }
 
-    // TODO нет комментариев
+    @PostMapping("/item/comment/add")
+    @ResponseBody
+    public Mono<Void> addCommentToPost (@RequestBody CommentRequest commentRequest) {
+        return marketService.addComment(commentRequest)
+                .then(Mono.empty());
+    }
+
+    @PostMapping("/item/comment/edit/{id}")
+    @ResponseBody
+    public Mono<Void> editCommentById (@PathVariable Long id,
+                                       @RequestBody  CommentRequest commentRequest) {
+        return marketService.editComment(id, commentRequest)
+                .then(Mono.empty());
+    }
+
+    @PostMapping("/item/comment/delete/{id}")
+    @ResponseBody
+    public Mono<Void> deleteCommentById (@PathVariable Long id) {
+        return marketService.deleteComment(id)
+                .then(Mono.empty());
+    }
 }

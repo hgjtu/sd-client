@@ -1,6 +1,7 @@
 package dev.hgjtu.auth_client.dto.market;
 
 import dev.hgjtu.auth_client.dto.MediaUploadResponse;
+import dev.hgjtu.auth_client.dto.communication.UserWithMediaForResources;
 import dev.hgjtu.auth_client.models.ItemComment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class ItemResponse {
     private Integer categoryId;
     private String title;
     private String description;
-    private String username;
+    private UserWithMediaForResources authorInfo;
     private List<MediaUploadResponse> medias;
     private Integer price;
     private String location;

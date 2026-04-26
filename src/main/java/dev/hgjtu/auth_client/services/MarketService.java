@@ -2,11 +2,13 @@ package dev.hgjtu.auth_client.services;
 
 import dev.hgjtu.auth_client.dto.MediaUploadResponse;
 import dev.hgjtu.auth_client.dto.UploadUrlRequest;
+import dev.hgjtu.auth_client.dto.market.CommentRequest;
 import dev.hgjtu.auth_client.dto.market.CategoryResponse;
 import dev.hgjtu.auth_client.dto.market.ItemMinResponse;
 import dev.hgjtu.auth_client.dto.market.ItemRequest;
 import dev.hgjtu.auth_client.dto.market.ItemResponse;
 import dev.hgjtu.auth_client.models.AvailableResources;
+import dev.hgjtu.auth_client.models.PostComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -143,6 +145,31 @@ public class MarketService {
                 .uri(gatewayServiceURL + marketResourcePrefix + "/items/all-by-username/{username}/{mode}", params)
                 .retrieve()
                 .bodyToFlux(ItemMinResponse.class);
+    }
+
+    public Mono<PostComment> addComment(CommentRequest commentRequest) {
+        return webClient.post()
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/add-comment")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(commentRequest)
+                .retrieve()
+                .bodyToMono(PostComment.class);
+    }
+
+    public Mono<ItemResponse> editComment(Long commentId, CommentRequest commentRequest) {
+        return webClient.patch()
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/edit-comment/{commentId}", commentId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(commentRequest)
+                .retrieve()
+                .bodyToMono(ItemResponse.class);
+    }
+
+    public Mono<String> deleteComment(Long commentId) {
+        return webClient.delete()
+                .uri(gatewayServiceURL + marketResourcePrefix + "/items/delete-comment/{commentId}", commentId)
+                .retrieve()
+                .bodyToMono(String.class);
     }
 
 }
