@@ -39,15 +39,28 @@ public class JumpGroupController {
                                       @RequestParam(required = false, defaultValue = "false") Boolean isParticipant,
                                       Model model) {
 
-        Mono<List<TrainingLevelResponse>> trainingLevels = jumpGroupService.getTrainingLevels().collectList();
-        Mono<PageResponse<GroupResponse>> groupsPage = jumpGroupService.getGroupsByParams(
-                page, size, sort, direction, places, trainingLevel,
-                jumpDateTimeStart, jumpDateTimeEnd, isParticipant
-        );
+        Mono<List<TrainingLevelResponse>> trainingLevels =
+                jumpGroupService.getTrainingLevels().collectList();
+
+        Mono<PageResponse<GroupResponse>> groupsPage =
+                jumpGroupService.getGroupsByParams(
+                        page, size, sort, direction,
+                        places, trainingLevel,
+                        jumpDateTimeStart, jumpDateTimeEnd,
+                        isParticipant
+                );
+
         return Mono.zip(trainingLevels, groupsPage)
                 .map(tuple -> {
                     model.addAttribute("trainingLevels", tuple.getT1());
                     model.addAttribute("groupsPage", tuple.getT2());
+
+                    model.addAttribute("places", places);
+                    model.addAttribute("trainingLevelSelected", trainingLevel);
+                    model.addAttribute("jumpDateTimeStart", jumpDateTimeStart);
+                    model.addAttribute("jumpDateTimeEnd", jumpDateTimeEnd);
+                    model.addAttribute("isParticipant", isParticipant);
+
                     return "groups/find-group";
                 })
                 .onErrorResume(Exception.class, e -> {

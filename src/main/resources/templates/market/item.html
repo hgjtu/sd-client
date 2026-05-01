@@ -324,7 +324,7 @@
         /* Поле редактирования комментария (инлайн) */
         .edit-input { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #d1d5db; }
         .save-edit-btn { background:var(--accent); color:#fff; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; margin-left:8px; }
-        
+
         .item-images {
             display: flex;
             gap: 0.5rem;
@@ -426,6 +426,7 @@
                 data-id=${c.id},
                 data-item-id=${c.itemId},
                 data-user-id=${c.userId},
+                data-author-username=${c.authorUsername},
                 data-reply-id=${c.replyCommentId},
                 data-content=${c.content},
                 data-created=${c.createdAt}
@@ -461,10 +462,12 @@
                 node.className = 'comment-node';
                 node.dataset.commentId = data.id;
 
+                const authorName = data.authorUsername || ('Пользователь #' + data.userId);
+
                 node.innerHTML = `
             <div class="comment-header">
                 <div>
-                    <div class="comment-author">Пользователь #${data.userId}</div>
+                    <div class="comment-author">${escapeHtml(authorName)}</div>
                     <div class="comment-meta">${data.created} · <span class="likes">❤️ ${data.likes}</span></div>
                 </div>
                 <div></div>
@@ -518,6 +521,7 @@
                     id: rc.dataset.id,
                     itemId: rc.dataset.itemId,
                     userId: rc.dataset.userId,
+                    authorUsername: rc.dataset.authorUsername,
                     replyId: rc.dataset.replyId === 'null' || rc.dataset.replyId === '' ? null : rc.dataset.replyId,
                     content: rc.dataset.content,
                     likes: rc.dataset.likes || 0,

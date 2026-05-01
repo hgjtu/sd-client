@@ -44,27 +44,53 @@
                        class="form-control"
                        placeholder="Введите место и Enter"/>
 
-                <div id="placesContainer" class="d-flex flex-wrap gap-2 mt-2"></div>
+                <div id="placesContainer" class="d-flex flex-wrap gap-2 mt-2">
+
+                    <th:block th:if="${places != null}" th:each="place : ${places}">
+                        <span class="badge bg-primary d-flex align-items-center gap-2 place-badge">
+                            <span th:text="${place}"></span>
+                            <button type="button"
+                                    class="btn-close btn-close-white btn-sm remove-place"></button>
+                        </span>
+
+                        <input type="hidden"
+                               name="places"
+                               th:value="${place}"
+                               class="place-hidden">
+                    </th:block>
+
+                </div>
             </div>
 
             <div>
                 <label>Уровень подготовки</label>
+
                 <select name="trainingLevel" class="form-select">
                     <option value="">Любой</option>
+
                     <th:block th:each="level : ${trainingLevels}">
-                        <option th:value="${level.id}" th:text="${level.levelName}"></option>
+                        <option th:value="${level.id}"
+                                th:text="${level.levelName}"
+                                th:selected="${trainingLevelSelected == level.id}">
+                        </option>
                     </th:block>
                 </select>
             </div>
 
             <div>
                 <label>Дата от</label>
-                <input type="datetime-local" name="jumpDateTimeStart" class="form-control"/>
+                <input type="datetime-local"
+                       name="jumpDateTimeStart"
+                       class="form-control"
+                       th:value="${jumpDateTimeStart}">
             </div>
 
             <div>
                 <label>Дата до</label>
-                <input type="datetime-local" name="jumpDateTimeEnd" class="form-control"/>
+                <input type="datetime-local"
+                       name="jumpDateTimeEnd"
+                       class="form-control"
+                       th:value="${jumpDateTimeEnd}">
             </div>
 
             <div class="form-check">
@@ -72,7 +98,9 @@
                        type="checkbox"
                        name="isParticipant"
                        value="true"
-                       id="myGroups">
+                       id="myGroups"
+                       th:checked="${isParticipant}">
+
                 <label class="form-check-label" for="myGroups">
                     Только мои группы
                 </label>
@@ -103,8 +131,11 @@
                     Название
                 </div>
 
-                <span class="badge-level"
-                      th:text="'Уровень ' + ${group.trainingLevel}">
+                <span class="badge-level">
+                    <th:block th:each="lvl : ${trainingLevels}">
+                        <th:block th:if="${lvl.id == group.trainingLevel}" th:text="${lvl.levelName}"></th:block>
+                    </th:block>
+                    уровень
                 </span>
             </div>
 
@@ -175,6 +206,23 @@
     const input = document.getElementById('placeInput');
     const container = document.getElementById('placesContainer');
 
+    function bindRemoveButtons() {
+        container.querySelectorAll('.remove-place').forEach(btn => {
+            btn.onclick = function () {
+                const badge = btn.closest('.place-badge');
+                const hidden = badge.nextElementSibling;
+
+                badge.remove();
+
+                if (hidden && hidden.classList.contains('place-hidden')) {
+                    hidden.remove();
+                }
+            };
+        });
+    }
+
+    bindRemoveButtons();
+
     input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -183,21 +231,22 @@
             if (!value) return;
 
             const badge = document.createElement('span');
-            badge.className = 'badge bg-primary d-flex align-items-center gap-2';
-            badge.innerHTML = `${value} <button type="button" class="btn-close btn-close-white btn-sm"></button>`;
+            badge.className = 'badge bg-primary d-flex align-items-center gap-2 place-badge';
+            badge.innerHTML =
+                `<span>${value}</span>
+                 <button type="button"
+                         class="btn-close btn-close-white btn-sm remove-place"></button>`;
 
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = 'places';
             hiddenInput.value = value;
-
-            badge.querySelector('button').addEventListener('click', function () {
-                badge.remove();
-                hiddenInput.remove();
-            });
+            hiddenInput.className = 'place-hidden';
 
             container.appendChild(badge);
             container.appendChild(hiddenInput);
+
+            bindRemoveButtons();
 
             input.value = '';
         }

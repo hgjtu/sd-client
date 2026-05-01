@@ -9,6 +9,7 @@ public class ItemComment {
     private Long id;
     private Long itemId;
     private Long userId;
+    private String authorUsername;
     private Long replyCommentId;
     private String content;
     private Integer likes;

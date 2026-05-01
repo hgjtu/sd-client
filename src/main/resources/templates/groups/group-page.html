@@ -487,7 +487,7 @@
 <div class="post-page mt-4">
 
     <div class="mb-3">
-        <a href="javascript:history.back()" class="btn-back">
+        <a href="/jump-group" class="btn-back">
             ← Назад
         </a>
     </div>
@@ -549,8 +549,14 @@
                 <form th:if="${group.participantBool == true}"
                       th:action="@{'/jump-group/join-group/' + ${group.id}}"
                       method="post"
-                      style="display:inline;">
-                    <button class="btn btn-outline-danger">
+                      style="display:inline;"
+                      id="leaveGroupForm">
+
+                    <!-- добавили data-count -->
+                    <button type="submit"
+                            class="btn btn-outline-danger"
+                            id="leaveGroupBtn"
+                            th:attr="data-count=${#lists.size(group.participants)}">
                         🚪 Выйти
                     </button>
                 </form>
@@ -821,6 +827,43 @@
                 location.reload();
             };
         });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const leaveBtn = document.getElementById("leaveGroupBtn");
+        const leaveForm = document.getElementById("leaveGroupForm");
+
+        if (leaveBtn && leaveForm) {
+            leaveBtn.addEventListener("click", async function (e) {
+                e.preventDefault();
+
+                const count = Number(this.dataset.count || 0);
+
+                let message = "Вы уверены, что хотите выйти из группы?";
+
+                if (count === 1) {
+                    message = "Вы последний участник группы. Если выйдете, группа будет расформирована. Продолжить?";
+                }
+
+                if (!confirm(message)) return;
+
+                const formData = new FormData(leaveForm);
+
+                await fetch(leaveForm.action, {
+                    method: "POST",
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    },
+                    body: formData
+                });
+
+                window.location.href = "/jump-group";
+            });
+        }
+
     });
 </script>
 
