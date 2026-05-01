@@ -224,8 +224,11 @@
                             <i class="bi bi-pencil"></i>️
                         </a>
 
-                        <a th:href="@{'/logbook/delete/' + ${jump.id}}"
-                           class="btn btn-sm btn-outline-danger">
+                        <a href="#"
+                           class="btn btn-sm btn-outline-danger"
+                           data-bs-toggle="modal"
+                           data-bs-target="#deleteJumpModal"
+                           th:attr="data-id=${jump.id}">
                             <i class="bi bi-trash"></i>
                         </a>
                     </td>
@@ -317,6 +320,48 @@
                         <span id="emailBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="deleteJumpModal"
+         tabindex="-1"
+         aria-labelledby="deleteJumpModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteJumpModalLabel">
+                        Подтверждение удаления
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Закрыть"></button>
+                </div>
+
+                <div class="modal-body">
+                    Вы уверены, что хотите удалить запись из логбука?
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Отмена
+                    </button>
+
+                    <a href="#"
+                       class="btn btn-danger"
+                       id="confirmDeleteJumpBtn">
+                        Удалить
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>
@@ -588,6 +633,23 @@
         // Очистка ошибок при вводе
         newEmailInput?.addEventListener('input', hideError);
         confirmEmailInput?.addEventListener('input', hideError);
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const deleteModal = document.getElementById('deleteJumpModal');
+        const confirmBtn = document.getElementById('confirmDeleteJumpBtn');
+
+        deleteModal?.addEventListener('show.bs.modal', function (event) {
+
+            const button = event.relatedTarget;
+            const jumpId = button?.getAttribute('data-id');
+
+            confirmBtn.href = '/logbook/delete/' + jumpId;
+        });
+
     });
 </script>
 
