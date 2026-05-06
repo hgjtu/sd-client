@@ -2,6 +2,7 @@ package dev.hgjtu.auth_client.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.RequestEntity;
@@ -39,6 +40,9 @@ import java.util.Map;
 public class SecurityConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    @Value("${home_server.ip}")
+    private String homeServerIp;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -88,11 +92,11 @@ public class SecurityConfig {
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                 .scope("read", "openid", "profile")
-                .userInfoUri("http://localhost:9090/userinfo") // auth-server
+                .userInfoUri("http://" + (homeServerIp.equals("localhost") ? "localhost" : "auth-server") + ":9090/userinfo") // auth-server
                 .userNameAttributeName("sub")
-                .authorizationUri("http://localhost:9090/oauth2/authorize") // 194.87.94.103
-                .tokenUri("http://localhost:9090/oauth2/token") // auth-server
-                .jwkSetUri("http://localhost:9090/oauth2/jwks") // auth-server
+                .authorizationUri("http://" + homeServerIp + ":9090/oauth2/authorize") // 194.87.94.103
+                .tokenUri("http://" + (homeServerIp.equals("localhost") ? "localhost" : "auth-server") + ":9090/oauth2/token") // auth-server
+                .jwkSetUri("http://" + (homeServerIp.equals("localhost") ? "localhost" : "auth-server") + ":9090/oauth2/jwks") // auth-server
                 .clientName("Web Client")
                 .build();
     }
