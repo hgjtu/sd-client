@@ -26,6 +26,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -63,8 +64,24 @@ public class SecurityConfig {
                         )
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/")
-                        .invalidateHttpSession(true)
+                        .logoutUrl("/logout")
+                        .addLogoutHandler((request, response, authentication) -> {
+                            String serverLogoutUrl = "http://" + (homeServerIp.equals("localhost") ? "localhost" : "auth-server") + ":9090/oauth2/logout"
+                                    + "?post_logout_redirect_uri="
+                                    + URLEncoder.encode("http://"  + (homeServerIp.equals("localhost") ? "localhost" : "client") +  ":5050/", StandardCharsets.UTF_8);
+
+                            request.getSession().setAttribute("LOGOUT_REDIRECT", serverLogoutUrl);
+                        })
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            String serverLogoutUrl = (String) request.getSession().getAttribute("LOGOUT_REDIRECT");
+                            if (serverLogoutUrl != null) {
+                                response.sendRedirect(serverLogoutUrl);
+                            } else {
+                                response.sendRedirect("/");
+                            }
+                        })
+                        .invalidateHttpSession(false)
+                        .clearAuthentication(true)
                         .deleteCookies("JSESSIONID", "CLIENT_SESSION")
                         .permitAll()
                 )

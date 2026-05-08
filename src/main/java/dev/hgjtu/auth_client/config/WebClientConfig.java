@@ -79,13 +79,18 @@ public class WebClientConfig {
 
     @Bean
     public WebClient serverWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
-        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
-                new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
-
-        oauth2.setDefaultClientRegistrationId(ccClientId);
-
-        return WebClient.builder()
-                .apply(oauth2.oauth2Configuration())
-                .build();
+        return WebClient.builder().build();
     }
+
+//    @Bean
+//    public WebClient publicWebClient(OAuth2AuthorizedClientManager authorizedClientManager) {
+//        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 =
+//                new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+//
+//        oauth2.setDefaultClientRegistrationId(ccClientId);
+//
+//        return WebClient.builder()
+//                .apply(oauth2.oauth2Configuration())
+//                .build();
+//    }
 }

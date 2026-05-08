@@ -50,7 +50,7 @@ public class BaseController {
     @PostMapping("/register")
     public Mono<String> register(@ModelAttribute RegistrationRequest registrationRequest) {
         return baseService.registerUser(registrationRequest)
-                .then(Mono.just("redirect:/login?registered"));
+                .then(Mono.just("redirect:/profile"));
     }
 
     @GetMapping("/change-password")

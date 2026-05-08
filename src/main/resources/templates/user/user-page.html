@@ -112,6 +112,7 @@
                      class="mt-4">
 
                     <form th:action="@{/logout}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                         <button type="submit" class="btn btn-danger modern-btn w-100">
                             <i class="bi bi-box-arrow-right me-2"></i>
                             Выйти
