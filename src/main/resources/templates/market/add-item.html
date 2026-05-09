@@ -24,6 +24,24 @@
             border-radius: 0.5rem;
             box-shadow: 0 8px 20px rgba(0,0,0,0.05);
         }
+        .media-preview {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+            border: 1px solid #dee2e6;
+        }
+        .preview-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .removed {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .removed button {
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -96,26 +114,23 @@
                        multiple>
 
                 <div id="previewContainer" class="d-flex flex-wrap gap-2 mt-3">
-
-                    <th:block th:if="${item != null && !item.medias.isEmpty()}">
+                    <!-- Существующие медиа -->
+                    <th:block th:if="${item != null && item.medias != null && !item.medias.isEmpty()}">
                         <div th:each="media : ${item.medias}"
-                             class="position-relative"
-                             th:attr="data-media-id=${media.id}, data-url=${media.uploadUrl}">
+                             class="preview-wrapper existing-media"
+                             th:attr="data-media-id=${media.id}">
 
-                            <img th:src="${media.uploadUrl}"
-                                 style="width:120px;height:120px;object-fit:cover"
-                                 class="rounded border"
-                                 th:alt="${media.uploadUrl}"/>
+                            <img th:src="${media.uploadUrl}" class="media-preview" alt="Media preview">
 
                             <button type="button"
-                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                    th:attr="onclick=|deleteExistingMedia('${media.id}', this)|">
-                                &times;
+                                    class="btn btn-sm btn-danger position-absolute top-0 end-0 remove-existing"
+                                    th:attr="onclick=|removeExistingMedia('${media.id}', this)|">
+                                ×
                             </button>
                         </div>
                     </th:block>
-
                 </div>
+                <small class="text-muted">Можно загрузить до 10 изображений. Максимальный размер: 10MB</small>
             </div>
 
             <button type="submit" class="btn btn-primary"
@@ -142,8 +157,10 @@
     const previewContainer = document.getElementById("previewContainer");
 
     const MAX_FILES = 10;
-    let pendingFiles = [];
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
+    let pendingFiles = [];
+    let removedMediaIds = [];
     let itemId = "[[${item != null ? item.id : ''}]]";
     if (itemId) {
         itemId = parseInt(itemId);
@@ -156,29 +173,24 @@
     ================================ */
     photoInput?.addEventListener("change", function (event) {
         const files = Array.from(event.target.files);
+        const existingMediaCount = document.querySelectorAll('.existing-media:not(.removed)').length;
 
-        files.forEach((file, index) => {
-            console.log(`Файл ${index}:`, {
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                lastModified: new Date(file.lastModified)
-            });
-        });
-
-        if (pendingFiles.length + files.length > MAX_FILES) {
-            alert("Можно загрузить максимум 10 фотографий");
+        if (existingMediaCount + pendingFiles.length + files.length > MAX_FILES) {
+            alert(`Можно загрузить максимум ${MAX_FILES} изображений`);
+            photoInput.value = "";
             return;
         }
 
         for (const file of files) {
+            // Проверка типа файла
             if (!file.type.startsWith("image/")) {
-                alert("Можно загружать только изображения");
+                alert(`Файл ${file.name} не является изображением`);
                 continue;
             }
 
-            if (file.size > 5 * 1024 * 1024) {
-                alert("Максимальный размер файла — 5MB");
+            // Проверка размера
+            if (file.size > MAX_FILE_SIZE) {
+                alert(`Файл ${file.name} превышает максимальный размер ${MAX_FILE_SIZE / 1024 / 1024}MB`);
                 continue;
             }
 
@@ -203,88 +215,159 @@
     form.addEventListener("submit", async function (e) {
         e.preventDefault();
 
-        const formData = new FormData(form);
-        const itemData = Object.fromEntries(formData.entries());
-        delete itemData._csrf;
+        try {
+            // 1. Сначала сохраняем/обновляем товар
+            const formData = new FormData(form);
+            const itemData = Object.fromEntries(formData.entries());
+            delete itemData._csrf;
 
-        console.log(itemData); // ПРОВЕРЬ ЧТО ТУТ
+            console.log('Saving item:', itemData);
 
-        const saveResponse = await fetch(form.action, {
-            method: form.method || "POST",
-            headers: {
-                "Content-Type": "application/json",
-                [csrfHeader]: csrfToken
-            },
-            body: JSON.stringify(itemData)
-        });
+            const saveResponse = await fetch(form.action, {
+                method: form.method || "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(itemData)
+            });
 
-        if (!saveResponse.ok) {
-            alert("Ошибка сохранения");
-            return;
+            if (!saveResponse.ok) {
+                const errorText = await saveResponse.text();
+                throw new Error(errorText || "Ошибка сохранения товара");
+            }
+
+            // Получаем ID товара
+            const responseText = await saveResponse.text();
+            itemId = responseText ? parseInt(responseText) : itemId;
+
+            if (!itemId) {
+                throw new Error("Не удалось получить ID товара");
+            }
+
+            console.log('Item saved with ID:', itemId);
+
+            // 2. Удаляем помеченные фото (последовательно)
+            if (removedMediaIds.length > 0) {
+                await deleteMarkedMediaSequentially();
+            }
+
+            // 3. Загружаем новые фото
+            if (pendingFiles.length > 0) {
+                await uploadAllPhotos();
+            }
+
+            // 4. Перенаправляем на страницу товара
+            window.location.href = "/market/item/" + itemId;
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Ошибка при сохранении: " + error.message);
         }
-
-        itemId = await saveResponse.text();
-
-        await uploadAllPhotos();
-
-        window.location.href = "/market/item/" + itemId;
     });
 
     /* ================================
        ☁️ Загрузка всех фото
     ================================ */
     async function uploadAllPhotos() {
+        const uploadedMediaIds = [];
 
         for (const file of pendingFiles) {
+            try {
+                console.log('Uploading file:', file.name);
 
-            // Получаем presigned URL
-            const uploadResponse = await fetch("/media/MARKET/upload-url/item/" + itemId.toString(), {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    [csrfHeader]: csrfToken
-                },
-                body: JSON.stringify({
-                    fileName: file.name,
-                    contentType: file.type
-                })
-            });
-
-            if (!uploadResponse.ok) throw new Error("Ошибка получения upload-url");
-
-            const uploadData = await uploadResponse.json();
-            const uploadUrl = uploadData.uploadUrl;
-            const mediaId = uploadData.id;
-
-            // Загружаем в S3 / MinIO
-            const s3Response = await fetch(uploadUrl, {
-                method: "PUT",
-                body: file
-            });
-
-            if (!s3Response.ok) throw new Error("Ошибка загрузки в S3");
-
-            // Подтверждаем загрузку
-            const completeResponse = await fetch(`/media/MARKET/complete/${mediaId}`, {
-                method: "POST",
-                headers: {[csrfHeader]: csrfToken}
-            });
-
-            if (completeResponse.ok) {
-                // Привязываем к item
-                await fetch(`/market/items/add-media/${itemId}`, {
+                // Получаем presigned URL
+                const uploadResponse = await fetch(`/media/MARKET/upload-url/item/${itemId}`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         [csrfHeader]: csrfToken
                     },
-                    body: JSON.stringify([mediaId])
+                    body: JSON.stringify({
+                        fileName: file.name,
+                        contentType: file.type
+                    })
                 });
+
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text();
+                    throw new Error(`Ошибка получения upload-url: ${errorText}`);
+                }
+
+                const uploadData = await uploadResponse.json();
+                console.log('Upload data:', uploadData);
+
+                const uploadUrl = uploadData.uploadUrl;
+                const mediaId = uploadData.id;
+
+                // Загружаем в S3 / MinIO
+                const s3Response = await fetch(uploadUrl, {
+                    method: "PUT",
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type
+                    }
+                });
+
+                if (!s3Response.ok) {
+                    throw new Error("Ошибка загрузки в хранилище");
+                }
+
+                // Подтверждаем загрузку
+                const completeResponse = await fetch(`/media/MARKET/complete/${mediaId}`, {
+                    method: "POST",
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
+
+                if (!completeResponse.ok) {
+                    throw new Error("Ошибка подтверждения загрузки");
+                }
+
+                uploadedMediaIds.push(mediaId);
+                console.log('File uploaded successfully, media ID:', mediaId);
+
+            } catch (error) {
+                console.error('Error uploading file:', file.name, error);
+                alert(`Ошибка при загрузке файла ${file.name}: ${error.message}`);
             }
-            else throw new Error("Ошибка подтверждения");
+        }
+
+        // Привязываем все загруженные медиа к товару
+        if (uploadedMediaIds.length > 0) {
+            await addMediaToItem(uploadedMediaIds);
         }
 
         pendingFiles = [];
+    }
+
+    /* ================================
+       🔗 Привязка медиа к товару
+    ================================ */
+    async function addMediaToItem(mediaIds) {
+        try {
+            console.log('Adding media to item:', mediaIds);
+
+            const addMediaResponse = await fetch(`/market/items/add-media/${itemId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(mediaIds)
+            });
+
+            if (!addMediaResponse.ok) {
+                const errorText = await addMediaResponse.text();
+                throw new Error(`Ошибка привязки медиа к товару: ${errorText}`);
+            }
+
+            console.log('Media added successfully');
+        } catch (error) {
+            console.error('Error adding media to item:', error);
+            alert("Ошибка при привязке медиа: " + error.message);
+        }
     }
 
     /* ================================
@@ -292,24 +375,24 @@
     ================================ */
     function createPreview(src, file) {
         const wrapper = document.createElement("div");
-        wrapper.className = "position-relative";
-        wrapper.dataset.filename = file.name;
+        wrapper.className = "preview-wrapper pending-media";
 
         const img = document.createElement("img");
         img.src = src;
-        img.style.width = "120px";
-        img.style.height = "120px";
-        img.style.objectFit = "cover";
-        img.className = "rounded border";
+        img.alt = "Preview";
+        img.className = "media-preview";
 
         const removeBtn = document.createElement("button");
         removeBtn.type = "button";
-        removeBtn.innerHTML = "&times;";
+        removeBtn.innerHTML = "×";
         removeBtn.className = "btn btn-sm btn-danger position-absolute top-0 end-0";
         removeBtn.onclick = () => {
-            pendingFiles = pendingFiles.filter(f => f !== file);
+            // Удаляем файл из массива
+            const index = pendingFiles.findIndex(f => f === file);
+            if (index !== -1) {
+                pendingFiles.splice(index, 1);
+            }
             wrapper.remove();
-            console.log('Удалён файл:', file.name);
         };
 
         wrapper.appendChild(img);
@@ -318,24 +401,51 @@
     }
 
     /* ================================
-       🗑 Удаление существующих
+       🗑 Удаление существующих медиа
     ================================ */
-    async function deleteExistingMedia(mediaId, button) {
-        if (confirm('Удалить фото?')) {
-            const deleteMediaResponse = await fetch(`/market/items/delete-media/${itemId}/${mediaId}`, {
-                method: "DELETE",
-                headers: {
-                    [csrfHeader]: csrfToken
-                },
-            });
+    window.removeExistingMedia = function(mediaId, button) {
+        if (!confirm('Удалить фото?')) return;
 
-            if(deleteMediaResponse.ok){
-                button.closest('.position-relative').remove();
-            }
-            else{
-                alert("Ошибка удаления");
+        // Добавляем ID в список удаленных
+        if (!removedMediaIds.includes(mediaId)) {
+            removedMediaIds.push(mediaId);
+        }
+
+        // Помечаем элемент как удаленный
+        const wrapper = button.closest('.preview-wrapper');
+        if (wrapper) {
+            wrapper.classList.add('removed');
+            button.disabled = true;
+            button.innerHTML = '✓';
+        }
+
+        console.log('Marked for removal:', mediaId);
+    };
+
+    async function deleteMarkedMediaSequentially() {
+        console.log('Deleting media sequentially:', removedMediaIds);
+
+        for (const mediaId of removedMediaIds) {
+            try {
+                const deleteResponse = await fetch(`/market/items/delete-media/${itemId}/${mediaId}`, {
+                    method: "DELETE",
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
+
+                if (!deleteResponse.ok) {
+                    const errorText = await deleteResponse.text();
+                    console.error(`Ошибка удаления медиа ${mediaId}:`, errorText);
+                } else {
+                    console.log(`Media ${mediaId} deleted successfully`);
+                }
+            } catch (error) {
+                console.error(`Error deleting media ${mediaId}:`, error);
             }
         }
+
+        removedMediaIds = [];
     }
 </script>
 </body>
