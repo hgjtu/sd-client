@@ -563,11 +563,8 @@
 
                 <!-- Кнопки -->
 <!--                <div class="post-actions" th:if="${#authentication != null and #authentication.name == group.organizerId}">-->
-                <div th:if="${#authentication != null}">
+                <div class="post-actions" th:if="${#authentication != null and #authentication.name == group.organizerInfo.username}">
                     <a th:href="@{'/jump-group/edit/' + ${group.id}}" class="btn-edit">✏️ Редактировать</a>
-                    <form th:action="@{'/jump-group/delete/' + ${group.id}}" method="post" style="display:inline;">
-                        <button type="submit" class="btn-delete">🗑️ Удалить</button>
-                    </form>
                 </div>
 
             </div>
