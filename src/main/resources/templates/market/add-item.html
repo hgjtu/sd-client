@@ -144,7 +144,12 @@
     const MAX_FILES = 10;
     let pendingFiles = [];
 
-    let itemId = [[${item != null ? item.id : null}]];
+    let itemId = "[[${item != null ? item.id : ''}]]";
+    if (itemId) {
+        itemId = parseInt(itemId);
+    } else {
+        itemId = null;
+    }
 
     /* ================================
        📸 Выбор файлов

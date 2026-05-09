@@ -66,7 +66,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler((request, response, authentication) -> {
-                            String serverLogoutUrl = "http://" + (homeServerIp.equals("localhost") ? "localhost" : "auth-server") + ":9090/oauth2/logout"
+                            String serverLogoutUrl = "http://" + homeServerIp + ":9090/oauth2/logout"
                                     + "?post_logout_redirect_uri="
                                     + URLEncoder.encode("http://"  + (homeServerIp.equals("localhost") ? "localhost" : "client") +  ":5050/", StandardCharsets.UTF_8);
 
