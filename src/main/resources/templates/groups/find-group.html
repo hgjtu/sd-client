@@ -202,6 +202,25 @@
 
 <div th:replace="fragments/footer :: site-footer"></div>
 
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Используем th:inline="javascript" для корректной сериализации
+        const trainingLevels = /*[[${trainingLevels}]]*/ [];
+
+        // Преобразуем список объектов в удобный формат
+        const levelsMap = {};
+        if (trainingLevels && Array.isArray(trainingLevels)) {
+            trainingLevels.forEach(level => {
+                levelsMap[level.id] = level.levelName;
+            });
+        }
+
+        // Сохраняем в localStorage
+        localStorage.setItem('trainingLevels', JSON.stringify(levelsMap));
+        console.log('Training levels saved:', levelsMap);
+    });
+</script>
+
 <script>
     const input = document.getElementById('placeInput');
     const container = document.getElementById('placesContainer');

@@ -519,7 +519,7 @@
                     👤 Организатор:
                     <strong th:text="${group.organizerInfo.username}">user</strong><br>
                     🎯 Уровень подготовки:
-                    <strong th:text="${group.trainingLevel}"></strong><br>
+                    <strong id="trainingLevelDisplay"></strong><br>
                     👥 Участников:
                     <strong th:text="${#lists.size(group.participants)}"></strong>
                     /
@@ -607,6 +607,23 @@
 
 <!-- footer -->
 <div th:replace="fragments/footer :: site-footer"></div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Получаем trainingLevelId из модели
+        const trainingLevelId = /*[[${group.trainingLevel}]]*/ null;
+
+        // Загружаем сохраненные уровни
+        const levelsMap = JSON.parse(localStorage.getItem('trainingLevels')) || {};
+
+        // Отображаем название уровня
+        const displayElement = document.getElementById('trainingLevelDisplay');
+        if (displayElement) {
+            const levelName = levelsMap[trainingLevelId] || 'Неизвестный уровень';
+            displayElement.textContent = levelName;
+        }
+    });
+</script>
 
 <!-- ================= JS ================= -->
 <script>
