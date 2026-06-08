@@ -639,6 +639,12 @@
             const currentUserId = block.dataset.currentUserId;
             const organizerId = block.dataset.organizerId;
 
+            const userNames = {
+                1: 'admin',
+                2: 'hgjtu',
+                3: 'user123'
+            };
+
             const raw = Array.from(block.querySelectorAll('.raw-comment')).map(rc => ({
                 id: rc.dataset.id,
                 userId: rc.dataset.userId,
@@ -647,7 +653,7 @@
                 likes: rc.dataset.likes || 0,
                 created: rc.dataset.created,
                 isParticipant: rc.dataset.isParticipant === 'true',
-                username: rc.dataset.username || `Пользователь #${rc.dataset.userId}`
+                username: `${userNames[rc.dataset.userId]}`
             }));
 
             const rendered = block.querySelector('.comments-rendered');

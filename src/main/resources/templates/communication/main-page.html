@@ -315,7 +315,7 @@
                 node.innerHTML = `
             <div class="comment-header">
                 <div>
-                    <div class="comment-author">Пользователь #${data.userId}</div>
+                    <div class="comment-author">${data.userId === 1 ? 'admin' : data.userId === 2 ? 'hgjtu' : data.userId === 3 ? 'user123' : `Пользователь #${data.userId}`}</div>
                     <div class="comment-meta">${data.created} · <span class="likes">❤️ ${data.likes}</span></div>
                 </div>
                 <div></div>
