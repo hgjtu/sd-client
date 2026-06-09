@@ -341,6 +341,30 @@
             transform: scale(1.05);
         }
 
+        .partner-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #b2c5d3 0%, #6ab7cf 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(173, 207, 220, 0.46);
+        }
+
+        .partner-badge img {
+            height: 20px;
+            width: auto;
+            border-radius: 3px;
+        }
+
+        .partner-badge span {
+            letter-spacing: 0.3px;
+        }
+
 
         @media(max-width:768px){
             .post {
@@ -387,6 +411,12 @@
 
         <!-- Информация о товаре -->
         <div class="col-12 col-md-6">
+            <div th:if="${item.authorInfo.username == 'altimeter'}" class="partner-badge">
+                <img th:src="@{/images/logotype.jpg}" alt="Partner Logo"
+                     onerror="this.style.display='none'">
+                <span>товар от партнера</span>
+            </div>
+
             <h2 th:text="${item.title}">Название товара</h2>
             <p class="text-muted mb-1" th:text="'Цена: ' + ${item.price} + ' ₽'">Цена</p>
             <p class="text-muted mb-1" th:text="'Локация: ' + ${item.location}">Локация</p>

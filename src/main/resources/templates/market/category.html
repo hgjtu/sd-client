@@ -117,26 +117,37 @@
                  th:data-id="${item.id}"
                  th:data-mode="${mode}">
 
-                <img class="item-img"
-                     th:src="${item.mainImageUrl != null} ? ${item.mainImageUrl} : '/default-item.png'"
-                     th:onerror="this.onerror=null; this.src='/default-item.png'"
-                     th:alt="${item.title}">
+                <!-- Обертка для картинки -->
+                <div class="item-img-wrapper">
+
+                    <!-- Основная картинка -->
+                    <img class="item-img"
+                         th:src="${item.mainImageUrl != null} ? ${item.mainImageUrl} : '/default-item.png'"
+                         th:onerror="this.onerror=null; this.src='/default-item.png'"
+                         th:alt="${item.title}">
+
+                    <!-- Логотип поверх картинки -->
+                    <img th:if="${#strings.length(item.title) >= 18}"
+                         class="partner-logo-corner"
+                         th:src="@{/images/logotype.jpg}"
+                         alt="Partner"
+                         onerror="this.style.display='none'">
+                </div>
 
                 <div class="card-body">
-
                     <h5 class="card-title mb-2"
                         th:text="${item.title}">
                         Название товара
                     </h5>
-
                     <p class="price-text mb-0"
                        th:text="${item.price} + ' ₽'">
                         Цена
                     </p>
-
                 </div>
 
             </div>
+
+        </div>
 
         </div>
 
